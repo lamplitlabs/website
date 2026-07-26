@@ -75,8 +75,8 @@ export default function Home() {
       />
       <HeroSection />
       <WhyLamplitSection />
-      <JourneySection />
       <ProductsSection />
+      <JourneySection />
       <AboutSection />
       <ContactSection />
       <Footer />

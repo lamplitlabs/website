@@ -8,6 +8,7 @@ import { ContactSection } from "@/components/home/contact-section";
 import { Footer } from "@/components/home/footer";
 import { Header } from "@/components/home/header";
 import { HeroSection } from "@/components/home/hero-section";
+import { JourneySection } from "@/components/home/journey-section";
 import { ProductsSection } from "@/components/home/products-section";
 import { WhyLamplitSection } from "@/components/home/why-lamplit-section";
 
@@ -37,7 +38,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const sectionIds = ["products", "about", "contact", "our-story"];
+    const sectionIds = ["products", "about", "contact", "our-story", "journey"];
     const observers: IntersectionObserver[] = [];
 
     for (const id of sectionIds) {
@@ -74,6 +75,7 @@ export default function Home() {
       />
       <HeroSection />
       <WhyLamplitSection />
+      <JourneySection />
       <ProductsSection />
       <AboutSection />
       <ContactSection />

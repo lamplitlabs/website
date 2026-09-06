@@ -5,6 +5,9 @@ node_modules/
 .next/
 out/
 
+# Vercel CLI (created by `vercel pull` / `vercel build`)
+.vercel/
+
 # Environment
 .env
 .env.local

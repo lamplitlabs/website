@@ -58,6 +58,7 @@ components/     → UI components (product grid, hero globe, social bar, etc.)
 hooks/          → Custom React hooks
 lib/            → Utility functions
 public/         → Static assets (favicons, product cover SVGs, OG image)
+vercel.json     → Vercel routing config (explicit `/` → `/index` rewrite for the static export)
 .github/        → GitHub Actions workflows for CI and Vercel deployment
 ```
 
@@ -66,6 +67,8 @@ public/         → Static assets (favicons, product cover SVGs, OG image)
 Pushes to `main` automatically deploy to Vercel via the workflow in `.github/workflows/deploy-web-vercel.yml`.
 
 The canonical production endpoints are [lamplitlabs.com](https://lamplitlabs.com) and [www.lamplitlabs.com](https://www.lamplitlabs.com), both served by Vercel.
+
+Vercel's Next.js builder strips the `.html` extension from static-export pages (`out/index.html` is served as `/index`) and does not emit an explicit route for `/`. `vercel.json` adds that rewrite so the homepage never depends on implicit directory-index resolution. Keep it in place when changing routing.
 
 ## Connect
 

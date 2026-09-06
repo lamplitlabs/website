@@ -28,7 +28,7 @@ npm run clean        # Remove .next and out directories
 ## Project Facts
 
 - **Project:** Lamplit Labs corporate website
-- **Tech Stack:** Next.js 14 (static export), TypeScript, Tailwind CSS, shadcn/ui
+- **Tech Stack:** Next.js 15 (static export), TypeScript, Tailwind CSS, shadcn/ui
 - **Deployment:** Vercel (auto-deploy on main branch push)
 - **Product Code:** `app/`, `components/`, `hooks/`, `lib/`, `public/`
 - **Configuration:** `next.config.js`, `tailwind.config.ts`, `tsconfig.json`
@@ -36,7 +36,7 @@ npm run clean        # Remove .next and out directories
 
 ## Key Conventions
 
-- **Page structure:** Use Next.js 14 app directory with React Server Components by default.
+- **Page structure:** Use Next.js 15 app directory with React Server Components by default.
 - **UI components:** Extend shadcn/ui patterns; check existing components before creating new ones.
 - **Styling:** Tailwind CSS utility classes with `class-variance-authority` for component variants.
 - **Dark mode:** Supported via `next-themes`; preserve theme switching.

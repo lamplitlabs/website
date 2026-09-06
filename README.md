@@ -22,7 +22,7 @@ Each product lives in its own repository and is deployed independently.
 
 ## Tech Stack
 
-- [Next.js 14](https://nextjs.org/) — static export (`output: "export"`)
+- [Next.js 15](https://nextjs.org/) — static export (`output: "export"`)
 - [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) patterns
 - [TypeScript](https://www.typescriptlang.org/)
 - Deployed to [Vercel](https://vercel.com/)

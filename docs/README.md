@@ -35,7 +35,7 @@ workflows/       Repeatable engineering procedures
 ## Repository Context
 
 - **Purpose:** Lamplit Labs corporate website (static export)
-- **Tech Stack:** Next.js 14, TypeScript, Tailwind CSS, shadcn/ui, Vercel
+- **Tech Stack:** Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, Vercel
 - **Product Code:** `app/`, `components/`, `hooks/`, `lib/`, `public/`
 - **Real Commands:**
   - `npm run dev` — local development

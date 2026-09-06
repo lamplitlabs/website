@@ -108,6 +108,11 @@ See `.github/workflows/ci.yml` and `.github/workflows/deploy-web-vercel.yml` for
 | class-variance-authority | 0.7.1 | Component variants | Type-safe CSS classes |
 | next-themes | 0.4.4 | Dark mode | Light/dark theme toggle |
 | lucide-react | 0.469.0 | Icon library | Consistent icon set |
+| vercel (`tools/vercel-cli`) | 59.11.7 | Deploy CLI used by the deploy workflow | Exact pin; not a site dependency |
+
+### Dependency Security
+
+Both `package.json` and `tools/vercel-cli/package.json` carry an npm `overrides` block that patches transitive packages pinned by `next`/`vercel` (e.g. `postcss`, `undici`, `minimatch`). Keep them when bumping the parents, and re-run `npm audit` in both directories — see `docs/memory/2026-09-06-dependabot-transitive-overrides.md`.
 
 ## Known Limitations & Constraints
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, ExternalLink } from "lucide-react";
 import { OutboundLink } from "@/components/outbound-link";
@@ -7,17 +8,20 @@ import { Logo } from "@/components/logo";
 import { getProductBySlug, products } from "@/lib/site-data";
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
 }
 
-export function generateMetadata({ params }: ProductPageProps): Metadata {
-  const product = getProductBySlug(params.slug);
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
   if (!product) {
     return {
@@ -88,8 +92,9 @@ function ProductJsonLd({ slug }: { slug: string }) {
   );
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
   if (!product) {
     notFound();
@@ -99,19 +104,19 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   return (
     <>
-      <ProductJsonLd slug={params.slug} />
+      <ProductJsonLd slug={slug} />
 
       {/* ── Minimal nav bar ──────────────────────────────── */}
       <nav className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <a
+          <Link
             href="/"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             <Logo className="h-6 w-6" />
             <span className="hidden sm:inline">Lamplit Labs</span>
-          </a>
+          </Link>
           <OutboundLink
             href={product.url}
             target="_blank"
@@ -191,7 +196,7 @@ export default function ProductPage({ params }: ProductPageProps) {
               </OutboundLink>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <a href="/">View all products</a>
+              <Link href="/">View all products</Link>
             </Button>
           </div>
         </div>
@@ -288,13 +293,13 @@ export default function ProductPage({ params }: ProductPageProps) {
       {/* ── Footer ───────────────────────────────────────── */}
       <footer className="border-t">
         <div className="mx-auto max-w-5xl px-4 py-8 text-center text-sm text-muted-foreground">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-2 transition-colors hover:text-foreground"
           >
             <Logo className="h-5 w-5" />
             Lamplit Labs
-          </a>
+          </Link>
           <p className="mt-2">
             &copy; {new Date().getFullYear()} Lamplit Labs. All rights reserved.
           </p>

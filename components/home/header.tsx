@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { LampToggle } from "@/components/lamp-toggle";
 import { Logo } from "@/components/logo";
@@ -31,13 +32,13 @@ export function Header({
       }`}
     >
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between overflow-visible px-4">
-        <a
+        <Link
           href="/"
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
         >
           <Logo className="h-8 w-8" lit={theme !== "dark"} />
           <span className="text-lg font-semibold tracking-tight">Lamplit Labs</span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => {

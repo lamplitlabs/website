@@ -3,15 +3,15 @@
 ## Core Framework & Language
 
 - **Node.js:** 20+ (see `.nvmrc` for exact version)
-- **Runtime:** Next.js 14.2.21 with static export (`output: "export"` in `next.config.js`)
+- **Runtime:** Next.js 15.5.25 with static export (`output: "export"` in `next.config.js`)
 - **Language:** TypeScript 5.6.3 (strict mode)
 - **Package Manager:** npm (lock file tracked)
 
 ## Frontend Stack
 
 ### UI Framework & Styling
-- **React:** 18.3.1
-- **Next.js:** 14.2.21 (App Router, React Server Components by default)
+- **React:** 19.2.8
+- **Next.js:** 15.5.25 (App Router, React Server Components by default)
 - **Tailwind CSS:** 3.4.17 + tailwindcss-animate
 - **Component Library:** shadcn/ui patterns (using `@radix-ui/react-slot`, `clsx`, `class-variance-authority`, `tailwind-merge`)
 - **Icons:** lucide-react 0.469.0
@@ -31,7 +31,7 @@
 - **Build Tool:** Next.js built-in
 - **Output:** Static HTML export to `./out/`
 - **Deployment:** Vercel (via `.github/workflows/deploy-web-vercel.yml`)
-- **CSS Processing:** PostCSS 8.4.49 + Autoprefixer 10.4.20
+- **CSS Processing:** PostCSS 8.5.x (pinned to patched 8.5.23+ range) + Autoprefixer 10.4.20
 
 ## Development Environment Setup
 
@@ -58,7 +58,7 @@ npm run clean
 ## Project Structure
 
 ```
-app/              Next.js 14 app directory (pages, layout, global styles)
+app/              Next.js 15 app directory (pages, layout, global styles)
 components/       Reusable UI components (Sections, Cards, Hero, etc.)
 hooks/            Custom React hooks (useTheme, useScroll, etc.)
 lib/              Utility functions and helpers
@@ -100,14 +100,19 @@ See `.github/workflows/ci.yml` and `.github/workflows/deploy-web-vercel.yml` for
 
 | Package | Version | Purpose | Notes |
 |---------|---------|---------|-------|
-| next | 14.2.21 | Web framework | Static export with App Router |
-| react | 18.3.1 | UI library | Server & client components |
+| next | 15.5.25 | Web framework | Static export with App Router |
+| react | 19.2.8 | UI library | Server & client components |
 | typescript | 5.6.3 | Type safety | Strict mode |
 | tailwindcss | 3.4.17 | Styling | Utility-first CSS |
 | @radix-ui/react-slot | 1.1.1 | UI primitives | Composition pattern |
 | class-variance-authority | 0.7.1 | Component variants | Type-safe CSS classes |
 | next-themes | 0.4.4 | Dark mode | Light/dark theme toggle |
 | lucide-react | 0.469.0 | Icon library | Consistent icon set |
+| vercel (`tools/vercel-cli`) | 59.11.7 | Deploy CLI used by the deploy workflow | Exact pin; not a site dependency |
+
+### Dependency Security
+
+Both `package.json` and `tools/vercel-cli/package.json` carry an npm `overrides` block that patches transitive packages pinned by `next`/`vercel` (e.g. `postcss`, `undici`, `minimatch`). Keep them when bumping the parents, and re-run `npm audit` in both directories — see `docs/memory/2026-09-06-dependabot-transitive-overrides.md`.
 
 ## Known Limitations & Constraints
 

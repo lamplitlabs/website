@@ -85,6 +85,6 @@ npm run build         # ✓ succeeds
 
 ## Related Resources
 
-- **Rollback Workflow:** [`docs/workflows/rollback.md`](../../docs/workflows/rollback.md)
-- **Work Plan Template:** [`docs/plans/_template.md`](../../docs/plans/_template.md)
-- **PULSE Agent Guide:** [`AGENTS.md`](../../AGENTS.md) — see Rollback Planning & Agent-Driven Recovery
+- **Rollback Workflow:** [`docs/workflows/rollback.md`](../../workflows/rollback.md)
+- **Work Plan Template:** [`docs/plans/_template.md`](../../plans/_template.md)
+- **PULSE Agent Guide:** [`AGENTS.md`](../../../AGENTS.md) — see Rollback Planning & Agent-Driven Recovery

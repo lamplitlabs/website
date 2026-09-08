@@ -115,6 +115,9 @@ function ProductCard({
       <div className="flex items-center justify-between border-t border-border/40 bg-card px-4 py-3">
         <OutboundLink
           href={product.url}
+          aria-label={`${
+            isInDevelopment ? "Follow development" : "Visit site"
+          }: ${product.name}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -126,6 +129,9 @@ function ProductCard({
         </OutboundLink>
         <a
           href={`/products/${product.slug}`}
+          aria-label={`${
+            isInDevelopment ? "Explore product" : "Learn more"
+          }: ${product.name}`}
           className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           {isInDevelopment ? "Explore product" : "Learn more"} &rarr;

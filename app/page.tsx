@@ -31,6 +31,20 @@ export default function Home() {
   }, [mobileMenuOpen]);
 
   useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const closeMobileMenuOnDesktop = () => {
+      if (desktopQuery.matches) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    desktopQuery.addEventListener("change", closeMobileMenuOnDesktop);
+    closeMobileMenuOnDesktop();
+    return () =>
+      desktopQuery.removeEventListener("change", closeMobileMenuOnDesktop);
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();

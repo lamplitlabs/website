@@ -111,6 +111,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
           <Link
             href="/"
+            aria-label="Back to Lamplit Labs home"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />

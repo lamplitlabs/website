@@ -87,12 +87,14 @@ export default function Home() {
         theme={theme}
         setTheme={setTheme}
       />
-      <HeroSection />
-      <WhyLamplitSection />
-      <ProductsSection />
-      <JourneySection />
-      <AboutSection />
-      <ContactSection />
+      <main>
+        <HeroSection />
+        <WhyLamplitSection />
+        <ProductsSection />
+        <JourneySection />
+        <AboutSection />
+        <ContactSection />
+      </main>
       <Footer />
       <EasterEggs />
     </div>

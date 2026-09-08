@@ -12,15 +12,17 @@
 
 | Product | Purpose | Technology | Status |
 |---------|---------|-----------|--------|
-| **Amistio** | Governance-first enterprise agent platform | Next.js | In development |
+| **Amistio** | Visual AI agent builder with app connectors and approval gates | Next.js | Live |
 | **Kenntnistrainer** | KI-gestützte medical exam prep (Germany) | Next.js | Live |
-| **Fachsprachprüfung** | FSP simulation & training (Germany) | Next.js | Coming soon |
+| **Fachsprachprüfung** | FSP simulation & training (Germany) | Next.js | Live |
 | **Leben in Deutschland** | German citizenship test prep (310 questions) | Next.js | Live |
 | **Resume Builder** | ATS-optimized resume creation | Next.js | Live |
 | **Developer Tools** | JSON formatter, Base64, UUID, etc. | Next.js | Live |
 | **EDMX Tools** | Tools for EDMX/OData metadata files | Next.js | Live |
+| **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams | Not recorded | Live |
+| **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services | Not recorded | Live |
 
-Each product lives in its own repository and deploys independently.
+Product descriptions and availability follow the website catalog in [`lib/site-data.ts`](../../lib/site-data.ts). Each product lives in its own repository and deploys independently; technologies not documented here are marked "Not recorded".
 
 ## Users & Goals
 

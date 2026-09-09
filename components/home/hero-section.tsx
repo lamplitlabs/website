@@ -43,6 +43,7 @@ export function HeroSection() {
         <div className="hero-entrance hero-entrance-5 mt-16 animate-bounce">
           <a
             href="#our-story"
+            aria-label="Read our story"
             className="inline-block text-muted-foreground/50 transition-colors hover:text-muted-foreground"
           >
             <ArrowDown className="h-6 w-6" />

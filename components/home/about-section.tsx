@@ -15,7 +15,7 @@ const aboutItems = [
   {
     icon: Globe,
     title: "Germany and beyond",
-    desc: "From enterprise agent governance to medical prep, citizenship, and developer tools - built locally, used globally.",
+    desc: "From visual AI agents to medical prep, citizenship, and developer tools - built locally, used globally.",
   },
   {
     icon: Heart,
@@ -31,7 +31,7 @@ export function AboutSection() {
         <RevealSection className="mb-14 text-center">
           <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">About Us</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Lamplit Labs builds Amistio for governed enterprise agents alongside
+            Lamplit Labs builds the visual AI agent builder Amistio alongside
             practical tools for education, careers, developer workflows, and
             compliance.
           </p>

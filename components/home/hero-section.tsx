@@ -15,7 +15,7 @@ export function HeroSection() {
         </h1>
 
         <p className="hero-entrance hero-entrance-3 mx-auto mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
-          From enterprise agent governance with Amistio to medical exam prep,
+          From the visual AI agent builder Amistio to medical exam prep,
           citizenship tools, career resources, developer utilities, and
           compliance &mdash; we build practical software that makes a real
           difference.

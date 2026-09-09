@@ -48,6 +48,7 @@ export function Header({
               <a
                 key={link.label}
                 href={link.href}
+                aria-current={isActive ? "location" : undefined}
                 {...(link.external
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}

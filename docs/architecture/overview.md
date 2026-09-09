@@ -40,7 +40,7 @@ A static, fast-loading corporate website showcasing Lamplit Labs and its product
 
 - **app/layout.tsx** — Root layout with theme provider, header, footer
 - **app/page.tsx** — Home page with all sections (hero, products, about, journey, contact)
-- **app/products/[slug]/page.tsx** — Dynamic product detail page (if implemented)
+- **app/products/[slug]/page.tsx** — Statically generated product detail pages; `generateStaticParams` maps each product in [`lib/site-data.ts`](../../lib/site-data.ts) to its route.
 
 Features:
 - React Server Components by default (RSC)

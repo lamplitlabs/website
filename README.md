@@ -4,21 +4,24 @@ The official website for [Lamplit Labs](https://www.lamplitlabs.com) — a techn
 
 Formerly known as Bites In Byte.
 
-From enterprise agent governance with Amistio to medical exam prep, citizenship tools, career resources, and developer utilities — small, practical software packed into every byte.
+From visual AI agents with Amistio and sovereign small-model AI with Lamplit Light to medical exam prep, citizenship tools, career resources, developer utilities, and Azure resources — small, practical software packed into every byte.
 
 ## Products
 
 | Product | Description | URL |
 |---------|-------------|-----|
-| **Amistio** | Governance-first enterprise agent platform (`BusinessApplication`) — **In development** | [amistio.com](https://www.amistio.com) |
+| **Amistio** | Visual AI agent builder with app connectors, versioned releases, and approval gates (`BusinessApplication`) — **Live** | [amistio.com](https://www.amistio.com) |
+| **Lamplit Light** | Sovereign AI lab — small, specialised models you host yourself, exported for transformers.js (browser, laptop, on-prem, private cloud, app, edge) — **In development** | [ai.lamplitlabs.com](https://ai.lamplitlabs.com) |
 | **Kenntnistrainer** | KI-gestützte Kenntnisprüfung simulation & training for foreign doctors in Germany | [kenntnistrainer.de](https://www.kenntnistrainer.de) |
-| **Fachsprachprüfung** | KI-gestützte FSP simulation & training for foreign doctors in Germany _(coming soon)_ | — |
+| **Fachsprachprüfung** | KI-gestützte FSP simulation & training for foreign doctors in Germany | [fachsprachtrainer.de](https://www.fachsprachtrainer.de) |
 | **Leben in Deutschland** | German citizenship test (Einbürgerungstest) prep with 310 questions | [lebenindeutschland.org](https://www.lebenindeutschland.org) |
 | **Resume Builder** | ATS-optimized resume builder | [resume.lamplitlabs.com](https://resume.lamplitlabs.com) |
 | **Developer Tools** | Everyday developer utilities — JSON formatter, Base64, UUID, and more | [tools.lamplitlabs.com](https://tools.lamplitlabs.com) |
 | **EDMX Tools** | Tools for EDMX/OData metadata files | [edmx.lamplitlabs.com](https://edmx.lamplitlabs.com) |
+| **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams | [azure-assets.lamplitlabs.com](https://azure-assets.lamplitlabs.com) |
+| **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services | [azure-compliance.lamplitlabs.com](https://azure-compliance.lamplitlabs.com) |
 
-Each product lives in its own repository and is deployed independently.
+Product descriptions, availability, and URLs follow the website catalog in [`lib/site-data.ts`](lib/site-data.ts). Each product lives in its own repository and is deployed independently.
 
 ## Tech Stack
 
@@ -78,6 +81,7 @@ Vercel's Next.js builder strips the `.html` extension from static-export pages (
 - [Blog](https://blogs.lamplitlabs.com)
 - [X](https://x.com/lamplitlabs)
 - [LinkedIn](https://www.linkedin.com/company/lamplitlabs)
+- [Hugging Face](https://huggingface.co/lamplitlabs)
 
 ## License
 

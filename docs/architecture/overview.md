@@ -24,8 +24,8 @@ A static, fast-loading corporate website showcasing Lamplit Labs and its product
     │                                    │
     │  • Layout & Theme                  │
     │  • Product grid & details          │
-    │  • Hero, about, journey sections   │
-    │  • Contact & social links          │
+    │  • Hero, why, AI sections          │
+    │  • About, journey, contact links   │
     └────────────────────────────────────┘
                  │
         ┌────────┴─────────┐
@@ -39,8 +39,8 @@ A static, fast-loading corporate website showcasing Lamplit Labs and its product
 ### 1. Pages & Routing (app/)
 
 - **app/layout.tsx** — Root layout with theme provider, header, footer
-- **app/page.tsx** — Home page with all sections (hero, products, about, journey, contact)
-- **app/products/[slug]/page.tsx** — Dynamic product detail page (if implemented)
+- **app/page.tsx** — Home page with all sections (hero, why Lamplit, AI, products, about, journey, contact)
+- **app/products/[slug]/page.tsx** — Statically generated product detail pages; `generateStaticParams` maps each product in [`lib/site-data.ts`](../../lib/site-data.ts) to its route.
 
 Features:
 - React Server Components by default (RSC)
@@ -58,11 +58,12 @@ Reusable UI building blocks organized by concern:
 
 #### Section Components (home/)
 - **HeroSection** — Main value proposition
-- **ProductsSection** — Grid of products with links
-- **AboutSection** — Company story and mission
-- **ContactSection** — Contact information and forms
 - **WhyLamplitSection** — Key differentiators
+- **AiSection** — Lamplit Light AI lab story (`components/home/ai-section.tsx`, `id="ai"`)
+- **ProductsSection** — Grid of products with category filter chips and links
+- **AboutSection** — Company story and mission
 - **JourneySection** — Timeline or history
+- **ContactSection** — Contact information and forms
 - **EasterEggs** — Interactive elements
 
 #### Common Patterns
@@ -104,10 +105,12 @@ Pure utility functions:
 │  │
 │  └─ Renders Sections:
 │      ├─ HeroSection
-│      ├─ ProductsSection (maps products array)
+│      ├─ WhyLamplitSection
+│      ├─ AiSection (`id="ai"`)
+│      ├─ ProductsSection (maps products array; filters by Product.category)
 │      ├─ AboutSection
-│      ├─ ContactSection
-│      └─ JourneySection
+│      ├─ JourneySection
+│      └─ ContactSection
 │
 └─ Static Output → ./out/ → Vercel CDN → Browser
 ```
@@ -128,12 +131,13 @@ Layout
 │  └─ Theme Toggle Button
 ├─ Main Content
 │  ├─ HeroSection
+│  ├─ WhyLamplitSection
+│  ├─ AiSection
 │  ├─ ProductsSection
 │  │  └─ ProductCard (repeated)
 │  ├─ AboutSection
-│  ├─ ContactSection
-│  ├─ WhyLamplitSection
 │  ├─ JourneySection
+│  ├─ ContactSection
 │  └─ EasterEggs
 └─ Footer
    ├─ Social Links

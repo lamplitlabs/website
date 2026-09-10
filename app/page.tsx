@@ -8,6 +8,7 @@ import { ContactSection } from "@/components/home/contact-section";
 import { Footer } from "@/components/home/footer";
 import { Header } from "@/components/home/header";
 import { HeroSection } from "@/components/home/hero-section";
+import { AiSection } from "@/components/home/ai-section";
 import { JourneySection } from "@/components/home/journey-section";
 import { ProductsSection } from "@/components/home/products-section";
 import { WhyLamplitSection } from "@/components/home/why-lamplit-section";
@@ -31,6 +32,20 @@ export default function Home() {
   }, [mobileMenuOpen]);
 
   useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const closeMobileMenuOnDesktop = () => {
+      if (desktopQuery.matches) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    desktopQuery.addEventListener("change", closeMobileMenuOnDesktop);
+    closeMobileMenuOnDesktop();
+    return () =>
+      desktopQuery.removeEventListener("change", closeMobileMenuOnDesktop);
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -38,7 +53,14 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const sectionIds = ["products", "about", "contact", "our-story", "journey"];
+    const sectionIds = [
+      "products",
+      "ai",
+      "about",
+      "contact",
+      "our-story",
+      "journey",
+    ];
     const observers: IntersectionObserver[] = [];
 
     for (const id of sectionIds) {
@@ -73,12 +95,15 @@ export default function Home() {
         theme={theme}
         setTheme={setTheme}
       />
-      <HeroSection />
-      <WhyLamplitSection />
-      <ProductsSection />
-      <JourneySection />
-      <AboutSection />
-      <ContactSection />
+      <main>
+        <HeroSection />
+        <WhyLamplitSection />
+        <AiSection />
+        <ProductsSection />
+        <JourneySection />
+        <AboutSection />
+        <ContactSection />
+      </main>
       <Footer />
       <EasterEggs />
     </div>

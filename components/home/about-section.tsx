@@ -15,7 +15,7 @@ const aboutItems = [
   {
     icon: Globe,
     title: "Germany and beyond",
-    desc: "From enterprise agent governance to medical prep, citizenship, and developer tools - built locally, used globally.",
+    desc: "From visual AI agents and self-hosted models to medical prep, citizenship, and developer tools - built locally, used globally.",
   },
   {
     icon: Heart,
@@ -26,14 +26,17 @@ const aboutItems = [
 
 export function AboutSection() {
   return (
-    <section id="about" className="border-t">
+    <section id="about" className="lab-grid border-t">
       <div className="mx-auto max-w-5xl px-4 py-24">
         <RevealSection className="mb-14 text-center">
-          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">About Us</h2>
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary">
+            About Us
+          </div>
+          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Who we are</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Lamplit Labs builds Amistio for governed enterprise agents alongside
-            practical tools for education, careers, developer workflows, and
-            compliance.
+            Lamplit Labs builds the visual AI agent builder Amistio and the
+            sovereign-AI lab Lamplit Light alongside practical tools for
+            education, careers, developer workflows, and compliance.
           </p>
         </RevealSection>
 
@@ -42,10 +45,10 @@ export function AboutSection() {
             {aboutItems.map((item) => (
               <div
                 key={item.title}
-                className="group rounded-xl border bg-card p-6 transition-all duration-300 hover:border-foreground/10 hover:shadow-md"
+                className="glass glass-lift group rounded-2xl p-6"
               >
-                <div className="mb-4 inline-flex rounded-lg bg-muted p-2.5 transition-colors group-hover:bg-foreground/10">
-                  <item.icon className="h-5 w-5 text-foreground/70" />
+                <div className="mb-4 inline-flex rounded-lg bg-muted p-2.5 transition-colors group-hover:bg-primary/10">
+                  <item.icon className="h-5 w-5 text-foreground/70 transition-colors group-hover:text-primary" />
                 </div>
                 <h3 className="font-semibold">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

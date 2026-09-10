@@ -4,13 +4,14 @@ The official website for [Lamplit Labs](https://www.lamplitlabs.com) — a techn
 
 Formerly known as Bites In Byte.
 
-From visual AI agents with Amistio to medical exam prep, citizenship tools, career resources, developer utilities, and Azure resources — small, practical software packed into every byte.
+From visual AI agents with Amistio and sovereign small-model AI with Lamplit Light to medical exam prep, citizenship tools, career resources, developer utilities, and Azure resources — small, practical software packed into every byte.
 
 ## Products
 
 | Product | Description | URL |
 |---------|-------------|-----|
 | **Amistio** | Visual AI agent builder with app connectors, versioned releases, and approval gates (`BusinessApplication`) — **Live** | [amistio.com](https://www.amistio.com) |
+| **Lamplit Light** | Sovereign AI lab — small, specialised models you host yourself, exported for transformers.js (browser, laptop, on-prem, private cloud, app, edge) — **In development** | [ai.lamplitlabs.com](https://ai.lamplitlabs.com) |
 | **Kenntnistrainer** | KI-gestützte Kenntnisprüfung simulation & training for foreign doctors in Germany | [kenntnistrainer.de](https://www.kenntnistrainer.de) |
 | **Fachsprachprüfung** | KI-gestützte FSP simulation & training for foreign doctors in Germany | [fachsprachtrainer.de](https://www.fachsprachtrainer.de) |
 | **Leben in Deutschland** | German citizenship test (Einbürgerungstest) prep with 310 questions | [lebenindeutschland.org](https://www.lebenindeutschland.org) |
@@ -80,6 +81,7 @@ Vercel's Next.js builder strips the `.html` extension from static-export pages (
 - [Blog](https://blogs.lamplitlabs.com)
 - [X](https://x.com/lamplitlabs)
 - [LinkedIn](https://www.linkedin.com/company/lamplitlabs)
+- [Hugging Face](https://huggingface.co/lamplitlabs)
 
 ## License
 

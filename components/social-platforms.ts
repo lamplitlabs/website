@@ -1,6 +1,6 @@
 import { BookOpen, Facebook, Instagram, Linkedin } from "lucide-react";
 import type { ComponentType } from "react";
-import { XIcon } from "@/components/icons";
+import { HuggingFaceIcon, XIcon } from "@/components/icons";
 import type { SocialLinks } from "@/lib/site-data";
 
 interface SocialPlatform {
@@ -15,4 +15,5 @@ export const socialPlatforms: SocialPlatform[] = [
   { key: "blog", label: "Blog", icon: BookOpen },
   { key: "x", label: "X", icon: XIcon },
   { key: "linkedin", label: "LinkedIn", icon: Linkedin },
+  { key: "huggingface", label: "Hugging Face", icon: HuggingFaceIcon },
 ];

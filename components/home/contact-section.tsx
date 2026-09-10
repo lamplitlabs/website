@@ -8,12 +8,17 @@ import { socialLinks } from "@/lib/site-data";
 export function ContactSection() {
   return (
     <section id="contact" className="border-t">
-      <div className="mx-auto max-w-3xl px-4 py-24 text-center">
-        <RevealSection>
-          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Get in Touch</h2>
+      <div className="mx-auto max-w-3xl px-4 py-24">
+        <RevealSection className="glass rounded-3xl px-6 py-14 text-center sm:px-12">
+          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            Get in Touch
+          </h2>
           <p className="mx-auto mt-6 max-w-lg text-lg text-muted-foreground">
             Have a question, suggestion, or want to collaborate? We&apos;d love to
             hear from you.
+          </p>
+          <p className="mono-label mx-auto mt-4 max-w-lg text-muted-foreground/70">
+            for products, partnerships and Lamplit Light pilots
           </p>
           <div className="mt-8">
             <Button size="lg" asChild>

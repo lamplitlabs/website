@@ -6,6 +6,7 @@ import {
   HeartHandshake,
   Lamp,
   Lightbulb,
+  Sparkles,
   Stethoscope,
 } from "lucide-react";
 import { OutboundLink } from "@/components/outbound-link";
@@ -50,13 +51,19 @@ const milestones: Milestone[] = [
     desc: "A new name to match where we're headed - a lab that shines a focused light on real problems.",
     icon: Lamp,
   },
+  {
+    year: "2026",
+    title: "Lamplit Light: our AI lab",
+    desc: "We start building small, specialised models you host yourself - beginning with a German tutor that runs entirely in the browser. AI that runs where you are.",
+    icon: Sparkles,
+  },
 ];
 
 const futurePillars = [
   {
     icon: FlaskConical,
-    title: "Model research",
-    desc: "Studying how AI models are developed, trained, and improved - and contributing what we learn.",
+    title: "Sovereign AI with Lamplit Light",
+    desc: "Small models you own and run yourself - distilled from large teachers, measured against release gates and an independent judge panel before they ship.",
   },
   {
     icon: HeartHandshake,
@@ -110,10 +117,10 @@ export function JourneySection() {
                         </div>
                       )}
 
-                      <div className="group rounded-xl border bg-card p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-md">
+                      <div className="glass glass-lift group rounded-2xl p-5">
                         <div className="flex items-center gap-3">
                           <span className="inline-flex rounded-lg bg-muted p-2.5 transition-colors group-hover:bg-primary/10">
-                            <milestone.icon className="h-4 w-4 text-foreground/70" />
+                            <milestone.icon className="h-4 w-4 text-foreground/70 transition-colors group-hover:text-primary" />
                           </span>
                           <div>
                             <p className="font-mono text-xs text-primary md:hidden">
@@ -160,24 +167,26 @@ export function JourneySection() {
             </span>
 
             <div className="pl-12 pt-16 md:mx-auto md:max-w-2xl md:pl-0">
-              <div className="rounded-xl border border-primary/25 bg-primary/5 p-6">
-                <p className="font-mono text-xs uppercase tracking-wider text-primary">
+              <div className="glass rounded-2xl border-primary/25 bg-primary/5 p-6">
+                <p className="mono-label text-primary">
                   What&apos;s next
                 </p>
                 <h3 className="mt-2 text-lg font-semibold">
                   A lab in the truest sense
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  As our name promises, we&apos;re going deeper: researching how
-                  models are built and improved, while shipping practical tools
-                  that put that knowledge to work for people.
+                  As our name promises, we&apos;re going deeper: with Lamplit Light
+                  we research how models are built, trained and measured - and
+                  ship that knowledge as models you can run where your data
+                  lives, alongside practical tools that put it to work for
+                  people.
                 </p>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {futurePillars.map((pillar) => (
                     <div
                       key={pillar.title}
-                      className="flex gap-3 rounded-lg border bg-background/60 p-4"
+                      className="glass glass-lift flex gap-3 rounded-xl bg-background/60 p-4"
                     >
                       <span className="inline-flex h-fit rounded-lg bg-primary/10 p-2">
                         <pillar.icon className="h-4 w-4 text-primary" />
@@ -205,6 +214,13 @@ export function JourneySection() {
                   >
                     Read the blog &rarr;
                   </OutboundLink>
+                  <span className="mx-2 text-muted-foreground/50">/</span>
+                  <a
+                    href="#ai"
+                    className="font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    Meet Lamplit Light &rarr;
+                  </a>
                 </p>
               </div>
             </div>

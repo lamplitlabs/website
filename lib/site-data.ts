@@ -5,6 +5,20 @@ export interface ProductHighlight {
 
 export type ProductStatus = "Live" | "In development";
 export type ProductCreativeWorkStatus = "Published" | "In development";
+export type ProductCategory =
+  | "AI"
+  | "Education"
+  | "Developer Tools"
+  | "Azure"
+  | "Career";
+
+export const productCategories: ProductCategory[] = [
+  "AI",
+  "Education",
+  "Developer Tools",
+  "Azure",
+  "Career",
+];
 
 export interface ProductSchema {
   name: string;
@@ -22,6 +36,7 @@ export interface Product {
   url: string;
   cover: string;
   tags: string[];
+  category: ProductCategory;
   highlights: ProductHighlight[];
   featured?: boolean;
   comingSoon?: boolean;
@@ -44,6 +59,7 @@ export interface SocialLinks {
   blog: string;
   x: string;
   linkedin: string;
+  huggingface: string;
 }
 
 export const socialLinks: SocialLinks = {
@@ -52,6 +68,7 @@ export const socialLinks: SocialLinks = {
   blog: "https://blogs.lamplitlabs.com",
   x: "https://x.com/lamplitlabs",
   linkedin: "https://www.linkedin.com/company/lamplitlabs",
+  huggingface: "https://huggingface.co/lamplitlabs",
 };
 
 export const products: Product[] = [
@@ -66,6 +83,7 @@ export const products: Product[] = [
     url: "https://www.amistio.com",
     cover: "/covers/amistio.svg",
     tags: ["AI Agents", "Visual Automation", "App Connectors"],
+    category: "AI",
     highlights: [
       {
         title: "Visual Agent Builder",
@@ -115,6 +133,66 @@ export const products: Product[] = [
     },
   },
   {
+    slug: "light",
+    name: "Lamplit Light",
+    title: "AI that runs where you are",
+    description:
+      "Small, specialised AI models you host yourself in the browser, on a laptop, on-prem, in your private cloud, inside your app, or on the edge. Your data never leaves.",
+    longDescription:
+      "Lamplit Light is Lamplit Labs' sovereign AI lab for distilling large teacher models into small, specialised student models for defined jobs. Each model is built from verified knowledge, distilled, trained, measured against deterministic offline release gates and an independent multi-model judge panel, then compressed into compact ONNX exports for self-hosted use. The first showcase is a German tutor for A2-B2 telc and Goethe preparation that plans sessions, drills, corrects, and explains in German or English entirely on the learner's own device. Every model ships under the light-<purpose>-<version> naming pattern.",
+    url: "https://ai.lamplitlabs.com",
+    cover: "/covers/light.svg",
+    tags: ["Sovereign AI", "Small Models", "On-device"],
+    category: "AI",
+    highlights: [
+      {
+        title: "Runs where you are",
+        description:
+          "Host compact models in a browser, on a laptop, on-prem, in a private cloud, inside your app, or on edge and IoT hardware.",
+      },
+      {
+        title: "Your weights, your rules",
+        description:
+          "Models are designed for self-hosting so your data stays where you run them and the exported weights are yours.",
+      },
+      {
+        title: "Distilled to measure",
+        description:
+          "Large teacher models are distilled into small, specialised student models for a clearly defined job.",
+      },
+      {
+        title: "Gated before release",
+        description:
+          "Every release is measured against deterministic offline gates and checked by an independent multi-model judge panel.",
+      },
+      {
+        title: "Try it in your browser",
+        description:
+          "The first showcase is an on-device German tutor for A2-B2 telc and Goethe exam preparation with no sign-up or cookies.",
+      },
+    ],
+    featured: true,
+    status: "In development",
+    metaTitle: "Lamplit Light - Small AI Models You Host Yourself",
+    metaDescription:
+      "Small, specialised AI models you host in browsers, apps, private clouds, laptops, on-prem, or at the edge. Your data never leaves.",
+    canonicalUrl: "https://ai.lamplitlabs.com",
+    schema: {
+      name: "Lamplit Light sovereign AI models",
+      applicationCategory: "BusinessApplication",
+      creativeWorkStatus: "In development",
+      featureList: [
+        "Self-hosted small AI models",
+        "Teacher-to-student model distillation",
+        "Verified knowledge training",
+        "Deterministic offline release gates",
+        "Independent multi-model judge panel",
+        "Compact ONNX q8 and q4 exports",
+        "Browser and edge runtime support",
+      ],
+    },
+  },
+  {
     slug: "kenntnistrainer",
     name: "Kenntnistrainer",
     title: "AI-powered Kenntnisprufung simulation and training",
@@ -125,6 +203,7 @@ export const products: Product[] = [
     url: "https://www.kenntnistrainer.de",
     cover: "/covers/kenntnistrainer.svg",
     tags: ["AI", "Medical", "Training"],
+    category: "Education",
     highlights: [
       { title: "7-Step Case Flow", description: "Structured exam simulation following the official Kenntnisprufung format step by step." },
       { title: "AI Feedback", description: "Get instant, detailed feedback on your responses powered by AI evaluation." },
@@ -144,6 +223,7 @@ export const products: Product[] = [
     url: "https://www.fachsprachtrainer.de",
     cover: "/covers/fsp.svg",
     tags: ["AI", "Medical", "Language"],
+    category: "Education",
     highlights: [
       { title: "Patient Conversation", description: "Practice realistic doctor-patient dialogues with AI-simulated patients." },
       { title: "Documentation Training", description: "Learn to write medical reports and referral letters in German." },
@@ -163,6 +243,7 @@ export const products: Product[] = [
     url: "https://www.lebenindeutschland.org",
     cover: "/covers/leben.svg",
     tags: ["Education", "Germany", "Integration"],
+    category: "Education",
     highlights: [
       { title: "310 Official Questions", description: "Complete coverage of all questions from the official question catalog." },
       { title: "Region-Specific Content", description: "Practice with questions specific to your Bundesland." },
@@ -182,6 +263,7 @@ export const products: Product[] = [
     url: "https://tools.lamplitlabs.com",
     cover: "/covers/tools.svg",
     tags: ["Developer Tools", "Utilities", "Web"],
+    category: "Developer Tools",
     highlights: [
       { title: "JSON Formatter", description: "Format, validate, and minify JSON with syntax highlighting." },
       { title: "Base64 Encoder/Decoder", description: "Encode and decode Base64 strings instantly." },
@@ -201,6 +283,7 @@ export const products: Product[] = [
     url: "https://resume.lamplitlabs.com",
     cover: "/covers/resume.svg",
     tags: ["Productivity", "Career"],
+    category: "Career",
     highlights: [
       { title: "ATS-Optimized", description: "Structured output that applicant tracking systems can parse correctly." },
       { title: "Professional Templates", description: "Clean, recruiter-friendly layouts you can customize." },
@@ -219,6 +302,7 @@ export const products: Product[] = [
     url: "https://edmx.lamplitlabs.com",
     cover: "/covers/edmx.svg",
     tags: ["Developer Tools", ".NET", "OData"],
+    category: "Developer Tools",
     highlights: [
       { title: "EDMX Explorer", description: "Browse entity types, properties, and associations visually." },
       { title: "EDMX Trimmer", description: "Remove unused entities to reduce metadata file size." },
@@ -237,6 +321,7 @@ export const products: Product[] = [
     url: "https://azure-assets.lamplitlabs.com",
     cover: "/covers/azure-assets.svg",
     tags: ["Azure", "Draw.io", "Architecture"],
+    category: "Azure",
     highlights: [
       { title: "643+ Icons", description: "Comprehensive collection of Azure service icons for diagrams." },
       { title: "Auto-Synced", description: "Continuously updated from official Microsoft Azure icon sets." },
@@ -255,6 +340,7 @@ export const products: Product[] = [
     url: "https://azure-compliance.lamplitlabs.com",
     cover: "/covers/azure-compliance.svg",
     tags: ["Azure", "Compliance", "Security"],
+    category: "Azure",
     highlights: [
       { title: "17 Frameworks", description: "Coverage across ISO 27001, SOC, HIPAA, PCI DSS, and more." },
       { title: "Interactive Matrix", description: "Search, filter, and explore compliance coverage by service." },
@@ -266,6 +352,7 @@ export const products: Product[] = [
 
 export const navLinks: NavLink[] = [
   { label: "Products", href: "#products" },
+  { label: "AI", href: "#ai" },
   { label: "About", href: "#about" },
   { label: "Blog", href: socialLinks.blog, external: true },
   { label: "Contact", href: "#contact" },

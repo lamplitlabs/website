@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import {
   ArrowUpRight,
   Blocks,
@@ -97,11 +98,31 @@ const buildSteps: BuildStep[] = [
   },
 ];
 
-const showcasePoints = [
-  "Plans a focused German learning session.",
-  "Drills, corrects, and explains as you work.",
-  "Explains in German or English.",
-  "Nothing you type leaves your device.",
+const familyPoints: { key: string; text: ReactNode }[] = [
+  {
+    key: "one-job",
+    text: (
+      <>
+        One clearly defined job per model, named{" "}
+        <code className="whitespace-nowrap font-mono text-[0.8125rem] text-foreground/90">
+          light-&lt;purpose&gt;-&lt;version&gt;
+        </code>
+        .
+      </>
+    ),
+  },
+  {
+    key: "release-facts",
+    text: "Every release lists its purpose, base model, size, licence and gate result.",
+  },
+  {
+    key: "runs-where-it-fits",
+    text: "Models that fit run in the browser; the rest run on hardware you control.",
+  },
+  {
+    key: "data-stays",
+    text: "Your prompts and data stay on the device or server you run the model on.",
+  },
 ];
 
 function ModelDistillationIllustration() {
@@ -277,18 +298,18 @@ export function AiSection() {
         <RevealSection className="mt-16">
           <div className="glass grid gap-8 rounded-2xl p-6 sm:grid-cols-[1.2fr_1fr] sm:p-8">
             <div>
-              <p className="mono-label text-primary">first showcase</p>
+              <p className="mono-label text-primary">the model family</p>
               <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight">
-                A German tutor that runs in your browser
+                One job per model. Every model yours to run.
               </h3>
               <ul className="mt-6 space-y-3">
-                {showcasePoints.map((point) => (
+                {familyPoints.map((point) => (
                   <li
-                    key={point}
+                    key={point.key}
                     className="flex gap-3 text-sm leading-relaxed text-muted-foreground"
                   >
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    <span>{point}</span>
+                    <span>{point.text}</span>
                   </li>
                 ))}
               </ul>
@@ -320,7 +341,7 @@ export function AiSection() {
                   trackingUrl={lightTryUrl}
                   className="inline-flex items-center justify-center rounded-lg border px-6 py-3 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  Try the tutor in your browser
+                  Try a model in your browser
                 </OutboundLink>
                 <OutboundLink
                   href={socialLinks.huggingface}

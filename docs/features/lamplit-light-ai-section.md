@@ -12,7 +12,7 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 ## User Story
 
 **As a** visitor evaluating Lamplit Labs  
-**I want to** understand the company's AI lab, its first on-device German tutor showcase, and where to follow the work  
+**I want to** understand the company's AI lab, its family of one-job-per-model releases, and where to follow the work  
 **So that** I can distinguish Lamplit Labs' AI capability from its existing products and reach the AI property when it becomes public.
 
 ## Requirements
@@ -25,7 +25,8 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 - Add `{ label: "AI", href: "#ai" }` between Products and About in `navLinks`; header desktop/mobile navigation and footer navigation consume that shared data.
 - Add `components/home/ai-section.tsx` with `id="ai"` and render it between `WhyLamplitSection` (`#our-story`) and `ProductsSection` (`#products`) in [`app/page.tsx`](../../app/page.tsx).
 - Add `ai` to the homepage IntersectionObserver `sectionIds` so the current-section navigation highlight covers the new AI section.
-- Present Lamplit Light with the eyebrow `Lamplit Light`, heading `AI that runs where you are.`, the sovereign-AI lead, five runtime targets, the six-step build story, the German tutor showcase, and outbound CTAs to `https://ai.lamplitlabs.com`, `https://ai.lamplitlabs.com/try`, and the Lamplit Labs Hugging Face organisation (`https://huggingface.co/lamplitlabs`) using `OutboundLink` with tracking context `ai_section` and tracking targets `light`, `light_try`, and `huggingface`.
+- Present Lamplit Light with the eyebrow `Lamplit Light`, heading `AI that runs where you are.`, the sovereign-AI lead, five runtime targets, the six-step build story, the model-family card (one job per model, `light-<purpose>-<version>`, what every release lists, where models run), and outbound CTAs to `https://ai.lamplitlabs.com`, `https://ai.lamplitlabs.com/try` ("Try a model in your browser"), and the Lamplit Labs Hugging Face organisation (`https://huggingface.co/lamplitlabs`) using `OutboundLink` with tracking context `ai_section` and tracking targets `light`, `light_try`, and `huggingface`.
+- Keep the homepage generic about the model family: no single model (such as the German tutor) is the headline of the AI section, the card, a CTA, the cover, or the journey copy. Individual models are the AI site's job; the product detail page may name the first model as the family's origin.
 - Provide an internal CTA to `/products/light` from the AI section.
 - Add the Hugging Face organisation to `socialLinks`/`SocialLinks` (`huggingface`) and to `socialPlatforms` with a monochrome brand icon in [`components/icons.tsx`](../../components/icons.tsx), so it appears wherever the shared social row renders (hero social bar, contact section, footer) and in the Organization JSON-LD `sameAs` list derived from `socialLinks`.
 - Modernize the hero, header, products grid, journey/about/footer copy, and shared CSS utilities only as needed to introduce the AI story and keep the homepage visual language coherent.
@@ -91,6 +92,7 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 - [x] Static export includes `/products/light`, and `public/sitemap.xml` includes `/products/light`.
 - [x] Metadata descriptions and keywords mention Lamplit Light, with no claim that the AI site is live before DNS and status are updated.
 - [x] The Hugging Face organisation link (`https://huggingface.co/lamplitlabs`) renders in the hero social bar, contact section, footer, AI section CTA, and the Organization JSON-LD `sameAs` list, with the accessible name `Hugging Face` on icon-only links.
+- [x] The homepage presents Lamplit Light as a model family (one job per model) rather than a single model: no tutor-specific headline, CTA, cover label, or journey copy; the `/try` CTA reads "Try a model in your browser".
 - [x] No new dependencies, lockfile changes, deployment changes, analytics provider changes, or cookie-consent changes are introduced.
 
 ## Verification Plan

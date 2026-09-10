@@ -54,7 +54,7 @@ const milestones: Milestone[] = [
   {
     year: "2026",
     title: "Lamplit Light: our AI lab",
-    desc: "We start building small, specialised models you host yourself - beginning with a German tutor that runs entirely in the browser. AI that runs where you are.",
+    desc: "We start building small, specialised models you host yourself - one model per job, each measured before it ships. AI that runs where you are.",
     icon: Sparkles,
   },
 ];

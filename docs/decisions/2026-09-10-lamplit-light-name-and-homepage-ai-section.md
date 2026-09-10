@@ -70,7 +70,7 @@ Lamplit Labs needs to modernize the homepage, make the company's AI work visible
 ### Option A: Dedicated homepage section + catalog entry + nav link (chosen)
 
 **Pros:**
-- Gives the AI lab enough space to explain the six-step build story, runtimes, privacy posture, and German tutor showcase.
+- Gives the AI lab enough space to explain the six-step build story, runtimes, privacy posture, and the model family (one job per model).
 - Keeps Lamplit Light discoverable in the product catalog and product detail route.
 - Adds a direct `#ai` navigation target without replacing the existing Products, About, Journey, or Contact flows.
 - Lets the product grid use categories for broader portfolio discovery.
@@ -118,7 +118,7 @@ We have decided to **name the product line Lamplit Light and incorporate it thro
 2. A dedicated section can explain the lab's compact-model workflow and sovereign runtime promise without replacing the broader Lamplit Labs homepage.
 3. A catalog entry keeps product detail pages, JSON-LD, sitemap generation, and future renaming centralized in the existing site-data model.
 
-Lamplit Light is documented as the AI lab of Lamplit Labs. It distils large teacher models into small, specialized student models for defined jobs; trains them on verified knowledge; measures them against deterministic offline release gates and an independent multi-model judge panel; and ships compact ONNX q8/q4 exports that run with transformers.js in the browser, on a laptop, on-prem, in a private cloud, inside an app, or on edge/IoT hardware. The first showcase is an A2-B2 German tutor for telc/Goethe exam preparation that runs on the learner's device with no server-side writing visibility, sign-up, or cookies.
+Lamplit Light is documented as the AI lab of Lamplit Labs. It distils large teacher models into small, specialized student models for defined jobs; trains them on verified knowledge; measures them against deterministic offline release gates and an independent multi-model judge panel; and ships compact ONNX q8/q4 exports that run with transformers.js in the browser, on a laptop, on-prem, in a private cloud, inside an app, or on edge/IoT hardware. It is a family, not a single model: every release targets one clearly defined job and is named `light-<purpose>-<version>`, and the AI site lists each model's purpose, base model, size, licence, gate result and judge-panel verdict. The German tutor (`light-german-tutor-*`) is the first member of that family, so the homepage stays generic and leaves individual models to the AI site's catalog.
 
 ## Consequences
 

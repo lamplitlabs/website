@@ -435,7 +435,74 @@ section[id] {
   animation: eyebrow-shimmer 6s ease-in-out infinite;
 }
 
+/* ── Build pipeline rail (Lamplit Light section) ───────── */
+/* One 8s cycle: the light crosses the rail during the first 78%,
+   then fades and rests. Stage pings/flashes use the same cycle
+   with per-stage delays computed in ai-section.tsx. */
+@keyframes beam-comet {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  78% {
+    left: 100%;
+    opacity: 1;
+  }
+  84%,
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes beam-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  14%,
+  100% {
+    transform: scale(2.3);
+    opacity: 0;
+  }
+}
+
+@keyframes beam-flash {
+  0%,
+  12%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px hsl(var(--glow) / 0.45);
+  }
+  3% {
+    transform: scale(1.7);
+    box-shadow: 0 0 24px hsl(var(--glow) / 0.95);
+  }
+}
+
+.beam-comet {
+  animation: beam-comet 8s linear infinite;
+}
+
+.beam-ping {
+  animation: beam-ping 8s ease-out infinite;
+}
+
+.beam-flash {
+  box-shadow: 0 0 10px hsl(var(--glow) / 0.45);
+  animation: beam-flash 8s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .beam-comet,
+  .beam-ping,
+  .beam-flash {
+    animation: none;
+  }
+
   .eyebrow-shimmer::before {
     animation: none;
   }

@@ -9,8 +9,8 @@
 >
   <title id="light-cover-title">Lamplit Light sovereign AI models</title>
   <desc id="light-cover-description">
-    A large teacher model distils through a narrowing flow into a small amber
-    model core inside a device, ready to run in self-hosted runtimes.
+    Verified knowledge flows through training, a release gate and compression
+    into a small amber model core inside a device, ready to run in self-hosted runtimes.
   </desc>
 
   <defs>
@@ -23,7 +23,7 @@
       <stop stop-color="#F5C46B" stop-opacity="0.2" />
       <stop offset="1" stop-color="#F5C46B" stop-opacity="0" />
     </radialGradient>
-    <linearGradient id="distill" x1="205" y1="0" x2="555" y2="0" gradientUnits="userSpaceOnUse">
+    <linearGradient id="flow" x1="205" y1="0" x2="555" y2="0" gradientUnits="userSpaceOnUse">
       <stop stop-color="#A5B4FC" />
       <stop offset="0.45" stop-color="#67E8F9" />
       <stop offset="1" stop-color="#F5C46B" />
@@ -74,18 +74,18 @@
         <circle cx="104" cy="111" r="5" fill="#67E8F9" />
         <path d="M77 73L99 56M109 57L129 77M132 85L108 108M99 108L76 78M77 76L129 81" stroke-opacity="0.48" />
       </g>
-      <text x="104" y="170" fill="#C7D2FE" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="1.5">
-        TEACHER MODEL
+      <text x="104" y="170" fill="#C7D2FE" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="1.2">
+        VERIFIED KNOWLEDGE
       </text>
     </g>
 
     <g transform="translate(258 146)">
-      <path d="M0 42C48 16 96 16 144 42" stroke="url(#distill)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.72" />
-      <path d="M0 84C48 110 96 110 144 84" stroke="url(#distill)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.55" />
-      <path d="M10 62H258" stroke="url(#distill)" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" />
+      <path d="M0 42C48 16 96 16 144 42" stroke="url(#flow)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.72" />
+      <path d="M0 84C48 110 96 110 144 84" stroke="url(#flow)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.55" />
+      <path d="M10 62H258" stroke="url(#flow)" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" />
       <path d="M146 42L242 62L146 84Z" fill="#F5C46B" fill-opacity="0.1" stroke="#F5C46B" stroke-opacity="0.36" />
       <g fill="#E0F2FE" fill-opacity="0.64" font-size="10" font-weight="700" letter-spacing="1.1">
-        <text x="22" y="28">DISTIL</text>
+        <text x="24" y="28">TRAIN</text>
         <text x="92" y="121">GATE</text>
         <text x="178" y="42">COMPRESS</text>
       </g>

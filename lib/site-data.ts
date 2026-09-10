@@ -139,7 +139,7 @@ export const products: Product[] = [
     description:
       "Small, specialised AI models you host yourself in the browser, on a laptop, on-prem, in your private cloud, inside your app, or on the edge. Your data never leaves.",
     longDescription:
-      "Lamplit Light is Lamplit Labs' sovereign AI lab for distilling large teacher models into small, specialised student models for defined jobs. Each model is built from verified knowledge, distilled, trained, measured against deterministic offline release gates and an independent multi-model judge panel, then compressed into compact ONNX exports for self-hosted use. Every model targets one clearly defined job and ships under the light-<purpose>-<version> naming pattern together with its purpose, base model, size, licence and gate result, so you always know what a model is for and which release you are running. The family started with a German language tutor and grows one job at a time.",
+      "Lamplit Light is Lamplit Labs' sovereign AI lab for small, specialised models you host yourself. Each model is built for one clearly defined job, grounded in verified knowledge, measured against deterministic offline release gates and an independent multi-model judge panel, then compressed into compact ONNX exports for self-hosted use. Every model ships under the light-<purpose>-<version> naming pattern together with its purpose, base model, size, licence and gate result, so you always know what a model is for and which release you are running. The family started with a German language tutor and grows one job at a time.",
     url: "https://ai.lamplitlabs.com",
     cover: "/covers/light.svg",
     tags: ["Sovereign AI", "Small Models", "On-device"],
@@ -156,9 +156,9 @@ export const products: Product[] = [
           "Models are designed for self-hosting so your data stays where you run them and the exported weights are yours.",
       },
       {
-        title: "Distilled to measure",
+        title: "Small by design",
         description:
-          "Large teacher models are distilled into small, specialised student models for a clearly defined job.",
+          "Each model is trained for a single, clearly defined job and nothing else, which keeps it small enough to run on hardware you already have.",
       },
       {
         title: "Gated before release",
@@ -168,7 +168,7 @@ export const products: Product[] = [
       {
         title: "One job per model",
         description:
-          "Each model targets a single, clearly defined job and is named light-<purpose>-<version>, so you always know what it is for and which release you run.",
+          "Named light-<purpose>-<version> and shipped with its purpose, base model, size, licence and gate result, so you always know what a model is for and which release you run.",
       },
     ],
     featured: true,
@@ -183,7 +183,7 @@ export const products: Product[] = [
       creativeWorkStatus: "In development",
       featureList: [
         "Self-hosted small AI models",
-        "Teacher-to-student model distillation",
+        "Single-purpose specialised models",
         "Verified knowledge training",
         "Deterministic offline release gates",
         "Independent multi-model judge panel",

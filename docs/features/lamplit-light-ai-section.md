@@ -35,7 +35,7 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 ### Non-Functional Requirements
 
 - **Accessibility:** Category filter chips must be keyboard-operable buttons with `aria-pressed`; existing product card action labels, named hero scroll link, mobile scroll lock, mobile expanded state, and `aria-current` current-section behavior must be preserved.
-- **Motion:** The six-step build story may animate with CSS only and must honor `prefers-reduced-motion` with a non-animated fallback.
+- **Motion:** The five-stage build pipeline may animate with CSS only (a light travelling the rail, stage pings and flashes on one shared 8s cycle) and must honor `prefers-reduced-motion` with a non-animated fallback: the rail and stage list stay fully readable with every animation disabled.
 - **Contrast:** Amber-on-dark accents, glass badges, and CTA states must maintain WCAG AA contrast.
 - **Performance:** Add no runtime dependencies; keep the site compatible with Next.js static export and avoid copying measurement numbers from the AI site that can go stale.
 - **Privacy and analytics:** Cookie consent, analytics wiring, and outbound-link tracking behavior remain unchanged except for the new `ai_section` tracking context and the new `huggingface` tracking target in the shared social rows.
@@ -79,7 +79,8 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 - Product category filters cannot currently produce an empty category because every category has at least one product; if a future category is empty, the grid should render its empty state gracefully.
 - With JavaScript disabled, the statically rendered product grid should still show all products.
 - The Lamplit Labs Hugging Face organisation exists but has no public models yet; the homepage links to it as the organisation's presence ("Lamplit Labs on Hugging Face") and must not claim that released weights are already published there.
-- The AI section's animation must not be the only way to understand the six-step build story.
+- The AI section's animation must not be the only way to understand the five-stage build pipeline.
+- Public copy describes what a Lamplit Light model is and does (small, single-purpose, grounded in verified knowledge, measured before release, hosted by you), not how it is trained. The training method (distillation, teacher/student framing) stays out of the product entry, cover art, AI section, journey copy, metadata and JSON-LD.
 
 ## Acceptance Criteria
 

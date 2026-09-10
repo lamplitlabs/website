@@ -61,6 +61,7 @@ const runtimes: RuntimeCard[] = [
 
 interface BuildStep {
   index: string;
+  label: string;
   title: string;
   desc: string;
 }
@@ -68,35 +69,47 @@ interface BuildStep {
 const buildSteps: BuildStep[] = [
   {
     index: "01",
+    label: "define",
     title: "Define the job",
     desc: "A narrow purpose and a clear bar the model has to clear.",
   },
   {
     index: "02",
+    label: "verify",
     title: "Gather verified knowledge",
     desc: "Ground the model in source material that can be checked.",
   },
   {
     index: "03",
-    title: "Distil from a teacher",
-    desc: "A large model answers thousands of prompts for the job; its answers become the lesson.",
+    label: "train",
+    title: "Train a specialist",
+    desc: "A small model is trained for exactly this job and nothing else, so it stays small enough to run on your hardware.",
   },
   {
     index: "04",
-    title: "Train a student",
-    desc: "A small model learns to reproduce them. Every student is named light-<purpose>-<version>.",
-  },
-  {
-    index: "05",
+    label: "measure",
     title: "Measure",
     desc: "Deterministic release gates and an independent judge panel decide what ships.",
   },
   {
-    index: "06",
+    index: "05",
+    label: "ship",
     title: "Compress and ship",
     desc: "Exported to ONNX and quantised, it loads straight into transformers.js.",
   },
 ];
+
+// The light travels the rail during the first `beamTravelFraction` of each
+// cycle (see `beam-comet` in globals.css), so stage k lights up when the head
+// passes it at k / (stages - 1) of that travel.
+const beamCycleSeconds = 8;
+const beamTravelFraction = 0.78;
+
+function beamDelay(index: number): string {
+  const seconds =
+    (beamCycleSeconds * beamTravelFraction * index) / (buildSteps.length - 1);
+  return `${seconds.toFixed(2)}s`;
+}
 
 const familyPoints: { key: string; text: ReactNode }[] = [
   {
@@ -125,7 +138,7 @@ const familyPoints: { key: string; text: ReactNode }[] = [
   },
 ];
 
-function ModelDistillationIllustration() {
+function ModelOnDeviceIllustration() {
   return (
     <svg
       aria-hidden="true"
@@ -133,7 +146,7 @@ function ModelDistillationIllustration() {
       className="h-full min-h-[260px] w-full text-primary"
     >
       <defs>
-        <linearGradient id="teacher-core" x1="0" x2="1" y1="0" y2="1">
+        <linearGradient id="model-core" x1="0" x2="1" y1="0" y2="1">
           <stop offset="0%" stopColor="currentColor" stopOpacity="0.22" />
           <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
         </linearGradient>
@@ -157,7 +170,7 @@ function ModelDistillationIllustration() {
         strokeWidth="1"
       />
       <circle cx="180" cy="250" r="5" className="fill-primary/60" />
-      <circle cx="118" cy="98" r="62" fill="url(#teacher-core)" />
+      <circle cx="118" cy="98" r="62" fill="url(#model-core)" />
       <circle cx="118" cy="98" r="42" className="fill-primary/10" />
       <path
         d="M158 106 C198 122 209 138 220 160 C205 184 190 194 158 205"
@@ -256,38 +269,92 @@ export function AiSection() {
         </div>
 
         <div className="mt-16">
-          <RevealSection className="mb-6 text-center">
-            <p className="mono-label text-primary">how a model is built</p>
-            <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight">
-              A high-level path from job to shipped runtime.
-            </h3>
+          <RevealSection className="mb-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="mono-label text-primary">how a model is built</p>
+                <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight">
+                  A high-level path from job to shipped runtime.
+                </h3>
+              </div>
+              <p className="max-w-lg text-sm leading-relaxed text-muted-foreground">
+                Five stages, one bar to clear. A model that fails its gate does
+                not ship.
+              </p>
+            </div>
           </RevealSection>
 
           <RevealSection>
-            <div className="relative">
-              <div
-                aria-hidden="true"
-                className="absolute bottom-5 left-5 top-5 w-px bg-gradient-to-b from-primary/20 via-primary/50 to-primary/20 lg:bottom-auto lg:left-0 lg:right-0 lg:top-6 lg:h-px lg:w-auto lg:bg-gradient-to-r"
-              />
-              <ol className="grid gap-5 lg:grid-cols-6 lg:gap-4">
+            <div className="glass overflow-hidden rounded-2xl">
+              <div className="flex items-center justify-between gap-4 border-b border-border/60 px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_hsl(var(--glow)/0.75)]"
+                  />
+                  <span className="mono-label">build pipeline</span>
+                </div>
+                <code className="hidden font-mono text-xs text-muted-foreground sm:block">
+                  light-&lt;purpose&gt;-&lt;version&gt;
+                </code>
+              </div>
+
+              {/* Desktop rail: a light pulse travels stage to stage. Decorative;
+                  the stage list below carries the content. */}
+              <div aria-hidden="true" className="relative hidden h-16 lg:block">
+                <div className="absolute left-[10%] right-[10%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-primary/10 via-primary/50 to-primary/10" />
+                <div className="absolute inset-y-0 left-[10%] right-[10%] overflow-hidden">
+                  <span className="beam-comet absolute top-1/2 h-px w-0 opacity-0">
+                    <span className="absolute right-0 top-1/2 h-0.5 w-32 -translate-y-1/2 rounded-full bg-gradient-to-r from-transparent via-primary/70 to-primary shadow-[0_0_14px_hsl(var(--glow)/0.85)]" />
+                  </span>
+                </div>
                 {buildSteps.map((step, index) => (
-                  <li key={step.index} className="relative flex gap-4 lg:block">
+                  <span
+                    key={step.index}
+                    className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: `${10 + index * 20}%` }}
+                  >
                     <span
-                      className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background text-primary shadow-[0_0_22px_hsl(var(--glow)/0.22)] motion-safe:animate-pulse"
-                      style={{
-                        animationDelay: `${index * 1.2}s`,
-                        animationDuration: "7.2s",
-                      }}
-                    >
-                      <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+                      className="beam-ping absolute inset-0 rounded-full border border-primary opacity-0"
+                      style={{ animationDelay: beamDelay(index) }}
+                    />
+                    <span className="relative flex h-6 w-6 items-center justify-center rounded-full border border-primary/40 bg-background">
+                      <span
+                        className="beam-flash h-2 w-2 rounded-full bg-primary"
+                        style={{ animationDelay: beamDelay(index) }}
+                      />
                     </span>
-                    <div className="glass rounded-2xl p-4 lg:mt-5">
-                      <p className="mono-label text-primary">{step.index}</p>
-                      <h4 className="mt-2 font-semibold">{step.title}</h4>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                        {step.desc}
-                      </p>
-                    </div>
+                    <span className="absolute left-1/2 top-full h-5 w-px bg-border/70" />
+                  </span>
+                ))}
+              </div>
+
+              <ol className="grid lg:grid-cols-5 lg:divide-x lg:divide-border/60 lg:border-t lg:border-border/60">
+                {buildSteps.map((step, index) => (
+                  <li
+                    key={step.index}
+                    className="relative py-5 pl-14 pr-5 before:absolute before:bottom-0 before:left-8 before:top-10 before:w-px before:bg-border/70 after:absolute after:left-8 after:top-0 after:h-4 after:w-px after:bg-border/70 first:after:hidden last:before:hidden lg:p-5 lg:before:hidden lg:after:hidden"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-5 top-4 flex h-6 w-6 items-center justify-center rounded-full border border-primary/40 bg-background lg:hidden"
+                    >
+                      <span
+                        className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--glow)/0.6)] motion-safe:animate-pulse"
+                        style={{
+                          animationDelay: `${index * 0.6}s`,
+                          animationDuration: "3s",
+                        }}
+                      />
+                    </span>
+                    <p className="mono-label text-primary">
+                      {step.index}
+                      <span className="text-muted-foreground"> / {step.label}</span>
+                    </p>
+                    <h4 className="mt-3 font-semibold">{step.title}</h4>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {step.desc}
+                    </p>
                   </li>
                 ))}
               </ol>
@@ -365,7 +432,7 @@ export function AiSection() {
             </div>
 
             <div className="flex items-center justify-center rounded-2xl bg-primary/5 text-primary">
-              <ModelDistillationIllustration />
+              <ModelOnDeviceIllustration />
             </div>
           </div>
         </RevealSection>

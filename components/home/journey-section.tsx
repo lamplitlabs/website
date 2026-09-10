@@ -63,7 +63,7 @@ const futurePillars = [
   {
     icon: FlaskConical,
     title: "Sovereign AI with Lamplit Light",
-    desc: "Small models you own and run yourself - distilled from large teachers, measured against release gates and an independent judge panel before they ship.",
+    desc: "Small models you own and run yourself - each built for one job, measured against release gates and an independent judge panel before it ships.",
   },
   {
     icon: HeartHandshake,

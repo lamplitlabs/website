@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   Blocks,
   Check,
+  Cpu,
   Laptop,
   MonitorSmartphone,
   Router,
@@ -15,6 +16,7 @@ import { HuggingFaceIcon } from "@/components/icons";
 import { OutboundLink } from "@/components/outbound-link";
 import { RevealSection } from "@/components/home/reveal-section";
 import { socialLinks } from "@/lib/site-data";
+import styles from "./ai-section.module.css";
 
 const lightHomeUrl = "https://ai.lamplitlabs.com";
 const lightTryUrl = "https://ai.lamplitlabs.com/try";
@@ -140,76 +142,46 @@ const familyPoints: { key: string; text: ReactNode }[] = [
 
 function ModelOnDeviceIllustration() {
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 360 300"
-      className="h-full min-h-[260px] w-full text-primary"
-    >
-      <defs>
-        <linearGradient id="model-core" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      <rect
-        x="102"
-        y="52"
-        width="156"
-        height="216"
-        rx="28"
-        className="fill-background stroke-primary/30"
-        strokeWidth="2"
-      />
-      <rect
-        x="116"
-        y="72"
-        width="128"
-        height="168"
-        rx="16"
-        className="fill-card stroke-border"
-        strokeWidth="1"
-      />
-      <circle cx="180" cy="250" r="5" className="fill-primary/60" />
-      <circle cx="118" cy="98" r="62" fill="url(#model-core)" />
-      <circle cx="118" cy="98" r="42" className="fill-primary/10" />
-      <path
-        d="M158 106 C198 122 209 138 220 160 C205 184 190 194 158 205"
-        className="fill-primary/10 stroke-primary/30"
-        strokeWidth="2"
-      />
-      <path
-        d="M146 118 C178 134 188 146 198 160 C188 174 178 184 146 197"
-        className="fill-primary/20 stroke-primary/40"
-        strokeWidth="2"
-      />
-      <circle cx="180" cy="160" r="24" className="fill-primary" />
-      <circle cx="180" cy="160" r="44" className="fill-primary/10" />
-      <path
-        d="M206 160 H232"
-        className="stroke-primary/50"
-        strokeLinecap="round"
-        strokeWidth="3"
-      />
-      <path
-        d="M72 224 H288"
-        className="stroke-border"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <path
-        d="M88 232 H272"
-        className="stroke-primary/20"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-    </svg>
+    <div aria-hidden="true" className={styles.modelScene}>
+      <div className={styles.sceneLabel}>
+        <span className={styles.sceneIndicator} />
+        Lamplit Light
+      </div>
+      <div className={styles.modelFloor} />
+      <div className={styles.modelOrbit} />
+      <div className={styles.modelRig}>
+        <div className={styles.modelDevice}>
+          <span className={styles.devicePort} />
+        </div>
+        <div className={styles.modelCircuit}>
+          <svg viewBox="0 0 160 200" fill="none">
+            <path d="M0 44H40V78H64M160 44H120V78H96M0 156H40V122H64M160 156H120V122H96M62 0V48H80V72M100 200V152H80V128" />
+            <circle cx="40" cy="44" r="3" />
+            <circle cx="120" cy="44" r="3" />
+            <circle cx="40" cy="156" r="3" />
+            <circle cx="120" cy="156" r="3" />
+          </svg>
+        </div>
+        <div className={styles.modelLayer}>
+          <span className={styles.layerNode} />
+          <span className={styles.layerNode} />
+          <span className={styles.layerNode} />
+          <span className={styles.layerNode} />
+        </div>
+        <div className={styles.modelCore}>
+          <Cpu className="h-10 w-10" strokeWidth={1} />
+          <span>Light</span>
+        </div>
+      </div>
+      <span className={styles.sceneCaption}>your model / your hardware</span>
+    </div>
   );
 }
 
 export function AiSection() {
   return (
-    <section id="ai" className="lab-grid border-t">
-      <div className="mx-auto max-w-5xl px-4 py-24">
+    <section id="ai" className={`lab-grid border-t ${styles.section}`}>
+      <div className="mx-auto max-w-6xl px-4 py-24">
         <RevealSection className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary">
             <Sparkles className="h-4 w-4" />
@@ -249,13 +221,13 @@ export function AiSection() {
             {runtimes.map((runtime) => (
               <article
                 key={runtime.title}
-                className="glass glass-lift rounded-2xl p-4"
+                className={`glass glass-lift rounded-2xl p-4 ${styles.runtimeCard}`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="mono-label text-primary">
                     {runtime.index}
                   </span>
-                  <span className="rounded-lg bg-primary/10 p-2 text-primary">
+                  <span className={`rounded-lg bg-primary/10 p-2 text-primary ${styles.runtimeIcon}`}>
                     <runtime.icon className="h-4 w-4" />
                   </span>
                 </div>
@@ -285,7 +257,7 @@ export function AiSection() {
           </RevealSection>
 
           <RevealSection>
-            <div className="glass overflow-hidden rounded-2xl">
+            <div className={`glass overflow-hidden rounded-2xl ${styles.pipelinePanel}`}>
               <div className="flex items-center justify-between gap-4 border-b border-border/60 px-5 py-3">
                 <div className="flex items-center gap-3">
                   <span
@@ -363,7 +335,7 @@ export function AiSection() {
         </div>
 
         <RevealSection className="mt-16">
-          <div className="glass grid gap-8 rounded-2xl p-6 sm:grid-cols-[1.2fr_1fr] sm:p-8">
+          <div className={`glass grid gap-8 rounded-2xl p-6 sm:grid-cols-[1.2fr_1fr] sm:p-8 ${styles.familyPanel}`}>
             <div>
               <p className="mono-label text-primary">the model family</p>
               <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight">
@@ -431,9 +403,7 @@ export function AiSection() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center rounded-2xl bg-primary/5 text-primary">
-              <ModelOnDeviceIllustration />
-            </div>
+            <ModelOnDeviceIllustration />
           </div>
         </RevealSection>
 

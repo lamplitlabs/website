@@ -86,7 +86,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="immersive-home min-h-screen">
       <Header
         scrolled={scrolled}
         activeSection={activeSection}

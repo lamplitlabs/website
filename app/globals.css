@@ -61,38 +61,38 @@
 
 /* ── Reveal animations ─────────────────────────────────── */
 
-@layer utilities {
-  .reveal {
+@keyframes reveal-up {
+  from {
     opacity: 0;
-    transform: translateY(32px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  /* Content is visible before hydration; only observed elements animate. */
+  .reveal,
+  .reveal-stagger > * {
+    opacity: 1;
   }
 
   .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
+    animation: reveal-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
-
-  /* stagger children */
-  .reveal-stagger > * {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .reveal-stagger.visible > *:nth-child(1) { transition-delay: 0ms; }
-  .reveal-stagger.visible > *:nth-child(2) { transition-delay: 100ms; }
-  .reveal-stagger.visible > *:nth-child(3) { transition-delay: 200ms; }
-  .reveal-stagger.visible > *:nth-child(4) { transition-delay: 300ms; }
-  .reveal-stagger.visible > *:nth-child(5) { transition-delay: 400ms; }
-  .reveal-stagger.visible > *:nth-child(6) { transition-delay: 500ms; }
 
   .reveal-stagger.visible > * {
-    opacity: 1;
-    transform: translateY(0);
+    animation: reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
+
+  .reveal-stagger.visible > *:nth-child(1) { animation-delay: 0ms; }
+  .reveal-stagger.visible > *:nth-child(2) { animation-delay: 100ms; }
+  .reveal-stagger.visible > *:nth-child(3) { animation-delay: 200ms; }
+  .reveal-stagger.visible > *:nth-child(4) { animation-delay: 300ms; }
+  .reveal-stagger.visible > *:nth-child(5) { animation-delay: 400ms; }
+  .reveal-stagger.visible > *:nth-child(6) { animation-delay: 500ms; }
 }
 
 /* ── Shared "lab" surface utilities ────────────────────── */
@@ -154,6 +154,57 @@
     background-image:
       linear-gradient(to right, hsl(var(--foreground) / 0.06) 1px, transparent 1px),
       linear-gradient(to bottom, hsl(var(--foreground) / 0.06) 1px, transparent 1px);
+  }
+}
+
+.immersive-home {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 48rem 38rem at 100% 35%, hsl(var(--glow) / 0.045), transparent 75%),
+    radial-gradient(ellipse 45rem 35rem at 0% 76%, hsl(var(--glow) / 0.04), transparent 75%);
+}
+
+:root:not(.dark) .immersive-home {
+  --primary: 30 82% 35%;
+  --ring: 30 82% 35%;
+  --muted-foreground: 30 8% 42%;
+}
+
+.immersive-home .glass-lift {
+  transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+  box-shadow:
+    inset 0 1px 0 hsl(var(--foreground) / 0.05),
+    0 3px 0 hsl(var(--border) / 0.28),
+    0 14px 28px -20px hsl(0 0% 0% / 0.25);
+}
+
+.site-header {
+  border-color: hsl(var(--border) / 0.75);
+  background: hsl(var(--background) / 0.82);
+  box-shadow:
+    inset 0 1px 0 hsl(var(--foreground) / 0.045),
+    0 2px 0 hsl(var(--border) / 0.25),
+    0 12px 35px -22px hsl(0 0% 0% / 0.35);
+  transition: background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.site-header-scrolled {
+  border-color: hsl(var(--primary) / 0.2);
+  background: hsl(var(--background) / 0.94);
+  box-shadow:
+    inset 0 1px 0 hsl(var(--foreground) / 0.06),
+    0 2px 0 hsl(var(--border) / 0.4),
+    0 15px 40px -20px hsl(0 0% 0% / 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .immersive-home .glass-lift:hover {
+    transform: perspective(800px) translateY(-4px) rotateX(2deg);
+    box-shadow:
+      inset 0 1px 0 hsl(var(--foreground) / 0.08),
+      0 3px 0 hsl(var(--primary) / 0.15),
+      0 22px 40px -22px hsl(var(--glow) / 0.28);
   }
 }
 
@@ -317,6 +368,10 @@
 
 section[id] {
   scroll-margin-top: 3.5rem;
+}
+
+.immersive-home section[id] {
+  scroll-margin-top: 6rem;
 }
 
 /* ── Glow effect for cards ─────────────────────────────── */
@@ -497,6 +552,31 @@ section[id] {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal-stagger > *,
+  .reveal.visible,
+  .reveal-stagger.visible > *,
+  .hero-entrance {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+
+  .glass-lift,
+  .glass-lift:hover {
+    transform: none;
+    transition: none;
+  }
+
+  .mobile-menu-enter,
+  .lamp-glow,
+  .cord-sway,
+  .cord-pull,
   .beam-comet,
   .beam-ping,
   .beam-flash {

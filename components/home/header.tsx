@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { LampToggle } from "@/components/lamp-toggle";
 import { Logo } from "@/components/logo";
@@ -23,20 +24,26 @@ export function Header({
   theme,
   setTheme,
 }: HeaderProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const displayTheme = mounted ? theme : "dark";
+
   return (
     <header
-      className={`fixed top-0 z-50 w-full overflow-visible transition-all duration-300 ${
-        scrolled
-          ? "border-b border-border/60 bg-background/70 shadow-[0_1px_0_0_hsl(var(--border))] backdrop-blur-xl supports-[backdrop-filter]:bg-background/60"
-          : "bg-transparent"
+      className={`site-header fixed inset-x-3 top-3 z-50 mx-auto max-w-6xl overflow-visible rounded-2xl border backdrop-blur-xl sm:inset-x-5 ${
+        scrolled ? "site-header-scrolled" : ""
       }`}
     >
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between overflow-visible px-4">
+      <div className="flex h-14 items-center justify-between overflow-visible px-4 sm:px-5">
         <Link
           href="/"
-          className="flex items-center gap-2 transition-opacity hover:opacity-80"
+          className="flex items-center gap-2 rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <Logo className="h-8 w-8" lit={theme !== "dark"} />
+          <Logo className="h-8 w-8" lit={displayTheme !== "dark"} />
           <span className="text-lg font-semibold tracking-tight">Lamplit Labs</span>
         </Link>
 
@@ -69,12 +76,12 @@ export function Header({
             );
           })}
           <div className="ml-2">
-            <LampToggle theme={theme} setTheme={setTheme} />
+            <LampToggle theme={displayTheme} setTheme={setTheme} />
           </div>
         </nav>
 
         <div className="flex items-center gap-2 md:hidden">
-          <LampToggle theme={theme} setTheme={setTheme} />
+          <LampToggle theme={displayTheme} setTheme={setTheme} />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -91,7 +98,7 @@ export function Header({
       </div>
 
       {mobileMenuOpen && (
-        <nav className="mobile-menu-enter border-t border-border/60 bg-background/95 px-4 pb-5 pt-3 backdrop-blur-xl md:hidden">
+        <nav className="mobile-menu-enter rounded-b-2xl border-t border-border/60 bg-background/95 px-4 pb-5 pt-3 md:hidden">
           {navLinks.map((link) => (
             <a
               key={link.label}

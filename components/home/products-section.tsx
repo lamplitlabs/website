@@ -5,7 +5,7 @@ import { products } from "@/lib/site-data";
 export function ProductsSection() {
   return (
     <section id="products" className="lab-grid border-t">
-      <div className="mx-auto max-w-5xl px-4 py-24">
+      <div className="mx-auto max-w-6xl px-4 py-24">
         <RevealSection className="mb-14 text-center">
           <div className="mb-4 inline-flex rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary">
             Our Products

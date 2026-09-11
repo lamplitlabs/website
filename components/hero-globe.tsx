@@ -1,575 +1,431 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
+import styles from "@/components/home/hero-scene.module.css";
 
-/**
- * Animated wireframe globe with chat bubbles,
- * signal pulses, data packets, orbit rings, and a particle network.
- * Pure <canvas> — zero dependencies.
- */
+interface Point3D {
+  x: number;
+  y: number;
+  z: number;
+}
 
-/* ── helpers ──────────────────────────────────────────────── */
+interface Orbit {
+  radius: number;
+  tilt: number;
+  roll: number;
+}
 
-interface Point3D { x: number; y: number; z: number }
+const TAU = Math.PI * 2;
+const ORBITS: Orbit[] = [
+  { radius: 1.34, tilt: 0.3, roll: 0.22 },
+  { radius: 1.16, tilt: 1.06, roll: -0.65 },
+];
 
-function latLngTo3D(lat: number, lng: number, r: number, rot: number): Point3D {
-  const phi = ((90 - lat) * Math.PI) / 180;
-  const theta = ((lng + rot) * Math.PI) / 180;
+function surfacePoint(latitude: number, longitude: number): Point3D {
   return {
-    x: r * Math.sin(phi) * Math.cos(theta),
-    y: r * Math.cos(phi),
-    z: r * Math.sin(phi) * Math.sin(theta),
+    x: Math.cos(latitude) * Math.cos(longitude),
+    y: Math.sin(latitude),
+    z: Math.cos(latitude) * Math.sin(longitude),
   };
 }
 
-function proj(p: Point3D, cx: number, cy: number, fov: number) {
-  const s = fov / (fov + p.z);
-  return { x: cx + p.x * s, y: cy + p.y * s, s };
+function orbitPoint(orbit: Orbit, angle: number): Point3D {
+  const x = Math.cos(angle) * orbit.radius;
+  const y = -Math.sin(angle) * Math.sin(orbit.tilt) * orbit.radius;
+  return {
+    x: x * Math.cos(orbit.roll) - y * Math.sin(orbit.roll),
+    y: x * Math.sin(orbit.roll) + y * Math.cos(orbit.roll),
+    z: Math.sin(angle) * Math.cos(orbit.tilt) * orbit.radius,
+  };
 }
 
-function depthAlpha(p: Point3D, r: number) {
-  return Math.max(0, (p.z + r) / (2 * r));
-}
+function createGeometry(compact: boolean) {
+  const steps = compact ? 48 : 72;
+  const meridians = compact ? 10 : 16;
+  const lines: Point3D[][] = [];
 
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
-
-function seeded(i: number) { return ((Math.sin(i * 127.1 + 311.7) * 43758.5453) % 1 + 1) % 1; }
-
-/* ── types ────────────────────────────────────────────────── */
-
-interface GlobeParticle {
-  lat: number; lng: number; size: number; pulse: number; pulseSpd: number;
-}
-
-interface ChatBubble {
-  lat: number; lng: number; life: number; maxLife: number;
-  text: string; offsetY: number;
-}
-
-interface PulseRing {
-  lat: number; lng: number; age: number; maxAge: number;
-}
-
-interface DataPacket {
-  fromLat: number; fromLng: number; toLat: number; toLng: number;
-  progress: number; speed: number;
-  _colorFn: (a: number) => string;
-}
-
-interface FloatingDot {
-  x: number; y: number; vx: number; vy: number; size: number; opacity: number;
-}
-
-/* ── component ────────────────────────────────────────────── */
-
-export function HeroGlobe({ className = "" }: { className?: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef = useRef<number>(0);
-  const { resolvedTheme } = useTheme();
-
-  const draw = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const maybeCtx = canvas.getContext("2d");
-    if (!maybeCtx) return;
-    const ctx = maybeCtx;
-
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-
-    if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.scale(dpr, dpr);
-    }
-
-    const isDark = resolvedTheme === "dark";
-
-    const c = (r: number, g: number, b: number) =>
-      (a: number) => `rgba(${r},${g},${b},${a})`;
-
-    const cGlobe  = isDark ? c(148, 163, 184) : c(100, 116, 139);
-    const cDot    = isDark ? c(148, 163, 184) : c(100, 116, 139);
-    const cConn   = isDark ? c(148, 163, 184) : c(100, 116, 139);
-    const cGlow   = isDark ? c(99, 102, 241)  : c(79, 70, 229);
-    const cChat   = isDark ? c(56, 189, 248)  : c(14, 165, 233);
-    const cPulse  = isDark ? c(167, 139, 250) : c(139, 92, 246);
-    const cPacket1 = isDark ? c(52, 211, 153) : c(16, 185, 129);
-    const cPacket2 = isDark ? c(251, 146, 60) : c(249, 115, 22);
-
-    const cx = w * 0.5;
-    const cy = h * 0.48;
-    const radius = Math.min(w, h) * 0.3;
-    const fov = 600;
-
-    /* ── init arrays ─────────────────────────────────────── */
-
-    const particles: GlobeParticle[] = [];
-    for (let i = 0; i < 80; i++) {
-      particles.push({
-        lat: Math.asin(2 * ((i * 0.618033988749895) % 1) - 1) * (180 / Math.PI),
-        lng: ((i * 137.508) % 360) - 180,
-        size: 1.0 + (i % 5) * 0.4,
-        pulse: seeded(i) * Math.PI * 2,
-        pulseSpd: 0.02 + seeded(i + 100) * 0.03,
-      });
-    }
-
-    // Cities with locale-appropriate greetings
-    const cities = [
-      { lat: 52.52, lng: 13.40, greetings: ["Hallo!", "Moin!", "Hi!"] },           // Berlin
-      { lat: 48.85, lng: 2.35, greetings: ["Bonjour!", "Salut!", "Coucou!"] },     // Paris
-      { lat: 40.71, lng: -74.01, greetings: ["Hey!", "Hi!", "Yo!"] },              // New York
-      { lat: 35.68, lng: 139.69, greetings: ["\u3053\u3093\u306B\u3061\u306F!", "\u304A\u306F\u3088\u3046!", "\u3084\u3042!"] },       // Tokyo (こんにちは, おはよう, やあ)
-      { lat: 28.61, lng: 77.21, greetings: ["\u0928\u092E\u0938\u094D\u0924\u0947!", "\u0939\u0948\u0932\u094B!", "\u0915\u094D\u092F\u093E \u0939\u093E\u0932?"] },     // Delhi (नमस्ते, हैलो, क्या हाल)
-      { lat: -33.87, lng: 151.21, greetings: ["G'day!", "Hey!", "Oi!"] },          // Sydney
-      { lat: 37.77, lng: -122.42, greetings: ["What's up!", "Hey!", "Sup?"] },     // San Francisco
-      { lat: 1.35, lng: 103.82, greetings: ["\u4F60\u597D!", "Hello!", "Hi!"] },              // Singapore (你好)
-      { lat: 55.75, lng: 37.62, greetings: ["\u041F\u0440\u0438\u0432\u0435\u0442!", "\u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435!"] },   // Moscow (Привет, Здравствуйте)
-      { lat: -23.55, lng: -46.63, greetings: ["Ol\u00E1!", "E a\u00ED!", "Oi!"] },            // São Paulo
-      { lat: 51.51, lng: -0.13, greetings: ["Hello!", "Hiya!", "Cheers!"] },       // London
-      { lat: 48.14, lng: 11.58, greetings: ["Servus!", "Gr\u00FC\u00DF Gott!", "Hallo!"] },   // Munich
-      { lat: 25.27, lng: 55.30, greetings: ["\u0645\u0631\u062D\u0628\u0627!", "\u0623\u0647\u0644\u0627\u064B!", "\u0633\u0644\u0627\u0645!"] },       // Dubai (مرحبا, أهلاً, سلام)
-      { lat: 37.57, lng: 126.98, greetings: ["\uC548\uB155!", "\uC548\uB155\uD558\uC138\uC694!"] },          // Seoul (안녕, 안녕하세요)
-      { lat: 13.76, lng: 100.50, greetings: ["\u0E2A\u0E27\u0E31\u0E2A\u0E14\u0E35!", "\u0E2B\u0E27\u0E31\u0E14\u0E14\u0E35!"] },             // Bangkok (สวัสดี, หวัดดี)
-      { lat: 41.01, lng: 28.98, greetings: ["Merhaba!", "Selam!"] },              // Istanbul
-      { lat: 19.43, lng: -99.13, greetings: ["\u00A1Hola!", "\u00BFQu\u00E9 tal?", "Buenas!"] },        // Mexico City
-      { lat: 30.04, lng: 31.24, greetings: ["\u0623\u0647\u0644\u0627\u064B!", "\u064A\u0627 \u0647\u0644\u0627!"] },              // Cairo (أهلاً, يا هلا)
-    ];
-
-    const chatBubbles: ChatBubble[] = [];
-    let chatTimer = 0;
-
-    const pulseRings: PulseRing[] = [];
-    let pulseTimer = 0;
-
-    const dataPackets: DataPacket[] = [];
-    let packetTimer = 0;
-
-    const floatingDots: FloatingDot[] = [];
-    for (let i = 0; i < 55; i++) {
-      floatingDots.push({
-        x: seeded(i + 200) * w,
-        y: seeded(i + 300) * h,
-        vx: (seeded(i + 400) - 0.5) * 0.4,
-        vy: (seeded(i + 500) - 0.5) * 0.4,
-        size: 0.5 + seeded(i + 600) * 1.8,
-        opacity: 0.08 + seeded(i + 700) * 0.25,
-      });
-    }
-
-    let rotation = 0;
-    let time = 0;
-
-    /* ── arc interpolation on globe surface ──────────────── */
-
-    function arcPoint(fLat: number, fLng: number, tLat: number, tLng: number, t: number, alt: number) {
-      const lat = lerp(fLat, tLat, t);
-      const lng = lerp(fLng, tLng, t);
-      const lift = Math.sin(t * Math.PI) * (alt - 1);
-      return latLngTo3D(lat, lng, radius * (1 + lift), rotation);
-    }
-
-    /* ── render loop ─────────────────────────────────────── */
-
-    function render() {
-      ctx.clearRect(0, 0, w, h);
-      rotation += 0.12;
-      time += 1;
-
-      // ── Floating background particles + connections ────
-      for (const d of floatingDots) {
-        d.x += d.vx; d.y += d.vy;
-        if (d.x < 0) d.x = w; if (d.x > w) d.x = 0;
-        if (d.y < 0) d.y = h; if (d.y > h) d.y = 0;
-      }
-      for (let i = 0; i < floatingDots.length; i++) {
-        for (let j = i + 1; j < floatingDots.length; j++) {
-          const dx = floatingDots[i].x - floatingDots[j].x;
-          const dy = floatingDots[i].y - floatingDots[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 100) {
-            ctx.beginPath();
-            ctx.moveTo(floatingDots[i].x, floatingDots[i].y);
-            ctx.lineTo(floatingDots[j].x, floatingDots[j].y);
-            ctx.strokeStyle = cConn((1 - dist / 100) * 0.06);
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
-      for (const d of floatingDots) {
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-        ctx.fillStyle = cDot(d.opacity * (0.8 + 0.2 * Math.sin(time * 0.02 + d.x)));
-        ctx.fill();
-      }
-
-      // ── Globe glow ────────────────────────────────────
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 2);
-      grad.addColorStop(0, cGlow(0.07));
-      grad.addColorStop(0.4, cGlow(0.03));
-      grad.addColorStop(1, cGlow(0));
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-
-      // ── Globe 3D shading (lit from top-left) ─────────
-      const shadeGrad = ctx.createRadialGradient(
-        cx - radius * 0.35, cy - radius * 0.35, radius * 0.05,
-        cx, cy, radius
-      );
-      shadeGrad.addColorStop(0, isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.12)");
-      shadeGrad.addColorStop(0.5, "rgba(0,0,0,0)");
-      shadeGrad.addColorStop(1, isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.06)");
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.fillStyle = shadeGrad;
-      ctx.fill();
-
-      // ── Globe wireframe: latitude (depth-shaded segments) ──
-      for (let lat = -60; lat <= 60; lat += 30) {
-        let prevPr: { x: number; y: number } | null = null;
-        for (let lng = -180; lng <= 180; lng += 3) {
-          const p = latLngTo3D(lat, lng, radius, rotation);
-          const pr = proj(p, cx, cy, fov);
-          const da = depthAlpha(p, radius);
-          if (da < 0.15) { prevPr = null; continue; }
-          if (prevPr) {
-            const alpha = 0.08 + da * 0.30;
-            const lw = 0.3 + da * 0.7;
-            ctx.beginPath();
-            ctx.moveTo(prevPr.x, prevPr.y);
-            ctx.lineTo(pr.x, pr.y);
-            ctx.strokeStyle = cGlobe(alpha);
-            ctx.lineWidth = lw;
-            ctx.stroke();
-          }
-          prevPr = { x: pr.x, y: pr.y };
-        }
-      }
-
-      // ── Globe wireframe: longitude (depth-shaded segments) ──
-      for (let lng = -180; lng < 180; lng += 30) {
-        let prevPr: { x: number; y: number } | null = null;
-        for (let lat = -90; lat <= 90; lat += 3) {
-          const p = latLngTo3D(lat, lng, radius, rotation);
-          const pr = proj(p, cx, cy, fov);
-          const da = depthAlpha(p, radius);
-          if (da < 0.15) { prevPr = null; continue; }
-          if (prevPr) {
-            const alpha = 0.08 + da * 0.30;
-            const lw = 0.3 + da * 0.7;
-            ctx.beginPath();
-            ctx.moveTo(prevPr.x, prevPr.y);
-            ctx.lineTo(pr.x, pr.y);
-            ctx.strokeStyle = cGlobe(alpha);
-            ctx.lineWidth = lw;
-            ctx.stroke();
-          }
-          prevPr = { x: pr.x, y: pr.y };
-        }
-      }
-
-      // ── Globe outline with atmospheric rim ────────────
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius + 2, 0, Math.PI * 2);
-      ctx.strokeStyle = cGlobe(0.06);
-      ctx.lineWidth = 4;
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = cGlobe(0.25);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // ── City pin dots ────────────────────────────────
-      for (const city of cities) {
-        const p = latLngTo3D(city.lat, city.lng, radius, rotation);
-        const da = depthAlpha(p, radius);
-        if (da < 0.15) continue;
-        const pr = proj(p, cx, cy, fov);
-        const a = da * 0.6;
-        // Outer glow
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, 5 * pr.s, 0, Math.PI * 2);
-        ctx.fillStyle = cGlow(a * 0.15);
-        ctx.fill();
-        // Pin dot
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, 1.8 * pr.s, 0, Math.PI * 2);
-        ctx.fillStyle = cGlow(a * 0.7);
-        ctx.fill();
-      }
-
-      // ── Globe surface particles ───────────────────────
-      const projPts: { x: number; y: number; a: number }[] = [];
-      for (const pt of particles) {
-        pt.pulse += pt.pulseSpd;
-        const p = latLngTo3D(pt.lat, pt.lng, radius, rotation);
-        const da = depthAlpha(p, radius);
-        if (da < 0.1) continue;
-        const pr = proj(p, cx, cy, fov);
-        const ps = 0.7 + 0.3 * Math.sin(pt.pulse);
-        const a = da * 0.6 * ps;
-        const sz = pt.size * pr.s * ps;
-        projPts.push({ x: pr.x, y: pr.y, a });
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, sz * 3, 0, Math.PI * 2);
-        ctx.fillStyle = cGlow(a * 0.12); ctx.fill();
-        ctx.beginPath(); ctx.arc(pr.x, pr.y, sz, 0, Math.PI * 2);
-        ctx.fillStyle = cDot(a); ctx.fill();
-      }
-      for (let i = 0; i < projPts.length; i++) {
-        for (let j = i + 1; j < projPts.length; j++) {
-          const dx = projPts[i].x - projPts[j].x;
-          const dy = projPts[i].y - projPts[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < radius * 0.55) {
-            ctx.beginPath();
-            ctx.moveTo(projPts[i].x, projPts[i].y);
-            ctx.lineTo(projPts[j].x, projPts[j].y);
-            ctx.strokeStyle = cConn((1 - dist / (radius * 0.55)) * 0.12 * Math.min(projPts[i].a, projPts[j].a));
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // ── Pulse rings expanding from hotspots ───────────
-      pulseTimer++;
-      if (pulseTimer > 90) {
-        pulseTimer = 0;
-        const ci = Math.floor(seeded(time) * cities.length);
-        pulseRings.push({ lat: cities[ci].lat, lng: cities[ci].lng, age: 0, maxAge: 80 });
-      }
-      for (let i = pulseRings.length - 1; i >= 0; i--) {
-        const ring = pulseRings[i];
-        ring.age++;
-        if (ring.age > ring.maxAge) { pulseRings.splice(i, 1); continue; }
-        const p = latLngTo3D(ring.lat, ring.lng, radius, rotation);
-        const da = depthAlpha(p, radius);
-        if (da < 0.1) continue;
-        const pr = proj(p, cx, cy, fov);
-        const t = ring.age / ring.maxAge;
-        const ringR = t * radius * 0.25 * pr.s;
-        const alpha = (1 - t) * 0.35 * da;
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, ringR, 0, Math.PI * 2);
-        ctx.strokeStyle = cPulse(alpha);
-        ctx.lineWidth = 1.5 * (1 - t);
-        ctx.stroke();
-      }
-
-      // ── Data packets traveling between cities ─────────
-      packetTimer++;
-      if (packetTimer > 70) {
-        packetTimer = 0;
-        const a = Math.floor(seeded(time + 50) * cities.length);
-        let b = Math.floor(seeded(time + 150) * cities.length);
-        if (b === a) b = (a + 1) % cities.length;
-        const useColor = seeded(time + 250) > 0.5 ? cPacket1 : cPacket2;
-        dataPackets.push({
-          fromLat: cities[a].lat, fromLng: cities[a].lng,
-          toLat: cities[b].lat, toLng: cities[b].lng,
-          progress: 0, speed: 0.006 + seeded(time + 350) * 0.004,
-          _colorFn: useColor,
-        });
-      }
-      for (let i = dataPackets.length - 1; i >= 0; i--) {
-        const pk = dataPackets[i];
-        pk.progress += pk.speed;
-        if (pk.progress > 1) { dataPackets.splice(i, 1); continue; }
-
-        const p = arcPoint(pk.fromLat, pk.fromLng, pk.toLat, pk.toLng, pk.progress, 1.08);
-        const da = depthAlpha(p, radius * 1.08);
-        if (da < 0.05) continue;
-        const pr = proj(p, cx, cy, fov);
-        const alpha = da * 0.8;
-
-        for (let tr = 1; tr <= 5; tr++) {
-          const trailT = Math.max(0, pk.progress - tr * 0.02);
-          const trP = arcPoint(pk.fromLat, pk.fromLng, pk.toLat, pk.toLng, trailT, 1.08);
-          const trDa = depthAlpha(trP, radius * 1.08);
-          if (trDa < 0.05) continue;
-          const trPr = proj(trP, cx, cy, fov);
-          ctx.beginPath();
-          ctx.arc(trPr.x, trPr.y, (3 - tr * 0.4) * pr.s, 0, Math.PI * 2);
-          ctx.fillStyle = pk._colorFn(alpha * (0.4 - tr * 0.07));
-          ctx.fill();
-        }
-
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, 2.5 * pr.s, 0, Math.PI * 2);
-        ctx.fillStyle = pk._colorFn(alpha);
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, 7 * pr.s, 0, Math.PI * 2);
-        ctx.fillStyle = pk._colorFn(alpha * 0.15);
-        ctx.fill();
-      }
-
-      // ── Chat bubbles popping up ───────────────────────
-      chatTimer++;
-      if (chatTimer > 80) {
-        chatTimer = 0;
-        const ci = Math.floor(seeded(time + 999) * cities.length);
-        const city = cities[ci];
-        const greeting = city.greetings[Math.floor(seeded(time + 1234) * city.greetings.length)];
-        chatBubbles.push({
-          lat: city.lat, lng: city.lng,
-          life: 0, maxLife: 140,
-          text: greeting,
-          offsetY: 0,
-        });
-      }
-      for (let i = chatBubbles.length - 1; i >= 0; i--) {
-        const cb = chatBubbles[i];
-        cb.life++;
-        if (cb.life > cb.maxLife) { chatBubbles.splice(i, 1); continue; }
-
-        const p = latLngTo3D(cb.lat, cb.lng, radius, rotation);
-        const da = depthAlpha(p, radius);
-        if (da < 0.15) continue;
-        const pr = proj(p, cx, cy, fov);
-
-        const t = cb.life / cb.maxLife;
-        cb.offsetY = -t * 40 * pr.s;
-        const alpha = da * (t < 0.15 ? t / 0.15 : t > 0.7 ? (1 - t) / 0.3 : 1) * 0.55;
-
-        const bx = pr.x;
-        const by = pr.y + cb.offsetY;
-
-        ctx.font = `${Math.round(9 * pr.s)}px Inter, system-ui, sans-serif`;
-        const metrics = ctx.measureText(cb.text);
-        const tw = metrics.width;
-        const th = 9 * pr.s;
-        const pad = 5 * pr.s;
-
-        const bw = tw + pad * 2;
-        const bh = th + pad * 1.5;
-        const br = 4 * pr.s;
-
-        ctx.beginPath();
-        ctx.roundRect(bx - bw / 2, by - bh / 2, bw, bh, br);
-        ctx.fillStyle = cChat(alpha * 0.15);
-        ctx.fill();
-        ctx.strokeStyle = cChat(alpha * 0.3);
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(bx - 3 * pr.s, by + bh / 2);
-        ctx.lineTo(bx, by + bh / 2 + 4 * pr.s);
-        ctx.lineTo(bx + 3 * pr.s, by + bh / 2);
-        ctx.fillStyle = cChat(alpha * 0.15);
-        ctx.fill();
-
-        ctx.fillStyle = cChat(alpha);
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(cb.text, bx, by);
-      }
-
-      // ── Orbit rings ───────────────────────────────────
-      ctx.save();
-      ctx.translate(cx, cy);
-      drawOrbitRing(ctx, radius, 1.35, 0.3, 0.25, cGlobe, time, 0.008, cGlow);
-      drawOrbitRing(ctx, radius, 1.5, 0.45, -0.35, cGlobe, time, -0.006, cPulse);
-      ctx.restore();
-
-      animRef.current = requestAnimationFrame(render);
-    }
-
-    render();
-    return () => { cancelAnimationFrame(animRef.current); };
-  }, [resolvedTheme]);
-
-  useEffect(() => {
-    const cleanup = draw();
-    return () => { cancelAnimationFrame(animRef.current); cleanup?.(); };
-  }, [draw]);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    const onResize = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => { cancelAnimationFrame(animRef.current); draw(); }, 150);
-    };
-    window.addEventListener("resize", onResize);
-    return () => { window.removeEventListener("resize", onResize); clearTimeout(timeout); };
-  }, [draw]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
-      aria-hidden="true"
-    />
-  );
-}
-
-/* ── orbit ring helper ────────────────────────────────────── */
-
-function drawOrbitRing(
-  ctx: CanvasRenderingContext2D,
-  radius: number,
-  radiusMult: number,
-  tilt: number,
-  rotAngle: number,
-  cGlobe: (a: number) => string,
-  time: number,
-  speed: number,
-  cAccent: (a: number) => string,
-) {
-  const cosR = Math.cos(rotAngle);
-  const sinR = Math.sin(rotAngle);
-  const rx = radius * radiusMult;
-  const ry = rx * tilt;
-
-  ctx.beginPath();
-  for (let a = 0; a <= Math.PI * 2; a += 0.02) {
-    const px = Math.cos(a) * rx;
-    const py = Math.sin(a) * ry;
-    const fx = px * cosR - py * sinR;
-    const fy = px * sinR + py * cosR;
-    if (a === 0) ctx.moveTo(fx, fy); else ctx.lineTo(fx, fy);
+  for (let latitude = -60; latitude <= 60; latitude += 30) {
+    lines.push(Array.from({ length: steps + 1 }, (_, index) =>
+      surfacePoint(latitude * Math.PI / 180, index / steps * TAU),
+    ));
   }
-  ctx.closePath();
-  ctx.strokeStyle = cGlobe(0.18);
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 8]);
+
+  for (let longitude = 0; longitude < meridians; longitude++) {
+    lines.push(Array.from({ length: steps + 1 }, (_, index) =>
+      surfacePoint((index / steps - 0.5) * Math.PI, longitude / meridians * TAU),
+    ));
+  }
+
+  const count = compact ? 40 : 72;
+  const particles = Array.from({ length: count }, (_, index) =>
+    surfacePoint(Math.asin(1 - 2 * (index + 0.5) / count), index * 2.399963),
+  );
+  const orbits = ORBITS.map((orbit) =>
+    Array.from({ length: steps * 2 + 1 }, (_, index) =>
+      orbitPoint(orbit, index / (steps * 2) * TAU),
+    ),
+  );
+
+  return { lines, particles, orbits };
+}
+
+function projector(cx: number, cy: number, radius: number, yaw: number, pitch: number) {
+  const cosYaw = Math.cos(yaw);
+  const sinYaw = Math.sin(yaw);
+  const cosPitch = Math.cos(pitch);
+  const sinPitch = Math.sin(pitch);
+  const cosRoll = Math.cos(-0.2);
+  const sinRoll = Math.sin(-0.2);
+
+  return (point: Point3D): Point3D => {
+    const x = point.x * cosYaw + point.z * sinYaw;
+    const depth = -point.x * sinYaw + point.z * cosYaw;
+    const y = point.y * cosPitch - depth * sinPitch;
+    return {
+      x: cx + (x * cosRoll - y * sinRoll) * radius,
+      y: cy - (x * sinRoll + y * cosRoll) * radius,
+      z: point.y * sinPitch + depth * cosPitch,
+    };
+  };
+}
+
+function drawScene(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  geometry: ReturnType<typeof createGeometry>,
+  time: number,
+  pointer: { x: number; y: number },
+  dark: boolean,
+) {
+  ctx.clearRect(0, 0, width, height);
+  const radius = width * 0.325;
+  const cx = width * (0.5 + pointer.x * 0.009);
+  const cy = height * (0.43 + pointer.y * 0.008) + Math.sin(time * 0.6) * radius * 0.012;
+  const pitch = 0.2 + pointer.y * 0.08;
+  const projectSurface = projector(cx, cy, radius, -0.4 + time * 0.09 + pointer.x * 0.12, pitch);
+  const projectOrbit = projector(cx, cy, radius, pointer.x * 0.12, pitch);
+  const orbitPaths = geometry.orbits.map((path) => path.map(projectOrbit));
+  const satellites = ORBITS.map((orbit, index) =>
+    projectOrbit(orbitPoint(orbit, time * (index === 0 ? 0.18 : -0.13) + 0.8 + index * 2.4)),
+  ).sort((a, b) => a.z - b.z);
+
+  const metal = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+  metal.addColorStop(0, "#fff0c3");
+  metal.addColorStop(0.3, "#dca255");
+  metal.addColorStop(0.58, "#805028");
+  metal.addColorStop(0.8, "#f4c67e");
+  metal.addColorStop(1, "#986139");
+
+  // Rear hardware is painted before the opaque sphere; front arcs occlude it.
+  function drawOrbits(front: boolean) {
+    ctx.save();
+    ctx.globalAlpha = front ? 0.95 : 0.42;
+    ctx.lineCap = "round";
+    for (const path of orbitPaths) {
+      ctx.beginPath();
+      for (let index = 1; index < path.length; index++) {
+        const a = path[index - 1];
+        const b = path[index];
+        if (((a.z + b.z) / 2 >= 0) !== front) continue;
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+      }
+      ctx.lineWidth = front ? 3 : 2;
+      ctx.strokeStyle = dark ? "#50351f" : "#795032";
+      ctx.stroke();
+      ctx.lineWidth = front ? 1.25 : 0.85;
+      ctx.strokeStyle = metal;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    for (const point of satellites) {
+      if ((point.z >= 0) !== front) continue;
+      const size = Math.max(1.8, width * 0.0055) * (1 + point.z * 0.12);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, size * 3.5, 0, TAU);
+      ctx.fillStyle = `rgba(239, 175, 77, ${front ? 0.12 : 0.04})`;
+      ctx.fill();
+      const bead = ctx.createRadialGradient(
+        point.x - size * 0.3, point.y - size * 0.4, 0,
+        point.x, point.y, size,
+      );
+      bead.addColorStop(0, "#fff6dc");
+      bead.addColorStop(0.4, "#e4b267");
+      bead.addColorStop(1, "#785032");
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, size, 0, TAU);
+      ctx.fillStyle = bead;
+      ctx.fill();
+    }
+  }
+
+  drawOrbits(false);
+
+  const sphere = ctx.createRadialGradient(
+    cx - radius * 0.4, cy - radius * 0.48, radius * 0.025,
+    cx, cy, radius,
+  );
+  sphere.addColorStop(0, dark ? "#fff0bb" : "#fff4d4");
+  sphere.addColorStop(0.18, "#e2b66c");
+  sphere.addColorStop(0.4, "#ad763a");
+  sphere.addColorStop(0.64, "#644525");
+  sphere.addColorStop(0.84, "#302a21");
+  sphere.addColorStop(1, dark ? "#13191b" : "#242624");
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, TAU);
+  ctx.fillStyle = sphere;
+  ctx.fill();
+
+  ctx.save();
+  ctx.clip();
+  const wire = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+  wire.addColorStop(0, "rgba(255, 247, 217, 0.72)");
+  wire.addColorStop(0.5, "rgba(251, 209, 135, 0.35)");
+  wire.addColorStop(1, "rgba(181, 125, 67, 0.16)");
+  ctx.strokeStyle = wire;
+  ctx.lineWidth = width < 440 ? 0.7 : 0.9;
+  ctx.beginPath();
+  for (const line of geometry.lines) {
+    let previous: Point3D | null = null;
+    for (const point of line) {
+      const projected = projectSurface(point);
+      if (previous && previous.z > 0 && projected.z > 0) {
+        ctx.moveTo(previous.x, previous.y);
+        ctx.lineTo(projected.x, projected.y);
+      }
+      previous = projected;
+    }
+  }
   ctx.stroke();
-  ctx.setLineDash([]);
 
-  const angle = time * speed;
-  const opx = Math.cos(angle) * rx;
-  const opy = Math.sin(angle) * ry;
-  const ofx = opx * cosR - opy * sinR;
-  const ofy = opx * sinR + opy * cosR;
-
-  for (let t = 1; t <= 8; t++) {
-    const ta = angle - t * 0.04 * Math.sign(speed);
-    const tpx = Math.cos(ta) * rx;
-    const tpy = Math.sin(ta) * ry;
-    const tfx = tpx * cosR - tpy * sinR;
-    const tfy = tpx * sinR + tpy * cosR;
+  const particles = geometry.particles.map(projectSurface).sort((a, b) => a.z - b.z);
+  for (const point of particles) {
+    if (point.z <= 0) continue;
+    const size = (width < 440 ? 0.7 : 0.9) + point.z * 1.1;
     ctx.beginPath();
-    ctx.arc(tfx, tfy, 2 - t * 0.2, 0, Math.PI * 2);
-    ctx.fillStyle = cAccent(0.3 - t * 0.035);
+    ctx.arc(point.x, point.y, size * 3, 0, TAU);
+    ctx.fillStyle = `rgba(255, 192, 99, ${point.z * 0.09})`;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, size, 0, TAU);
+    ctx.fillStyle = `rgba(255, 233, 185, ${0.2 + point.z * 0.7})`;
     ctx.fill();
   }
+  ctx.restore();
 
   ctx.beginPath();
-  ctx.arc(ofx, ofy, 2.5, 0, Math.PI * 2);
-  ctx.fillStyle = cAccent(0.6);
-  ctx.fill();
-
+  ctx.arc(cx, cy, radius, 0, TAU);
+  ctx.strokeStyle = metal;
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
   ctx.beginPath();
-  ctx.arc(ofx, ofy, 9, 0, Math.PI * 2);
-  ctx.fillStyle = cAccent(0.08);
-  ctx.fill();
+  ctx.arc(cx, cy, radius + 1.5, Math.PI * 1.03, Math.PI * 1.67);
+  ctx.strokeStyle = "rgba(255, 226, 160, 0.55)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  drawOrbits(true);
+}
+
+export function HeroGlobe({ className = "" }: { className?: string }) {
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    const sceneElement = sceneRef.current;
+    const canvasElement = canvasRef.current;
+    if (!sceneElement || !canvasElement) return;
+    const context = canvasElement.getContext("2d");
+    if (!context) return;
+    const scene = sceneElement;
+    const canvas = canvasElement;
+    const ctx = context;
+
+    const dark = resolvedTheme === "dark"
+      || (!resolvedTheme && document.documentElement.classList.contains("dark"));
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const pointerQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const pointerSurface = scene.closest("section") ?? scene;
+    const pointer = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
+    let frame: number | null = null;
+    let lastTime: number | null = null;
+    let elapsed = 0;
+    let width = 0;
+    let height = 0;
+    let compact = true;
+    let geometry = createGeometry(compact);
+    let intersecting = false;
+    let contextAvailable = true;
+    let disposed = false;
+    let pointerListening = false;
+    let densityQuery: MediaQueryList | null = null;
+
+    function resetPointer() {
+      target.x = 0;
+      target.y = 0;
+    }
+
+    function movePointer(event: PointerEvent) {
+      if (event.pointerType === "touch") return;
+      const bounds = pointerSurface.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      target.x = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1));
+      target.y = Math.max(-1, Math.min(1, (event.clientY - bounds.top) / bounds.height * 2 - 1));
+    }
+
+    function listenToPointer(enabled: boolean) {
+      if (pointerListening === enabled) return;
+      pointerListening = enabled;
+      if (enabled) {
+        pointerSurface.addEventListener("pointermove", movePointer, { passive: true });
+        pointerSurface.addEventListener("pointerleave", resetPointer);
+      } else {
+        pointerSurface.removeEventListener("pointermove", movePointer);
+        pointerSurface.removeEventListener("pointerleave", resetPointer);
+        resetPointer();
+        pointer.x = 0;
+        pointer.y = 0;
+      }
+    }
+
+    function canAnimate() {
+      return !disposed && contextAvailable && intersecting && !document.hidden
+        && !motionQuery.matches && width > 0 && height > 0;
+    }
+
+    function paint() {
+      if (disposed || !contextAvailable || document.hidden || width <= 0 || height <= 0) return;
+      drawScene(ctx, width, height, geometry, motionQuery.matches ? 0 : elapsed, pointer, dark);
+      scene.dataset.ready = "true";
+    }
+
+    function stop() {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+      lastTime = null;
+    }
+
+    function tick(now: number) {
+      frame = null;
+      if (!canAnimate()) return;
+      const delta = lastTime === null ? 0 : Math.max(0, Math.min((now - lastTime) / 1000, 0.05));
+      lastTime = now;
+      elapsed += delta;
+      const blend = 1 - Math.exp(-delta * 6);
+      pointer.x += (target.x - pointer.x) * blend;
+      pointer.y += (target.y - pointer.y) * blend;
+      paint();
+      frame = requestAnimationFrame(tick);
+    }
+
+    // Every lifecycle event reconciles the same single animation loop.
+    function sync() {
+      stop();
+      const animate = canAnimate();
+      listenToPointer(animate && pointerQuery.matches);
+      paint();
+      if (animate) frame = requestAnimationFrame(tick);
+    }
+
+    function resize() {
+      if (disposed) return;
+      const bounds = scene.getBoundingClientRect();
+      width = bounds.width;
+      height = bounds.height;
+      const nextCompact = width < 440;
+      if (nextCompact !== compact) {
+        compact = nextCompact;
+        geometry = createGeometry(compact);
+      }
+      if (width > 0 && height > 0 && contextAvailable) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const pixelWidth = Math.max(1, Math.round(width * dpr));
+        const pixelHeight = Math.max(1, Math.round(height * dpr));
+        if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
+        if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
+        ctx.setTransform(pixelWidth / width, 0, 0, pixelHeight / height, 0, 0);
+      }
+      sync();
+    }
+
+    function watchDensity() {
+      densityQuery?.removeEventListener("change", changeDensity);
+      densityQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+      densityQuery.addEventListener("change", changeDensity);
+    }
+
+    function changeDensity() {
+      watchDensity();
+      resize();
+    }
+
+    function loseContext(event: Event) {
+      event.preventDefault();
+      contextAvailable = false;
+      delete scene.dataset.ready;
+      sync();
+    }
+
+    function restoreContext() {
+      contextAvailable = true;
+      resize();
+    }
+
+    const intersectionObserver = typeof IntersectionObserver === "undefined"
+      ? null
+      : new IntersectionObserver(([entry]) => {
+        intersecting = entry.isIntersecting;
+        sync();
+      });
+    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resize);
+    intersectionObserver?.observe(scene);
+    resizeObserver?.observe(scene);
+    window.addEventListener("resize", resize, { passive: true });
+    document.addEventListener("visibilitychange", sync);
+    motionQuery.addEventListener("change", sync);
+    pointerQuery.addEventListener("change", sync);
+    canvas.addEventListener("contextlost", loseContext);
+    canvas.addEventListener("contextrestored", restoreContext);
+    watchDensity();
+    resize();
+
+    return () => {
+      disposed = true;
+      stop();
+      listenToPointer(false);
+      intersectionObserver?.disconnect();
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", sync);
+      motionQuery.removeEventListener("change", sync);
+      pointerQuery.removeEventListener("change", sync);
+      densityQuery?.removeEventListener("change", changeDensity);
+      canvas.removeEventListener("contextlost", loseContext);
+      canvas.removeEventListener("contextrestored", restoreContext);
+      delete scene.dataset.ready;
+    };
+  }, [resolvedTheme]);
+
+  return (
+    <div ref={sceneRef} className={`${styles.scene} ${className}`} aria-hidden="true">
+      <div className={styles.backlight} />
+      <div className={styles.groundGrid} />
+      <div className={styles.platform} />
+      <div className={styles.fallback}>
+        <div className={styles.orbitBack} />
+        <div className={styles.fallbackSphere}>
+          <span className={styles.fallbackMeridian} />
+          <span className={`${styles.fallbackMeridian} ${styles.wideMeridian}`} />
+          <span className={styles.fallbackLatitude} />
+        </div>
+        <div className={styles.orbitFront} />
+      </div>
+      <canvas ref={canvasRef} className={styles.canvas} />
+    </div>
+  );
 }

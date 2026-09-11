@@ -96,6 +96,85 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 - [x] The homepage presents Lamplit Light as a model family (one job per model) rather than a single model: no tutor-specific headline, CTA, cover label, or journey copy; the `/try` CTA reads "Try a model in your browser".
 - [x] No new dependencies, lockfile changes, deployment changes, analytics provider changes, or cookie-consent changes are introduced.
 
+## Immersive Visual Refinement (2026-09-11)
+
+**Tier:** 0 - decorative polish of the existing homepage; no new product,
+navigation, catalog, or data behavior. The accepted decision's visual refresh
+remains the controlling scope.
+
+**Status:** Done (local implementation; not a deployment)
+
+**Delivered:** 2026-09-11
+
+Give the homepage a more immersive, three-dimensional presentation without
+replacing its warm Lamplit identity: a prominent sculptural globe beside the
+hero copy, softly lit perspective surfaces, tactile product cards, and a
+layered model-on-device illustration in the AI section. Keep the existing
+headings, product facts, five-stage build story, CTAs, destinations, accessible
+names, filtering, themes, and tracking intact.
+
+Depth must be visible at rest, not only on hover. Pointer tilt is optional
+decoration for fine pointers; it must not intercept links, require dragging,
+add tab stops, or change touch scrolling. Reduced-motion users receive a
+composed static scene with no pointer parallax or looping animation. Canvas
+work must pause when offscreen or the document is hidden, cap pixel density,
+and release observers, listeners, and animation frames on cleanup. All content
+must remain available without JavaScript.
+
+Use existing React, canvas, and CSS capabilities only. Do not add rendering
+libraries, fonts, remote assets, dependencies, deployment changes, analytics
+changes, or consent changes. Keep dimensional styling scoped so product detail
+pages and unrelated controls do not inherit unintended transforms.
+
+Acceptance covers visible depth on desktop and mobile in both themes,
+readable copy and focus indicators, no horizontal overflow, all ten catalog
+products and their category filters, preserved mobile-menu and current-section
+behavior, and the static reduced-motion presentation. Run the existing lint,
+typecheck, and export commands; inspect the rendered browser where available.
+
+Before delivery, remove only this refinement's hunks and newly introduced
+visual files if readability, navigation, motion preferences, export, or
+performance regress and cannot be repaired. Preserve unrelated working-tree
+changes. After a commit, use a scoped `git revert` instead of resetting the
+branch. No dependency or deployment rollback is needed.
+
+### Delivery Evidence
+
+The hero now has an illuminated copper globe with depth-sorted orbital
+hardware, a raised platform, and a CSS sculpture fallback. Product cards use
+the shared `TiltSurface` with stationary layout wrappers, bounded fine-pointer
+rotation, tracked highlights, and 44px footer actions. The AI illustration
+uses perspective-separated device, circuit, glass, and model layers. The
+floating header retains the existing navigation and menu behavior.
+
+The header's theme-dependent markup is stable through hydration before
+displaying the saved theme. Shared reveals leave content visible without
+JavaScript, and their entrance transforms do not persist over nested 3D
+surfaces. Reduced-motion overrides keep the composed depth while removing
+movement. Light-theme accent and muted text colors are scoped to the homepage
+for readability; product detail styling is not redesigned.
+
+`npm run lint && npm run typecheck && npm run build` passed with the existing
+dependencies, producing all 14 static pages. A local harness using the actual
+TypeScript/React components and generated HTML passed 174 assertions for
+catalog content, category controls, exact accessible action names, link
+destinations, development/coming-soon/empty branches, section order, metadata,
+all ten product detail exports, and unchanged protected product behavior.
+
+The installed Edge browser passed 80 assertions across both themes, 320px,
+390px, 768px, 1024px, and 1440px layouts, keyboard category activation, pointer
+tilt and reset, pending-frame cleanup on filtering, theme switching, the mobile
+menu breakpoint, offscreen canvas suspension, runtime motion preferences,
+and a 3x display emulation with canvas density capped at 2. Visibility and
+context-loss/recovery handling used controlled browser events, not a claim of
+real GPU failure. No-JavaScript and reduced-motion views retained all content.
+
+The actual `out/` export was also served locally and rendered in desktop,
+mobile, reduced-motion, and no-JavaScript modes, including the Lamplit Light
+detail page. These views had no horizontal overflow or runtime/hydration
+errors. No dependencies, catalog facts, links, analytics, consent, deployment
+configuration, or product publication states were changed.
+
 ## Verification Plan
 
 Verified on 2026-09-10 with `npm run lint && npm run typecheck && npm run build`, an export-assertion script over `out/` (35 checks: section order, nav links, preserved aria-labels, JSON-LD `sameAs`, no metric-like numbers in the AI section, `/products/light` export, sitemap, cover, Hugging Face links), and headless-browser screenshots of the homepage in dark/light/mobile plus `/products/light`.

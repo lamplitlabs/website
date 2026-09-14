@@ -114,7 +114,7 @@ Update your work plan or session notes:
 
 **Reversal:** [Files restored with git commands]
 
-**Verification:** 
+**Verification:**
 - [Check 1] ✓ passed
 - [Check 2] ✓ passed
 

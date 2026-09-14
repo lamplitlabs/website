@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { OutboundLink } from "@/components/outbound-link";
 import { socialPlatforms } from "@/components/social-platforms";
 import { navLinks, products, socialLinks } from "@/lib/site-data";
@@ -13,12 +14,12 @@ export function Footer() {
       <div className="mx-auto max-w-5xl px-4 py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-1">
-            <a href="#" className="inline-flex items-center gap-2">
+            <Link href="/" className="inline-flex items-center gap-2">
               <Logo className="h-7 w-7" lit />
               <span className="text-base font-semibold tracking-tight">
                 Lamplit Labs
               </span>
-            </a>
+            </Link>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Practical tools and AI you can run where you are - small software
               that illuminates the path forward.

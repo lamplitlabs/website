@@ -204,8 +204,8 @@ If only the Lamplit Light product must be pulled, delete its object from `lib/si
 
 ## Open Human Steps
 
-- [ ] Owner: point `ai.lamplitlabs.com` at the Vercel project for the AI site; until then, outbound CTAs on the homepage lead to an unresolved host.
-- [ ] Owner: flip Lamplit Light `status` to `"Live"` and `schema.creativeWorkStatus` to `"Published"` once the site is public.
+- [x] Owner: point `ai.lamplitlabs.com` at the Vercel project for the AI site. Verified 2026-09-17: the host resolves through Vercel DNS (`dig +short ai.lamplitlabs.com` returns a `vercel-dns` CNAME and A records), `https://ai.lamplitlabs.com` answers HTTP 200 with the title "Lamplit Labs AI - models you can host yourself", and `https://ai.lamplitlabs.com/try` answers 307 to the Hugging Face space. The homepage CTAs no longer lead to an unresolved host.
+- [ ] Owner: flip Lamplit Light `status` to `"Live"` and `schema.creativeWorkStatus` to `"Published"` in `lib/site-data.ts` now that the AI site is reachable. This is the only remaining blocker for marking this feature Shipped; the catalog entry still says "In development" until the owner confirms the site is meant to be public.
 - [ ] Owner: confirm or change the name "Lamplit Light"; the product name lives in `lib/site-data.ts` for a one-line rename.
 - [ ] Optional: rename the `Project-light` folder and `copilot-distill` package in the source repo to match the public product line.
 

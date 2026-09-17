@@ -15,7 +15,7 @@ Lamplit Labs now presents two connected pillars: practical products and the Lamp
 | Product | Purpose | Technology | Status |
 |---------|---------|-----------|--------|
 | **Amistio** | Visual AI agent builder with app connectors and approval gates | Next.js | Live |
-| **Lamplit Light** | Sovereign AI lab: small, specialised models you host yourself (browser, laptop, on-prem, private cloud, app, edge) | Python distillation toolkit + React/Vite site; models exported to ONNX for transformers.js | In development (ai.lamplitlabs.com not yet public) |
+| **Lamplit Light** | Sovereign AI lab: small, specialised models you host yourself (browser, laptop, on-prem, private cloud, app, edge) | Python distillation toolkit + React/Vite site; models exported to ONNX for transformers.js | In development (ai.lamplitlabs.com resolves and serves the AI site as of 2026-09-17; catalog status flip to Live awaits owner confirmation) |
 | **Kenntnistrainer** | KI-gestützte medical exam prep (Germany) | Next.js | Live |
 | **Fachsprachprüfung** | FSP simulation & training (Germany) | Next.js | Live |
 | **Leben in Deutschland** | German citizenship test prep (310 questions) | Next.js | Live |

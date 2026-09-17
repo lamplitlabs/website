@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { OutboundLink } from "@/components/outbound-link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
+import { SiteNav } from "@/components/site-nav";
 import {
   getProductBySlug,
   isProductInDevelopment,
@@ -110,32 +111,20 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <>
       <ProductJsonLd slug={slug} />
 
-      {/* ── Minimal nav bar ──────────────────────────────── */}
-      <nav className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <Link
-            href="/"
-            aria-label="Back to Lamplit Labs home"
-            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <Logo className="h-6 w-6" />
-            <span className="hidden sm:inline">Lamplit Labs</span>
-          </Link>
-          <OutboundLink
-            href={product.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            trackingTarget={product.slug}
-            trackingContext="product_page_nav_cta"
-            trackingUrl={product.url}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            {isInDevelopment ? "Follow development" : `Visit ${product.name}`}
-            <ExternalLink className="h-3.5 w-3.5" />
-          </OutboundLink>
-        </div>
-      </nav>
+      <SiteNav>
+        <OutboundLink
+          href={product.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          trackingTarget={product.slug}
+          trackingContext="product_page_nav_cta"
+          trackingUrl={product.url}
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          {isInDevelopment ? "Follow development" : `Visit ${product.name}`}
+          <ExternalLink className="h-3.5 w-3.5" />
+        </OutboundLink>
+      </SiteNav>
 
       <main>
         {/* ── Hero section with cover ──────────────────────── */}

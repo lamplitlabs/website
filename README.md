@@ -53,6 +53,15 @@ npm run build
 npm run clean
 ```
 
+### Testing
+
+```bash
+# Run the smoke tests (tests/smoke.test.mjs) with the Node.js built-in test runner
+npm run test
+```
+
+The smoke tests live in `tests/` and need no build step or extra dependencies. Lint and typecheck with `npm run lint` and `npm run typecheck`.
+
 ## Project Structure
 
 ```

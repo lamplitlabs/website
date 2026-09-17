@@ -28,6 +28,7 @@ npm run dev          # Start local dev server at http://localhost:3000
 npm run build        # Build static export to ./out
 npm run lint         # Lint with ESLint
 npm run typecheck    # Run TypeScript type checker
+npm run test         # Run smoke tests (node --test, tests/**/*.test.mjs)
 npm run clean        # Clean build artifacts
 ```
 
@@ -42,7 +43,7 @@ npm run clean        # Clean build artifacts
 3. **Plan** — Create plans in `docs/plans/` for non-trivial work.
 4. **Specify** — Describe features in `docs/features/`.
 5. **Build** — Implement product code only after decisions and plans are clear.
-6. **Verify** — Run `npm run lint`, `npm run typecheck`, `npm run build`.
+6. **Verify** — Run `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`.
 7. **Learn** — Record patterns and lessons in `docs/memory/`.
 
 ## Critical Rules

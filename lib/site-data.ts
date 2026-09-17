@@ -39,7 +39,6 @@ export interface Product {
   category: ProductCategory;
   highlights: ProductHighlight[];
   featured?: boolean;
-  comingSoon?: boolean;
   status?: ProductStatus;
   metaTitle?: string;
   metaDescription?: string;

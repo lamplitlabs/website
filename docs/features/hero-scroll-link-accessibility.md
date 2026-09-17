@@ -1,7 +1,7 @@
 # Feature: Hero Scroll Link Accessibility
 
 **Date:** 2026-09-09
-**Status:** Verified in worker; awaiting human review and merge
+**Status:** Merged (landed to main)
 **Owner:** Lamplit Labs
 **Tier:** 0 - accessible-name repair of an existing icon-only link
 **Worker starting commit:** `e757e942e45fa46d2c024c706d66701da31fcfe2`

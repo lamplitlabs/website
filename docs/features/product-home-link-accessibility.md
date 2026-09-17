@@ -1,7 +1,7 @@
 # Feature: Product Home Link Accessibility
 
 **Date:** 2026-09-08
-**Status:** Verified in worker; awaiting human review and merge
+**Status:** Merged (landed to main)
 **Owner:** Lamplit Labs
 **Tier:** 0 - existing-link accessibility markup repair
 **Worker starting commit:** `c246a1b59adc8a162f894d94006038c3837a8589`

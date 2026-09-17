@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/**/*.test.mjs\"",
     "clean": "rm -rf .next out"
   },
   "dependencies": {

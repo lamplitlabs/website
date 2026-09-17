@@ -5,7 +5,11 @@ import { ArrowLeft, ArrowUpRight, ExternalLink } from "lucide-react";
 import { OutboundLink } from "@/components/outbound-link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
-import { getProductBySlug, products } from "@/lib/site-data";
+import {
+  getProductBySlug,
+  isProductInDevelopment,
+  products,
+} from "@/lib/site-data";
 
 interface ProductPageProps {
   params: Promise<{
@@ -100,7 +104,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const isInDevelopment = product.status === "In development";
+  const isInDevelopment = isProductInDevelopment(product);
 
   return (
     <>

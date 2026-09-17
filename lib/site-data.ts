@@ -172,7 +172,7 @@ export const products: Product[] = [
       },
     ],
     featured: true,
-    status: "In development",
+    status: "Live",
     metaTitle: "Lamplit Light - Small AI Models You Host Yourself",
     metaDescription:
       "Small, specialised AI models you host in browsers, apps, private clouds, laptops, on-prem, or at the edge. Your data never leaves.",
@@ -180,7 +180,7 @@ export const products: Product[] = [
     schema: {
       name: "Lamplit Light sovereign AI models",
       applicationCategory: "BusinessApplication",
-      creativeWorkStatus: "In development",
+      creativeWorkStatus: "Published",
       featureList: [
         "Self-hosted small AI models",
         "Single-purpose specialised models",

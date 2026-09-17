@@ -74,7 +74,7 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 
 ## Edge Cases
 
-- `ai.lamplitlabs.com` is not live until the owner points DNS at the AI site's Vercel project, so Lamplit Light remains `In development` and its outbound action should read as development-following rather than a live-product claim.
+- `ai.lamplitlabs.com` now resolves (Vercel DNS) and serves the AI site, so Lamplit Light is `Live` with `creativeWorkStatus: "Published"` and its outbound action reads "Visit site"; if the host ever stops resolving, flip both fields back to `In development` in `lib/site-data.ts`.
 - The homepage should not copy benchmark numbers from the AI site; the AI site generates numbers from measurements and duplicated static numbers would go stale.
 - Product category filters cannot currently produce an empty category because every category has at least one product; if a future category is empty, the grid should render its empty state gracefully.
 - With JavaScript disabled, the statically rendered product grid should still show all products.

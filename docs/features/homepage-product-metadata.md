@@ -2,7 +2,7 @@
 
 **ID:** FEAT-002
 **Date:** 2026-09-08
-**Status:** Verified in worker; awaiting human review and merge
+**Status:** Merged (landed to main)
 **Owner:** Lamplit Labs
 **Tier:** 0 - copy-only correction
 **Worker starting commit:** `99f9c01819c64669c9957f98e8443753c68a6643`

@@ -1,7 +1,7 @@
 # Feature: Mobile Menu Expanded State
 
 **Date:** 2026-09-08
-**Status:** Verified in worker; awaiting human review and merge
+**Status:** Merged (landed to main)
 **Owner:** Lamplit Labs
 **Tier:** 0 - existing-state accessibility markup repair
 **Worker starting commit:** `78809858a29b743e2e6cbc435845df469285dd2e`

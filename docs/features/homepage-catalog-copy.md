@@ -1,7 +1,7 @@
 # Feature: Catalog-Aligned Visible Homepage Copy
 
 **Date:** 2026-09-09
-**Status:** Done in worker; awaiting human review and merge
+**Status:** Merged (landed to main)
 **Delivered:** 2026-09-09 (local worker only)
 **Owner:** Lamplit Labs
 **Tier:** 0 - four literal copy corrections on existing rendered surfaces

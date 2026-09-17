@@ -132,6 +132,4 @@ Both `package.json` and `tools/vercel-cli/package.json` carry an npm `overrides`
 
 ## Open Questions
 
-- [ ] Are there performance budgets or metrics being tracked?
-- [ ] Should we implement server-side image optimization despite static export?
-- [ ] Are there additional integrations (analytics, monitoring, error tracking) planned?
+Tracked centrally in [`open-questions.md`](open-questions.md) (performance budgets: #2, image optimization: #4, analytics/monitoring integrations: #5).

@@ -56,11 +56,13 @@ npm run clean        # Clean build artifacts
 - Keep prompts and plans model-agnostic.
 - When changes touch files, dependencies, or deployment, define a rollback plan first.
 
-## First Intake Questions (Open)
+## Open Intake Questions
 
-- [ ] What is the cadence for adding or updating products in the showcase?
-- [ ] Are there performance or SEO goals we should track?
-- [ ] Should this repository maintain design system documentation for shadcn/ui usage?
+Unanswered questions that need owner input (release cadence, performance/SEO goals,
+design-system docs, i18n, analytics, image optimization) live in one place:
+[`docs/context/open-questions.md`](docs/context/open-questions.md). Do not write an ADR
+or plan that assumes an answer to one of them; reference the question by number and
+stop for owner input instead.
 
 ## Next Steps
 

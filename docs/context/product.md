@@ -59,10 +59,7 @@ Public channels are catalog data as well (`socialLinks` in `lib/site-data.ts`): 
 
 ## Future Directions (Open Questions)
 
-- [ ] Should this website support multiple languages (i18n)?
-- [ ] Are there analytics or conversion tracking goals we should instrument?
-- [ ] What is the release cadence for adding new products?
-- [ ] Should product detail pages add a public roadmap or changelog beyond category-based discovery?
+Tracked centrally in [`open-questions.md`](open-questions.md) (i18n: #6, analytics/conversion goals: #5, product release cadence: #1, roadmap/changelog on product pages: #7).
 
 ## Changes Made by PULSE Bootstrap
 

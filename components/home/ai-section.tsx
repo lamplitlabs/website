@@ -15,9 +15,15 @@ import Link from "next/link";
 import { HuggingFaceIcon } from "@/components/icons";
 import { OutboundLink } from "@/components/outbound-link";
 import { RevealSection } from "@/components/home/reveal-section";
-import { socialLinks } from "@/lib/site-data";
+import { getProductBySlug, socialLinks } from "@/lib/site-data";
 import styles from "./ai-section.module.css";
 
+const lightProduct = getProductBySlug("light");
+const lightStatus = lightProduct?.status ?? "In development";
+const lightStatusLabel =
+  lightStatus === "Live"
+    ? "Live \u00b7 public site at ai.lamplitlabs.com"
+    : "In development \u00b7 public site coming to ai.lamplitlabs.com";
 const lightHomeUrl = "https://ai.lamplitlabs.com";
 const lightTryUrl = "https://ai.lamplitlabs.com/try";
 
@@ -355,7 +361,7 @@ export function AiSection() {
 
               <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-sm text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_hsl(var(--glow)/0.75)]" />
-                In development &middot; public site coming to ai.lamplitlabs.com
+                {lightStatusLabel}
               </div>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

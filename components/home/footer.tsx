@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { OutboundLink } from "@/components/outbound-link";
 import { socialPlatforms } from "@/components/social-platforms";
-import { navLinks, products, socialLinks } from "@/lib/site-data";
+import {
+  isProductInDevelopment,
+  navLinks,
+  products,
+  socialLinks,
+} from "@/lib/site-data";
 import { Logo } from "@/components/logo";
 
 export function Footer() {
@@ -41,7 +46,7 @@ export function Footer() {
                     trackingUrl={product.url}
                   >
                     {product.name}
-                    {product.status === "In development" && (
+                    {isProductInDevelopment(product) && (
                       <span
                         aria-hidden="true"
                         className="mono-label ml-2 align-middle text-primary/80"

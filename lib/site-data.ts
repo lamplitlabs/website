@@ -47,6 +47,17 @@ export interface Product {
   schema?: ProductSchema;
 }
 
+/** Single source of truth for product status checks used across the UI. */
+export function isProductLive(product: Pick<Product, "status">): boolean {
+  return product.status === "Live";
+}
+
+export function isProductInDevelopment(
+  product: Pick<Product, "status">,
+): boolean {
+  return product.status === "In development";
+}
+
 export interface NavLink {
   label: string;
   href: string;

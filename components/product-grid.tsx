@@ -8,6 +8,8 @@ import { TiltSurface } from "@/components/tilt-surface";
 import { cn } from "@/lib/utils";
 import {
   productCategories,
+  isProductInDevelopment,
+  isProductLive,
   type Product,
   type ProductCategory,
 } from "@/lib/site-data";
@@ -22,8 +24,8 @@ function ProductCard({
 }) {
   const isFeatured = product.featured;
   const isComingSoon = product.comingSoon;
-  const isInDevelopment = product.status === "In development";
-  const isLive = product.status === "Live";
+  const isInDevelopment = isProductInDevelopment(product);
+  const isLive = isProductLive(product);
 
   const inner = (
     <>

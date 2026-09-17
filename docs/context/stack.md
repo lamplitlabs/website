@@ -2,7 +2,7 @@
 
 ## Core Framework & Language
 
-- **Node.js:** 20+ (see `.nvmrc` for exact version)
+- **Node.js:** 20.x LTS only (`engines` in `package.json` is `>=20 <21`; `.nvmrc` pins the exact version). The Pulse CTX-environment recipe pins `node@v20.20.2` and `npm@10.9.9` so agent clones match and `npm ci` emits no EBADENGINE warning.
 - **Runtime:** Next.js 15.5.25 with static export (`output: "export"` in `next.config.js`)
 - **Language:** TypeScript 5.6.3 (strict mode)
 - **Package Manager:** npm (lock file tracked)

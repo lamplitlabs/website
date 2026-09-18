@@ -39,7 +39,7 @@ export interface Product {
   category: ProductCategory;
   highlights: ProductHighlight[];
   featured?: boolean;
-  status?: ProductStatus;
+  status: ProductStatus;
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
@@ -214,6 +214,7 @@ export const products: Product[] = [
     cover: "/covers/kenntnistrainer.svg",
     tags: ["AI", "Medical", "Training"],
     category: "Education",
+    status: "Live",
     highlights: [
       { title: "7-Step Case Flow", description: "Structured exam simulation following the official Kenntnisprufung format step by step." },
       { title: "AI Feedback", description: "Get instant, detailed feedback on your responses powered by AI evaluation." },
@@ -234,6 +235,7 @@ export const products: Product[] = [
     cover: "/covers/fsp.svg",
     tags: ["AI", "Medical", "Language"],
     category: "Education",
+    status: "Live",
     highlights: [
       { title: "Patient Conversation", description: "Practice realistic doctor-patient dialogues with AI-simulated patients." },
       { title: "Documentation Training", description: "Learn to write medical reports and referral letters in German." },
@@ -254,6 +256,7 @@ export const products: Product[] = [
     cover: "/covers/leben.svg",
     tags: ["Education", "Germany", "Integration"],
     category: "Education",
+    status: "Live",
     highlights: [
       { title: "310 Official Questions", description: "Complete coverage of all questions from the official question catalog." },
       { title: "Region-Specific Content", description: "Practice with questions specific to your Bundesland." },
@@ -274,6 +277,7 @@ export const products: Product[] = [
     cover: "/covers/tools.svg",
     tags: ["Developer Tools", "Utilities", "Web"],
     category: "Developer Tools",
+    status: "Live",
     highlights: [
       { title: "JSON Formatter", description: "Format, validate, and minify JSON with syntax highlighting." },
       { title: "Base64 Encoder/Decoder", description: "Encode and decode Base64 strings instantly." },
@@ -294,6 +298,7 @@ export const products: Product[] = [
     cover: "/covers/resume.svg",
     tags: ["Productivity", "Career"],
     category: "Career",
+    status: "Live",
     highlights: [
       { title: "ATS-Optimized", description: "Structured output that applicant tracking systems can parse correctly." },
       { title: "Professional Templates", description: "Clean, recruiter-friendly layouts you can customize." },
@@ -313,6 +318,7 @@ export const products: Product[] = [
     cover: "/covers/edmx.svg",
     tags: ["Developer Tools", ".NET", "OData"],
     category: "Developer Tools",
+    status: "Live",
     highlights: [
       { title: "EDMX Explorer", description: "Browse entity types, properties, and associations visually." },
       { title: "EDMX Trimmer", description: "Remove unused entities to reduce metadata file size." },
@@ -332,6 +338,7 @@ export const products: Product[] = [
     cover: "/covers/azure-assets.svg",
     tags: ["Azure", "Draw.io", "Architecture"],
     category: "Azure",
+    status: "Live",
     highlights: [
       { title: "643+ Icons", description: "Comprehensive collection of Azure service icons for diagrams." },
       { title: "Auto-Synced", description: "Continuously updated from official Microsoft Azure icon sets." },
@@ -351,6 +358,7 @@ export const products: Product[] = [
     cover: "/covers/azure-compliance.svg",
     tags: ["Azure", "Compliance", "Security"],
     category: "Azure",
+    status: "Live",
     highlights: [
       { title: "17 Frameworks", description: "Coverage across ISO 27001, SOC, HIPAA, PCI DSS, and more." },
       { title: "Interactive Matrix", description: "Search, filter, and explore compliance coverage by service." },

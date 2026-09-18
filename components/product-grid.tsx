@@ -23,8 +23,10 @@ function ProductCard({
   index: number;
 }) {
   const isFeatured = product.featured;
-  const isComingSoon = product.comingSoon;
   const isInDevelopment = isProductInDevelopment(product);
+  // "Coming soon" is derived from status, not a separate flag, so the badge
+  // can never drift from a product's real status.
+  const isComingSoon = isInDevelopment;
   const isLive = isProductLive(product);
 
   const inner = (
@@ -40,7 +42,7 @@ function ProductCard({
               Featured
             </span>
           )}
-          {(product.status || isComingSoon) && (
+          {product.status && (
             <span className={styles.status}>
               {(isInDevelopment || isLive) && (
                 <span
@@ -51,7 +53,7 @@ function ProductCard({
                   aria-hidden="true"
                 />
               )}
-              {product.status ?? "Coming Soon"}
+              {product.status}
             </span>
           )}
         </div>

@@ -81,3 +81,18 @@ test("static export (out/) has HTML for each route and no dangling local assets"
     }
   }
 });
+
+// Product grid: every card in the exported home page renders exactly one
+// status badge. Guards the user-facing regression where a product ships with
+// no status (badge missing) or the badge is rendered twice (duplicate).
+test("static export (out/) home page renders exactly one status badge per product card", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  // Cards are the TiltSurface wrappers carrying the product-grid `card` class.
+  const cards = html.split(/(?=<[a-z]+ class="[^"]*\bproduct-grid_card__)/).slice(1);
+  assert.equal(cards.length, slugs.length, `expected ${slugs.length} product cards, found ${cards.length}`);
+  for (const card of cards) {
+    const name = card.match(/product-grid_name__[^"]*"[^>]*>([^<]+)</)?.[1] ?? "(unknown product)";
+    const badges = card.match(/class="product-grid_status__[^"]*"/g) ?? [];
+    assert.equal(badges.length, 1, `${name} renders ${badges.length} status badges (expected exactly 1)`);
+  }
+});

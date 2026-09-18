@@ -21,28 +21,36 @@ test("core product entry points exist", () => {
   }
 });
 
-test("product catalog uses only known status values", () => {
+// Load the real catalog: transpile lib/site-data.ts with the project's own
+// TypeScript so the assertions below check data, not source formatting.
+async function loadSiteData() {
+  const ts = (await import("typescript")).default;
   const src = readFileSync(resolve(root, "lib/site-data.ts"), "utf8");
-  const statuses = [...src.matchAll(/^\s*status:\s*"([^"]+)"/gm)].map((m) => m[1]);
-  assert.ok(statuses.length > 0, "expected at least one product status");
-  for (const s of statuses) {
-    assert.ok(["Live", "In development"].includes(s), `unknown status "${s}"`);
+  const { outputText } = ts.transpileModule(src, {
+    compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
+  });
+  const url = `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`;
+  return import(url);
+}
+
+test("product catalog uses only known status values", async () => {
+  const { products } = await loadSiteData();
+  assert.ok(products.length > 0, "expected at least one product");
+  for (const p of products) {
+    if (p.status === undefined) continue; // status is optional in the Product type
+    assert.ok(
+      ["Live", "In development"].includes(p.status),
+      `product "${p.slug}" has unknown status "${p.status}"`,
+    );
   }
 });
 
-test("a product marked comingSoon is never also marked Live", () => {
-  const src = readFileSync(resolve(root, "lib/site-data.ts"), "utf8");
-  const catalog = src.slice(src.indexOf("export const products"));
-  // Split the catalog into per-product blocks keyed on each `slug:` line.
-  const blocks = catalog.split(/^\s*slug:\s*"/m).slice(1);
-  assert.ok(blocks.length > 0, "expected at least one product entry");
-  for (const block of blocks) {
-    const slug = block.slice(0, block.indexOf('"'));
-    const comingSoon = /^\s*comingSoon:\s*true/m.test(block);
-    const live = /^\s*status:\s*"Live"/m.test(block);
+test("a product marked comingSoon is never also marked Live", async () => {
+  const { products, isProductLive } = await loadSiteData();
+  for (const p of products) {
     assert.ok(
-      !(comingSoon && live),
-      `product "${slug}" sets comingSoon: true but status "Live" — a shipped product would show a "coming soon" badge`,
+      !(p.comingSoon && isProductLive(p)),
+      `product "${p.slug}" sets comingSoon: true but status "Live" — a shipped product would show a "coming soon" badge`,
     );
   }
 });

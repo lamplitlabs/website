@@ -46,3 +46,24 @@ test("a product marked comingSoon is never also marked Live", () => {
     );
   }
 });
+
+test("every product cover resolves to a file under public/ and slugs are unique", () => {
+  const src = readFileSync(resolve(root, "lib/site-data.ts"), "utf8");
+  const catalog = src.slice(src.indexOf("export const products"));
+  const slugs = [...catalog.matchAll(/^\s*slug:\s*"([^"]+)"/gm)].map((m) => m[1]);
+  const covers = [...catalog.matchAll(/^\s*cover:\s*"([^"]+)"/gm)].map((m) => m[1]);
+  assert.ok(slugs.length > 0, "expected at least one product slug");
+  assert.equal(covers.length, slugs.length, "every product needs exactly one cover");
+  assert.deepEqual(
+    [...new Set(slugs)],
+    slugs,
+    `duplicate product slugs: ${slugs.filter((s, i) => slugs.indexOf(s) !== i).join(", ")}`,
+  );
+  for (const cover of covers) {
+    assert.ok(cover.startsWith("/"), `cover "${cover}" must be an absolute public path`);
+    assert.ok(
+      existsSync(resolve(root, "public", cover.slice(1))),
+      `cover "${cover}" does not exist under public/ — the product card would render a broken image`,
+    );
+  }
+});

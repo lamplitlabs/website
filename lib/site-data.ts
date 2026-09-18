@@ -222,6 +222,7 @@ export const products: Product[] = [
       { title: "German Medical Language", description: "Practice medical communication in German with realistic scenarios." },
     ],
     featured: true,
+    status: "Live",
   },
   {
     slug: "fachsprachprufung",
@@ -243,6 +244,7 @@ export const products: Product[] = [
       { title: "Exam-Ready Practice", description: "Covers all three FSP exam sections in a single training flow." },
     ],
     featured: true,
+    status: "Live",
   },
   {
     slug: "leben-in-deutschland",
@@ -264,6 +266,7 @@ export const products: Product[] = [
       { title: "Free to Use", description: "No account required, no paywalls. Just start practicing." },
     ],
     featured: true,
+    status: "Live",
   },
   {
     slug: "developer-tools",
@@ -285,6 +288,7 @@ export const products: Product[] = [
       { title: "Browser-Based", description: "All tools run entirely in your browser. Nothing is sent to a server." },
     ],
     featured: true,
+    status: "Live",
   },
   {
     slug: "resume-builder",
@@ -305,6 +309,7 @@ export const products: Product[] = [
       { title: "Quick Setup", description: "Fill in your details and get a polished resume in minutes." },
       { title: "Export Ready", description: "Download your resume as PDF, ready to submit." },
     ],
+    status: "Live",
   },
   {
     slug: "edmx-tools",
@@ -325,6 +330,7 @@ export const products: Product[] = [
       { title: "OpenAPI Converter", description: "Convert EDMX metadata to OpenAPI specification." },
       { title: "JSON Converter", description: "Transform EDMX XML into structured JSON for easier processing." },
     ],
+    status: "Live",
   },
   {
     slug: "azure-drawio-assets",
@@ -345,6 +351,7 @@ export const products: Product[] = [
       { title: "Draw.io Ready", description: "Icons formatted and ready to drag into your Draw.io diagrams." },
       { title: "Searchable Catalog", description: "Find the right icon quickly with built-in search." },
     ],
+    status: "Live",
   },
   {
     slug: "azure-compliance-matrix",
@@ -365,6 +372,7 @@ export const products: Product[] = [
       { title: "Azure Government", description: "Includes compliance data for both Azure and Azure Government." },
       { title: "Always Current", description: "Data sourced and updated from official Microsoft documentation." },
     ],
+    status: "Live",
   },
 ];
 

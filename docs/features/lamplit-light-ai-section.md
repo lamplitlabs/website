@@ -1,7 +1,7 @@
 # Feature: Lamplit Light AI Section
 
 **Date:** 2026-09-10  
-**Status:** In development (this change set); awaiting human review and merge  
+**Status:** Merged (present in app/layout.tsx, components/home/ai-section.tsx, and lib/site-data.ts)  
 **Owner:** Lamplit Labs  
 **Tier:** 2 - new homepage behavior: dedicated AI section, catalog entry, navigation link, and category filtering
 

@@ -2,7 +2,7 @@
 // Run with `npm test`. Extend with real unit tests as product code grows.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -73,5 +73,30 @@ test("every product cover resolves to a file under public/ and slugs are unique"
       existsSync(resolve(root, "public", cover.slice(1))),
       `cover "${cover}" does not exist under public/ — the product card would render a broken image`,
     );
+  }
+});
+
+// docs/memory/2026-09-11-public-copy-describes-outcomes-not-method.md: public copy
+// describes what a model does for the buyer, never the training method. Guard the
+// files that carry Lamplit Light copy so a later edit cannot reintroduce it silently.
+// "pipeline" is deliberately not banned: the feature spec and ADR name the public
+// "five-stage build pipeline" label; the banned words are the method itself.
+test("public product copy contains no training-method words", () => {
+  const banned = /distil|teacher|student|copilot-distill/i;
+  const files = [
+    "lib/site-data.ts",
+    "components/home/ai-section.tsx",
+    ...readdirSync(resolve(root, "public/covers"))
+      .filter((f) => f.endsWith(".svg"))
+      .map((f) => `public/covers/${f}`),
+  ];
+  for (const file of files) {
+    const lines = readFileSync(resolve(root, file), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      assert.ok(
+        !banned.test(line),
+        `${file}:${i + 1} mentions a training-method word (${line.trim()}) — public copy describes outcomes, not method`,
+      );
+    });
   }
 });

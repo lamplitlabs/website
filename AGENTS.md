@@ -29,6 +29,7 @@ npm run build        # Build static export to ./out
 npm run lint         # Lint with ESLint
 npm run typecheck    # Run TypeScript type checker
 npm run test         # Run smoke tests (node --test, tests/**/*.test.mjs)
+npm run test:e2e     # Build static export, then run all smoke tests incl. out/ check (never skipped)
 npm run clean        # Clean build artifacts
 npm run check        # Full verification: lint → typecheck → test → build (one command; if the script is
                      # not yet in package.json on your branch, run those four commands in that order)

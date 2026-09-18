@@ -226,12 +226,12 @@ export const products: Product[] = [
   {
     slug: "fachsprachprufung",
     status: "Live",
-    name: "Fachsprachprufung",
+    name: "Fachsprachprüfung",
     title: "AI-powered FSP simulation and training",
     description:
       "FSP preparation with AI simulation: doctor-patient conversation, documentation, and doctor-to-doctor handover in German.",
     longDescription:
-      "Fachsprachprufung supports foreign doctors preparing for the language-focused medical exam in Germany. It trains practical workflows from patient interaction to handover communication.",
+      "Fachsprachprüfung supports foreign doctors preparing for the language-focused medical exam in Germany. It trains practical workflows from patient interaction to handover communication.",
     url: "https://www.fachsprachtrainer.de",
     cover: "/covers/fsp.svg",
     tags: ["AI", "Medical", "Language"],

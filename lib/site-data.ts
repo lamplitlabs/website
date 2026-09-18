@@ -182,7 +182,7 @@ export const products: Product[] = [
       },
     ],
     featured: true,
-    status: "Live",
+    status: "In development",
     metaTitle: "Lamplit Light - Small AI Models You Host Yourself",
     metaDescription:
       "Small, specialised AI models you host in browsers, apps, private clouds, laptops, on-prem, or at the edge. Your data never leaves.",

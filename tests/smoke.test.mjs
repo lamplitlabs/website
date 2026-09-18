@@ -29,3 +29,20 @@ test("product catalog uses only known status values", () => {
     assert.ok(["Live", "In development"].includes(s), `unknown status "${s}"`);
   }
 });
+
+test("a product marked comingSoon is never also marked Live", () => {
+  const src = readFileSync(resolve(root, "lib/site-data.ts"), "utf8");
+  const catalog = src.slice(src.indexOf("export const products"));
+  // Split the catalog into per-product blocks keyed on each `slug:` line.
+  const blocks = catalog.split(/^\s*slug:\s*"/m).slice(1);
+  assert.ok(blocks.length > 0, "expected at least one product entry");
+  for (const block of blocks) {
+    const slug = block.slice(0, block.indexOf('"'));
+    const comingSoon = /^\s*comingSoon:\s*true/m.test(block);
+    const live = /^\s*status:\s*"Live"/m.test(block);
+    assert.ok(
+      !(comingSoon && live),
+      `product "${slug}" sets comingSoon: true but status "Live" — a shipped product would show a "coming soon" badge`,
+    );
+  }
+});

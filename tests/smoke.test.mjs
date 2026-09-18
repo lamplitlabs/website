@@ -100,3 +100,38 @@ test("public product copy contains no training-method words", () => {
     });
   }
 });
+
+// README.md's product table mirrors lib/site-data.ts (the README says so itself).
+// A "**Live**" / "**In development**" label in a README row must match that
+// product's `status`; a product still in development must carry the label so
+// visitors reading the README are not told it ships today. Names are compared
+// without diacritics because the catalog spells "Fachsprachprufung" ASCII-only.
+test("README product table agrees with lib/site-data.ts on product status", async () => {
+  const { products } = await loadSiteData();
+  const fold = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const readme = readFileSync(resolve(root, "README.md"), "utf8").split("\n");
+  const rows = new Map();
+  readme.forEach((line, i) => {
+    const m = line.match(/^\|\s*\*\*(.+?)\*\*\s*\|(.*)\|/);
+    if (!m) return;
+    const label = m[2].match(/\*\*(Live|In development)\*\*/)?.[1];
+    rows.set(fold(m[1]), { line: i + 1, label });
+  });
+  assert.ok(rows.size > 0, "README.md has no product table rows");
+  for (const p of products) {
+    const row = rows.get(fold(p.name));
+    assert.ok(row, `README.md product table has no row for "${p.name}" (lib/site-data.ts)`);
+    if (row.label !== undefined) {
+      assert.equal(
+        row.label,
+        p.status,
+        `README.md:${row.line} labels "${p.name}" as "${row.label}" but lib/site-data.ts says "${p.status}"`,
+      );
+    } else {
+      assert.ok(
+        p.status === "Live",
+        `README.md:${row.line} shows "${p.name}" without a status label but lib/site-data.ts says "${p.status}" — add "**${p.status}**" to the row`,
+      );
+    }
+  }
+});

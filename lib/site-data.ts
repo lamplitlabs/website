@@ -204,6 +204,7 @@ export const products: Product[] = [
   },
   {
     slug: "kenntnistrainer",
+    status: "Live",
     name: "Kenntnistrainer",
     title: "AI-powered Kenntnisprufung simulation and training",
     description:
@@ -226,6 +227,7 @@ export const products: Product[] = [
   },
   {
     slug: "fachsprachprufung",
+    status: "Live",
     name: "Fachsprachprufung",
     title: "AI-powered FSP simulation and training",
     description:
@@ -248,6 +250,7 @@ export const products: Product[] = [
   },
   {
     slug: "leben-in-deutschland",
+    status: "Live",
     name: "Leben in Deutschland",
     title: "Citizenship test prep for Germany",
     description:
@@ -270,6 +273,7 @@ export const products: Product[] = [
   },
   {
     slug: "developer-tools",
+    status: "Live",
     name: "Developer Tools",
     title: "Everyday utilities for developers",
     description:
@@ -292,6 +296,7 @@ export const products: Product[] = [
   },
   {
     slug: "resume-builder",
+    status: "Live",
     name: "Resume Builder",
     title: "Create an ATS-optimized resume",
     description:
@@ -313,6 +318,7 @@ export const products: Product[] = [
   },
   {
     slug: "edmx-tools",
+    status: "Live",
     name: "EDMX Tools",
     title: "Tools for EDMX and OData metadata",
     description:
@@ -334,6 +340,7 @@ export const products: Product[] = [
   },
   {
     slug: "azure-drawio-assets",
+    status: "Live",
     name: "Azure Draw.io Assets",
     title: "Azure icons for architecture diagrams",
     description:
@@ -355,6 +362,7 @@ export const products: Product[] = [
   },
   {
     slug: "azure-compliance-matrix",
+    status: "Live",
     name: "Azure Compliance Matrix",
     title: "Azure services compliance coverage",
     description:

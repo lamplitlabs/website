@@ -63,3 +63,40 @@ test("helpers reject unknown or missing status values", () => {
     assert.equal(isProductInDevelopment({ status }), false);
   }
 });
+
+// Drift guard: every product status is a ProductStatus member, and the README
+// product table agrees with lib/site-data.ts. A README row may carry an explicit
+// `— **Status**` marker; when it does it must equal the product's status, and a
+// product that is not Live must always carry one so the README never presents
+// an in-development product as if it were live.
+const productStatusUnion = source.match(/export type ProductStatus\s*=\s*([^;]+);/);
+const productStatusValues = [...(productStatusUnion?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+const readme = readFileSync(resolve(root, "README.md"), "utf8");
+const fold = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const readmeRows = new Map(
+  [...readme.matchAll(/^\|\s*\*\*([^*]+)\*\*\s*\|([^|]*)\|/gm)].map((m) => [fold(m[1].trim()), m[2]]),
+);
+
+test("every product status is one of the ProductStatus union values", () => {
+  assert.ok(productStatusValues.length > 0, "could not read ProductStatus union from lib/site-data.ts");
+  for (const product of products) {
+    assert.ok(
+      productStatusValues.includes(product.status),
+      `${product.slug}: status ${JSON.stringify(product.status)} not in ProductStatus (${productStatusValues.join(", ")})`,
+    );
+  }
+});
+
+test("README product table status markers match lib/site-data.ts", () => {
+  assert.ok(readmeRows.size > 0, "no product rows found in README.md");
+  for (const product of products) {
+    const row = readmeRows.get(fold(product.name));
+    assert.ok(row !== undefined, `${product.slug}: "${product.name}" has no row in the README product table`);
+    const marker = row.match(/\*\*([^*]+)\*\*\s*$/)?.[1]?.trim();
+    if (marker !== undefined) {
+      assert.equal(marker, product.status, `${product.slug}: README says "${marker}", site-data says "${product.status}"`);
+    } else {
+      assert.equal(product.status, "Live", `${product.slug}: status "${product.status}" must be marked in the README row`);
+    }
+  }
+});

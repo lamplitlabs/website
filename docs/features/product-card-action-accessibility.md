@@ -47,7 +47,7 @@ existing action phrase, followed by a colon, a space, and `product.name`:
 | Status branch | Outbound accessible name | Details accessible name |
 | --- | --- | --- |
 | Normal | `Visit site: ${product.name}` | `Learn more: ${product.name}` |
-| In development | `Follow development: ${product.name}` | `Explore product: ${product.name}` |
+| In development | `Follow development: ${product.name}` | `See progress: ${product.name}` |
 
 The visible words remain contained in each name. Visible copy and arrows,
 destinations, `target`/`rel`, tracking props, callbacks, the primary card anchor,
@@ -122,7 +122,7 @@ unchanged primary card anchors.
 The in-memory `In development` fixture used the name
 `Fixture & "Development"` and produced exactly
 `Follow development: Fixture & "Development"` and
-`Explore product: Fixture & "Development"`. Parsing confirmed the name
+`See progress: Fixture & "Development"`. Parsing confirmed the name
 survives HTML escaping. Two in-memory `comingSoon` fixtures, one with no
 status and one also marked `In development`, each exposed **zero links**.
 Their complete card markup was identical to their starting-revision renders.

@@ -100,3 +100,26 @@ test("README product table status markers match lib/site-data.ts", () => {
     }
   }
 });
+
+// Drift guard: slugs are URL path segments (app/products/[slug]), so each must
+// be plain ASCII lowercase-hyphenated and derived from the product name after
+// folding diacritics (e.g. "Fachsprachprüfung" -> "fachsprachprufung"). Some
+// slugs are deliberately shorter than the name ("light" for "Lamplit Light"),
+// so every slug token must be a token of the folded name rather than the whole.
+const slugify = (s) => fold(s).replace(/[^a-z0-9\s-]/g, "").trim().split(/[\s-]+/).filter(Boolean);
+
+test("every product slug is ASCII, unique and derived from the diacritic-folded product name", () => {
+  const seen = new Set();
+  for (const product of products) {
+    assert.match(product.slug, /^[a-z0-9]+(-[a-z0-9]+)*$/, `${product.slug}: slug must be lowercase ASCII with single hyphens`);
+    assert.ok(!seen.has(product.slug), `${product.slug}: duplicate slug`);
+    seen.add(product.slug);
+    const nameTokens = slugify(product.name);
+    for (const token of product.slug.split("-")) {
+      assert.ok(
+        nameTokens.includes(token),
+        `${product.slug}: token "${token}" is not in folded name "${nameTokens.join("-")}" (from "${product.name}")`,
+      );
+    }
+  }
+});

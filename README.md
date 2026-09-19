@@ -12,14 +12,14 @@ From visual AI agents with Amistio and sovereign small-model AI with Lamplit Lig
 |---------|-------------|-----|
 | **Amistio** | Visual AI agent builder with app connectors, versioned releases, and approval gates (`BusinessApplication`) — **Live** | [amistio.com](https://www.amistio.com) |
 | **Lamplit Light** | Sovereign AI lab — small, specialised models you host yourself, exported for transformers.js (browser, laptop, on-prem, private cloud, app, edge) — **In development** | [ai.lamplitlabs.com](https://ai.lamplitlabs.com) |
-| **Kenntnistrainer** | KI-gestützte Kenntnisprüfung simulation & training for foreign doctors in Germany | [kenntnistrainer.de](https://www.kenntnistrainer.de) |
-| **Fachsprachprüfung** | KI-gestützte FSP simulation & training for foreign doctors in Germany | [fachsprachtrainer.de](https://www.fachsprachtrainer.de) |
-| **Leben in Deutschland** | German citizenship test (Einbürgerungstest) prep with 310 questions | [lebenindeutschland.org](https://www.lebenindeutschland.org) |
-| **Resume Builder** | ATS-optimized resume builder | [resume.lamplitlabs.com](https://resume.lamplitlabs.com) |
-| **Developer Tools** | Everyday developer utilities — JSON formatter, Base64, UUID, and more | [tools.lamplitlabs.com](https://tools.lamplitlabs.com) |
-| **EDMX Tools** | Tools for EDMX/OData metadata files | [edmx.lamplitlabs.com](https://edmx.lamplitlabs.com) |
-| **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams | [azure-assets.lamplitlabs.com](https://azure-assets.lamplitlabs.com) |
-| **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services | [azure-compliance.lamplitlabs.com](https://azure-compliance.lamplitlabs.com) |
+| **Kenntnistrainer** | KI-gestützte Kenntnisprüfung simulation & training for foreign doctors in Germany — **Live** | [kenntnistrainer.de](https://www.kenntnistrainer.de) |
+| **Fachsprachprüfung** | KI-gestützte FSP simulation & training for foreign doctors in Germany — **Live** | [fachsprachtrainer.de](https://www.fachsprachtrainer.de) |
+| **Leben in Deutschland** | German citizenship test (Einbürgerungstest) prep with 310 questions — **Live** | [lebenindeutschland.org](https://www.lebenindeutschland.org) |
+| **Resume Builder** | ATS-optimized resume builder — **Live** | [resume.lamplitlabs.com](https://resume.lamplitlabs.com) |
+| **Developer Tools** | Everyday developer utilities — JSON formatter, Base64, UUID, and more — **Live** | [tools.lamplitlabs.com](https://tools.lamplitlabs.com) |
+| **EDMX Tools** | Tools for EDMX/OData metadata files — **Live** | [edmx.lamplitlabs.com](https://edmx.lamplitlabs.com) |
+| **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams — **Live** | [azure-assets.lamplitlabs.com](https://azure-assets.lamplitlabs.com) |
+| **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services — **Live** | [azure-compliance.lamplitlabs.com](https://azure-compliance.lamplitlabs.com) |
 
 Product descriptions, availability, and URLs follow the website catalog in [`lib/site-data.ts`](lib/site-data.ts). Each product lives in its own repository and is deployed independently.
 

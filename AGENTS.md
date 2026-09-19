@@ -31,8 +31,8 @@ npm run typecheck    # Run TypeScript type checker
 npm run test         # Run smoke tests (node --test, tests/**/*.test.mjs)
 npm run test:e2e     # Build static export, then run all smoke tests incl. out/ check (never skipped)
 npm run clean        # Clean build artifacts
-npm run check        # Full verification: lint → typecheck → test → build (one command; if the script is
-                     # not yet in package.json on your branch, run those four commands in that order)
+npm run check        # Full verification: lint → typecheck → build → test (one command; build runs
+                     # before test so the out/ export test in tests/routes.test.mjs is never skipped)
 ```
 
 **Verification:**
@@ -46,7 +46,7 @@ npm run check        # Full verification: lint → typecheck → test → build 
 3. **Plan** — Create plans in `docs/plans/` for non-trivial work.
 4. **Specify** — Describe features in `docs/features/`.
 5. **Build** — Implement product code only after decisions and plans are clear.
-6. **Verify** — Run `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`.
+6. **Verify** — Run `npm run check` (lint → typecheck → build → test), or the four commands individually.
 7. **Learn** — Record patterns and lessons in `docs/memory/`.
 
 ## Critical Rules

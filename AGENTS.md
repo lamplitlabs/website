@@ -59,6 +59,9 @@ npm run check        # Full verification: lint → typecheck → build → test 
 - Do not modify product code before the feature or ADR is documented.
 - Keep prompts and plans model-agnostic.
 - When changes touch files, dependencies, or deployment, define a rollback plan first.
+- One status-fill job per data file at a time (e.g. `lib/site-data.ts`): parallel edits to the same
+  object have shipped duplicate keys (TS1117). Before landing, rebase on fresh `main` and verify
+  `npm run typecheck` passes on the rebased branch.
 
 ## Open Intake Questions
 

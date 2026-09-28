@@ -56,7 +56,7 @@ npm run clean
 ### Testing
 
 ```bash
-# Run the smoke tests (tests/smoke.test.mjs) with the Node.js built-in test runner
+# Run the smoke tests (tests/**/*.test.mjs) with the Node.js built-in test runner
 npm run test
 ```
 

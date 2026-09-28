@@ -101,6 +101,26 @@ test("README product table status markers match lib/site-data.ts", () => {
   }
 });
 
+// Strict drift guard (supersedes the implicit-Live allowance above): every
+// README product row must carry exactly one `**<ProductStatus>**` marker and it
+// must equal the product's status in lib/site-data.ts, so no row can imply a
+// status by omission or name two statuses at once.
+test("every README product row carries exactly one status marker equal to site-data status", () => {
+  assert.ok(productStatusValues.length > 0, "could not read ProductStatus union from lib/site-data.ts");
+  const markerRe = new RegExp(`\\*\\*(${productStatusValues.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\*\\*`, "g");
+  for (const product of products) {
+    const row = readmeRows.get(fold(product.name));
+    assert.ok(row !== undefined, `${product.slug}: "${product.name}" has no row in the README product table`);
+    const markers = [...row.matchAll(markerRe)].map((m) => m[1]);
+    assert.equal(
+      markers.length,
+      1,
+      `${product.slug}: README row must carry exactly one status marker, found ${markers.length} (${markers.join(", ") || "none"})`,
+    );
+    assert.equal(markers[0], product.status, `${product.slug}: README says "${markers[0]}", site-data says "${product.status}"`);
+  }
+});
+
 // Drift guard: slugs are URL path segments (app/products/[slug]), so each must
 // be plain ASCII lowercase-hyphenated and derived from the product name after
 // folding diacritics (e.g. "Fachsprachprüfung" -> "fachsprachprufung"). Some

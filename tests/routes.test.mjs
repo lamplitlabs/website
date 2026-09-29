@@ -115,3 +115,19 @@ test("product card details CTA copy is distinct per status and internal", () => 
     "aria-label must reuse the same visible CTA copy"
   );
 });
+
+// PDP hero CTA copy per status. The hero button is an outbound link to the
+// product's own site, so an in-development product must be labelled the same
+// way the card footer and nav/bottom CTAs are: as an unfinished destination,
+// not a neutral "Explore" that reads like a launch.
+test("product page hero CTA copy is distinct per status and labels in-development destinations", () => {
+  const page = read("app/products/[slug]/page.tsx");
+  const hero = page.match(
+    /trackingContext="product_page_hero_cta"[\s\S]*?\{isInDevelopment\s*\?\s*`([^`]+)`\s*:\s*"([^"]+)"\}/
+  );
+  assert.ok(hero, "expected a status-branched hero CTA in app/products/[slug]/page.tsx");
+  const [, inDevelopment, live] = hero;
+  assert.equal(inDevelopment, "Visit ${product.name} (in development)");
+  assert.equal(live, "Get started");
+  assert.notEqual(inDevelopment, live, "hero CTA copy must differ per status");
+});

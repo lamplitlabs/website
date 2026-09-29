@@ -148,6 +148,23 @@ test("static export (out/) home page has zero ai.lamplitlabs.com hrefs while Lig
   }
 });
 
+
+// Product-page guard (ember-5): while Lamplit Light is In development its own
+// /products/light page (hero CTA, feature links, canonical/OG url) must not
+// link to the not-yet-public ai.lamplitlabs.com. Once Light is Live the page
+// must link out to it at least once.
+test("static export (out/) /products/light page has zero ai.lamplitlabs.com hrefs while Light is in development", () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "products", "light.html"), "utf8");
+  const hrefs = html.match(/href="https:\/\/ai\.lamplitlabs\.com[^"]*"/g) ?? [];
+  if (light === "In development") {
+    assert.equal(hrefs.length, 0, `/products/light links to ai.lamplitlabs.com ${hrefs.length} time(s) while Light is in development: ${hrefs.join(", ")}`);
+  } else {
+    assert.ok(hrefs.length >= 1, "live Light should link out from its product page");
+  }
+});
+
 // Footer Products list: an in-development product must not link out to its
 // not-yet-public domain from every page; it links to its internal
 // /products/<slug> page instead. Guards ai.lamplitlabs.com leaking as a footer

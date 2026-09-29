@@ -38,9 +38,12 @@ export async function generateMetadata({
   const defaultTitle = `${product.name} - ${product.title}`;
   const title = product.metaTitle ?? defaultTitle;
   const description = product.metaDescription ?? product.longDescription;
-  const canonicalUrl =
-    product.canonicalUrl ??
-    `https://www.lamplitlabs.com/products/${product.slug}`;
+  const internalUrl = `https://www.lamplitlabs.com/products/${product.slug}`;
+  // An in-development product's domain is not launched yet, so the internal
+  // product page stays canonical until the product goes live.
+  const canonicalUrl = isProductInDevelopment(product)
+    ? internalUrl
+    : (product.canonicalUrl ?? internalUrl);
 
   return {
     title: product.metaTitle ? { absolute: title } : title,

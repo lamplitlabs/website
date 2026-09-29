@@ -245,3 +245,29 @@ test("home sections and the product page never read trackingDoc (test-only until
     );
   }
 });
+
+// In-development CTA/canonical invariant (ember-4): while a product is
+// "In development" its domain is not launched, so the product page must keep
+// the canonical URL on the internal /products/<slug> path rather than the
+// external product domain (e.g. ai.lamplitlabs.com). Checked against the
+// source of app/products/[slug]/page.tsx so it does not depend on out/.
+test("every In development product resolves its canonical URL to the internal /products/<slug> path", () => {
+  const src = readFileSync(resolve(root, "app/products/[slug]/page.tsx"), "utf8");
+  const gate = src.match(
+    /const canonicalUrl = isProductInDevelopment\(product\)\s*\?\s*internalUrl\s*:\s*\(product\.canonicalUrl \?\? internalUrl\);/,
+  );
+  assert.ok(gate, "page.tsx must gate canonicalUrl on isProductInDevelopment(product) falling back to internalUrl");
+  const inDev = products.filter((p) => isProductInDevelopment(p));
+  assert.ok(inDev.length > 0, "expected at least one In development product in the catalog");
+  for (const product of inDev) {
+    const internalUrl = `https://www.lamplitlabs.com/products/${product.slug}`;
+    // Mirror the page's resolution: In development always wins over product.canonicalUrl.
+    const resolved = isProductInDevelopment(product) ? internalUrl : (product.canonicalUrl ?? internalUrl);
+    const path = new URL(resolved).pathname;
+    assert.equal(path, `/products/${product.slug}`, `${product.slug}: canonical must be the internal product path`);
+    assert.ok(
+      !/^https?:\/\/ai\./.test(resolved),
+      `${product.slug}: In development canonical "${resolved}" must not point at an external ai.* domain`,
+    );
+  }
+});

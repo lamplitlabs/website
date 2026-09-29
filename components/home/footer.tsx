@@ -3,6 +3,7 @@ import { OutboundLink } from "@/components/outbound-link";
 import { socialPlatforms } from "@/components/social-platforms";
 import {
   isProductInDevelopment,
+  isProductLive,
   navLinks,
   products,
   socialLinks,
@@ -10,6 +11,10 @@ import {
 import { Logo } from "@/components/logo";
 
 export function Footer() {
+  // The AI domain is only advertised in the footer once Lamplit Light is Live;
+  // while In development the AI section alone carries the "coming to" copy.
+  const light = products.find((product) => product.slug === "light");
+  const showAiDomain = light ? isProductLive(light) : false;
   return (
     <footer>
       <div
@@ -104,7 +109,8 @@ export function Footer() {
         <div className="mt-10 border-t pt-6 text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Lamplit Labs. All rights reserved.</p>
           <p className="mono-label mt-3 text-muted-foreground/60">
-            lamplitlabs.com &middot; ai.lamplitlabs.com
+            lamplitlabs.com
+            {showAiDomain && <> &middot; ai.lamplitlabs.com</>}
           </p>
         </div>
       </div>

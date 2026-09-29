@@ -23,8 +23,11 @@ const lightStatus = lightProduct?.status ?? "In development";
 // Single source of truth for the Light domain: lib/site-data.ts `url`, the
 // same field app/layout.tsx feeds into the JSON-LD schema, so the domain
 // string is written once and the status copy can never drift from it.
-const lightHomeUrl = lightProduct?.url ?? "https://ai.lamplitlabs.com";
-const lightDomain = new URL(lightHomeUrl).hostname;
+const lightHomeUrl = lightProduct?.url ?? "/products/light";
+// Relative fallback resolves against the site origin; only the hostname is
+// shown in copy, so an absent product yields the current origin, not a
+// hard-coded external domain.
+const lightDomain = new URL(lightHomeUrl, "https://lamplitlabs.com").hostname;
 const lightStatusLabel =
   lightStatus === "Live"
     ? `Live \u00b7 public site at ${lightDomain}`
@@ -388,7 +391,7 @@ export function AiSection() {
                     <ArrowUpRight className="h-4 w-4" />
                   </OutboundLink>
                 ) : (
-                  // ai.lamplitlabs.com is not public yet: send visitors to the
+                  // The Light public site is not live yet: send visitors to the
                   // internal product page instead of a dead external link.
                   <Link href="/products/light" className={primaryCtaClassName}>
                     Explore Lamplit Light

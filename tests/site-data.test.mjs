@@ -98,9 +98,7 @@ test("isProductInDevelopment returns true only for the exact literal \"In develo
 });
 
 // Drift guard: every product status is a ProductStatus member, and the README
-// product table agrees with lib/site-data.ts. Every README row must carry an
-// explicit `— **Status**` marker equal to the product's status, so the README
-// can never silently present an in-development product as if it were live.
+// product table agrees with lib/site-data.ts (see the strict marker test below).
 const productStatusUnion = source.match(/export type ProductStatus\s*=\s*([^;]+);/);
 const productStatusValues = [...(productStatusUnion?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((m) => m[1]);
 const readme = readFileSync(resolve(root, "README.md"), "utf8");
@@ -119,23 +117,13 @@ test("every product status is one of the ProductStatus union values", () => {
   }
 });
 
-test("README product table status markers match lib/site-data.ts", () => {
-  assert.ok(readmeRows.size > 0, "no product rows found in README.md");
-  for (const product of products) {
-    const row = readmeRows.get(fold(product.name));
-    assert.ok(row !== undefined, `${product.slug}: "${product.name}" has no row in the README product table`);
-    const marker = row.match(/\*\*([^*]+)\*\*\s*$/)?.[1]?.trim();
-    assert.ok(marker !== undefined, `${product.slug}: README row has no **Status** marker`);
-    assert.equal(marker, product.status, `${product.slug}: README says "${marker}", site-data says "${product.status}"`);
-  }
-});
-
-// Strict drift guard (supersedes the implicit-Live allowance above): every
+// Strict drift guard: every
 // README product row must carry exactly one `**<ProductStatus>**` marker and it
 // must equal the product's status in lib/site-data.ts, so no row can imply a
 // status by omission or name two statuses at once.
 test("every README product row carries exactly one status marker equal to site-data status", () => {
   assert.ok(productStatusValues.length > 0, "could not read ProductStatus union from lib/site-data.ts");
+  assert.ok(readmeRows.size > 0, "no product rows found in README.md");
   const markerRe = new RegExp(`\\*\\*(${productStatusValues.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\*\\*`, "g");
   for (const product of products) {
     const row = readmeRows.get(fold(product.name));

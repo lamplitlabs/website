@@ -186,6 +186,21 @@ test("static export (out/) footer block contains no ai.lamplitlabs.com text whil
   }
 });
 
+// Product page (umber-4): while Lamplit Light is In development the exported
+// /products/light page must not link to the not-yet-public ai.lamplitlabs.com
+// anywhere - hero, nav or bottom CTAs. Once Light is Live it must link out.
+test("static export (out/) product page has zero ai.lamplitlabs.com hrefs while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "products", "light.html"), "utf8");
+  const hrefs = html.match(/href="https:\/\/ai\.lamplitlabs\.com[^"]*"/g) ?? [];
+  if (light === "In development") {
+    assert.equal(hrefs.length, 0, `product page links to ai.lamplitlabs.com ${hrefs.length} time(s) while Light is in development: ${hrefs.join(", ")}`);
+  } else {
+    assert.ok(hrefs.length >= 1, "live Light product page should link out to ai.lamplitlabs.com");
+  }
+});
+
 // AI section Explore CTA (delta-15): while Lamplit Light is In development the
 // "Explore Lamplit Light" button in the exported #ai section must point at the
 // internal /products/light page, not at the not-yet-public ai.lamplitlabs.com.

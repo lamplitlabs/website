@@ -66,7 +66,7 @@ test("internal links in app/ and components/ point at known routes", () => {
 });
 
 // Only runs against a real static export; `npm run build` produces out/.
-test("static export (out/) has HTML for each route and no dangling local assets", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+test("static export (out/) has HTML for each route and no dangling local assets", () => {
   const out = resolve(root, "out");
   for (const route of routes) {
     const html = route === "/" ? "index.html" : `${route.slice(1)}.html`;
@@ -85,7 +85,7 @@ test("static export (out/) has HTML for each route and no dangling local assets"
 // Product grid: every card in the exported home page renders exactly one
 // status badge. Guards the user-facing regression where a product ships with
 // no status (badge missing) or the badge is rendered twice (duplicate).
-test("static export (out/) home page renders exactly one status badge per product card", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+test("static export (out/) home page renders exactly one status badge per product card", () => {
   const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
   // Cards are the TiltSurface wrappers carrying the product-grid `card` class.
   const cards = html.split(/(?=<[a-z]+ class="[^"]*\bproduct-grid_card__)/).slice(1);
@@ -136,7 +136,7 @@ test("product page hero CTA copy is distinct per status and labels in-developmen
 // not-yet-public domain must not appear as an <a href> anywhere on the home
 // page - footer, AI section CTAs or any future component. Once Light is Live
 // the page must link out to it at least once.
-test("static export (out/) home page has zero ai.lamplitlabs.com hrefs while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+test("static export (out/) home page has zero ai.lamplitlabs.com hrefs while Light is in development", () => {
   const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
   assert.ok(light, "expected a status for the light product");
   const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
@@ -152,7 +152,7 @@ test("static export (out/) home page has zero ai.lamplitlabs.com hrefs while Lig
 // not-yet-public domain from every page; it links to its internal
 // /products/<slug> page instead. Guards ai.lamplitlabs.com leaking as a footer
 // <a href> while Lamplit Light is In development.
-test("static export (out/) footer Products list has no ai.lamplitlabs.com href while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+test("static export (out/) footer Products list has no ai.lamplitlabs.com href while Light is in development", () => {
   const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
   assert.ok(light, "expected a status for the light product");
   const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
@@ -170,7 +170,7 @@ test("static export (out/) footer Products list has no ai.lamplitlabs.com href w
 // Footer text: beyond <a href>, the footer's domain line ("lamplitlabs.com ·
 // ai.lamplitlabs.com") must not advertise the AI domain as plain text while
 // Lamplit Light is In development; only the AI section carries that copy then.
-test("static export (out/) footer block contains no ai.lamplitlabs.com text while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+test("static export (out/) footer block contains no ai.lamplitlabs.com text while Light is in development", () => {
   const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
   assert.ok(light, "expected a status for the light product");
   const html = readFileSync(resolve(root, "out", "index.html"), "utf8");

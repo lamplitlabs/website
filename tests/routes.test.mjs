@@ -97,23 +97,32 @@ test("static export (out/) home page renders exactly one status badge per produc
   }
 });
 
-// Product-card CTA copy per status. The in-development details link goes to the
-// same internal /products/<slug> page as "Learn more", so its label must say it
-// leads to progress on an unfinished product rather than sounding like a launch.
-test("product card details CTA copy is distinct per status and internal", () => {
-  const grid = read("components/product-grid.tsx");
-  const cta = grid.match(
-    /isInDevelopment \? "([^"]+)" : "([^"]+)"\}\s*<ArrowRight/
-  );
-  assert.ok(cta, "expected a status-branched details CTA in product-grid.tsx");
-  const [, inDevelopment, live] = cta;
-  assert.equal(inDevelopment, "See progress");
-  assert.equal(live, "Learn more");
-  assert.notEqual(inDevelopment, live, "CTA copy must differ per status");
-  assert.ok(
-    grid.includes(`aria-label={\`\${\n                isInDevelopment ? "${inDevelopment}" : "${live}"\n              }: \${product.name}\`}`),
-    "aria-label must reuse the same visible CTA copy"
-  );
+// Product-card details CTA, asserted on the rendered export rather than on
+// source text. In-development cards render no footer (the whole card is
+// disabled), so only Live cards carry a details link, and its visible copy and
+// aria-label must both read "Learn more" and point at the internal PDP.
+test("static export (out/) home page renders a 'Learn more' details CTA on every live product card only", () => {
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const cards = html.split(/(?=<[a-z]+ class="[^"]*\bproduct-grid_card__)/).slice(1);
+  assert.equal(cards.length, slugs.length, `expected ${slugs.length} product cards, found ${cards.length}`);
+  let live = 0;
+  for (const card of cards) {
+    const name = card.match(/product-grid_name__[^"]*"[^>]*>([^<]+)</)?.[1] ?? "(unknown product)";
+    const inDevelopment = /product-grid_status__[^"]*"[^>]*>(?:<[^>]*>)*\s*In development/.test(card);
+    const details = card.match(/<a href="\/products\/([^"]+)" aria-label="([^"]+)"[^>]*>([^<]*)</g) ?? [];
+    if (inDevelopment) {
+      assert.equal(details.length, 0, `${name} is In development but renders a details CTA`);
+      continue;
+    }
+    live += 1;
+    assert.equal(details.length, 1, `${name} renders ${details.length} details CTAs (expected exactly 1)`);
+    const [, slug, label, copy] = details[0].match(/<a href="\/products\/([^"]+)" aria-label="([^"]+)"[^>]*>([^<]*)</);
+    assert.ok(slugs.includes(slug), `${name} details CTA points at unknown slug ${slug}`);
+    assert.equal(copy.trim(), "Learn more");
+    assert.equal(label, `Learn more: ${name}`, "aria-label must reuse the visible CTA copy");
+  }
+  assert.ok(live > 0, "expected at least one live product card");
+  assert.ok(!html.includes("See progress"), "dead 'See progress' copy must not reach the export");
 });
 
 // PDP hero CTA copy per status. The hero button is an outbound link to the

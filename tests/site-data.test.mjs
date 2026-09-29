@@ -204,6 +204,33 @@ test("every In development product links a real trackingDoc", () => {
   }
 });
 
+// `trackingDoc` is test-only data until an ADR covers rendering it in the UI
+// (ripple-5, nimbus-6). Rendering it on a page (a "why not yet live" note, a
+// progress link) is a product-surface decision, so any UI file that reads it
+// must cite the ADR in docs/decisions/ that allows it. Scan every home section
+// and the product detail page, not just the product grid.
+test("no UI file renders trackingDoc unless an ADR in docs/decisions/ covers it", () => {
+  const uiFiles = [
+    "components/product-grid.tsx",
+    ...readdirSync(resolve(root, "components/home"))
+      .filter((f) => f.endsWith(".tsx"))
+      .map((f) => `components/home/${f}`),
+    "app/products/[slug]/page.tsx",
+  ].filter((f) => existsSync(resolve(root, f)));
+  assert.ok(uiFiles.length > 2, "expected product-grid, home sections and the product page to exist");
+  const adrs = readdirSync(resolve(root, "docs/decisions"))
+    .filter((f) => f.endsWith(".md") && !f.startsWith("_"))
+    .filter((f) => /trackingDoc/.test(readFileSync(resolve(root, "docs/decisions", f), "utf8")));
+  for (const file of uiFiles) {
+    const src = readFileSync(resolve(root, file), "utf8");
+    if (!/\btrackingDoc\b/.test(src)) continue;
+    assert.ok(
+      adrs.length > 0,
+      `${file} renders trackingDoc but no ADR in docs/decisions/ mentions trackingDoc; add one before using it in the UI`,
+    );
+  }
+});
+
 // AI section "Try a model in your browser" CTA: the /try playground only exists
 // once Lamplit Light is Live. While the product is In development the CTA must
 // not render, so users are not sent on a dead-end click (nimbus-5).

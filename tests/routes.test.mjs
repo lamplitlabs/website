@@ -141,6 +141,24 @@ test("product page hero CTA copy is distinct per status and labels in-developmen
   assert.notEqual(inDevelopment, live, "hero CTA copy must differ per status");
 });
 
+// Source-level gate (juniper-5): while a product is In development its page
+// CTAs must stay on-page (#about) instead of linking out to the product's
+// not-yet-public url. Guards the ctaHref branch directly so a regression is
+// caught even without a fresh static export.
+test("product page uses #about as ctaHref while the product is in development", () => {
+  const page = read("app/products/[slug]/page.tsx");
+  assert.match(
+    page,
+    /const isInDevelopment = isProductInDevelopment\(product\);/,
+    "expected isInDevelopment derived from isProductInDevelopment(product)"
+  );
+  const cta = page.match(/const ctaHref = isInDevelopment\s*\?\s*"([^"]+)"\s*:\s*product\.url;/);
+  assert.ok(cta, "expected ctaHref to branch on isInDevelopment in app/products/[slug]/page.tsx");
+  assert.equal(cta[1], "#about", "in-development CTAs must anchor to #about, not the product url");
+  const hrefs = page.match(/href=\{ctaHref\}/g) ?? [];
+  assert.ok(hrefs.length >= 1, "expected at least one CTA to use href={ctaHref}");
+});
+
 // Whole-page guard (kestrel-10): while Lamplit Light is In development its
 // not-yet-public domain must not appear as an <a href> anywhere on the home
 // page - footer, AI section CTAs or any future component. Once Light is Live

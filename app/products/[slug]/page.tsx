@@ -185,7 +185,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   trackingUrl={product.url}
                 >
                   {isInDevelopment
-                    ? `Explore ${product.name}`
+                    ? `Visit ${product.name} (in development)`
                     : "Get started"}
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </OutboundLink>

@@ -29,6 +29,8 @@ const lightTryUrl = "https://ai.lamplitlabs.com/try";
 // The /try playground only exists once the product is Live; while it is In
 // development the CTA would be a dead-end click, so it is gated on status.
 const lightIsLive = lightProduct ? isProductLive(lightProduct) : false;
+const primaryCtaClassName =
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 interface RuntimeCard {
   index: string;
@@ -368,18 +370,27 @@ export function AiSection() {
               </div>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <OutboundLink
-                  href={lightHomeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  trackingTarget="light"
-                  trackingContext="ai_section"
-                  trackingUrl={lightHomeUrl}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                >
-                  Explore Lamplit Light
-                  <ArrowUpRight className="h-4 w-4" />
-                </OutboundLink>
+                {lightIsLive ? (
+                  <OutboundLink
+                    href={lightHomeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    trackingTarget="light"
+                    trackingContext="ai_section"
+                    trackingUrl={lightHomeUrl}
+                    className={primaryCtaClassName}
+                  >
+                    Explore Lamplit Light
+                    <ArrowUpRight className="h-4 w-4" />
+                  </OutboundLink>
+                ) : (
+                  // ai.lamplitlabs.com is not public yet: send visitors to the
+                  // internal product page instead of a dead external link.
+                  <Link href="/products/light" className={primaryCtaClassName}>
+                    Explore Lamplit Light
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                )}
                 {lightIsLive ? (
                   <OutboundLink
                     href={lightTryUrl}

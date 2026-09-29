@@ -192,6 +192,23 @@ test("static export (out/) /products/light page has zero ai.lamplitlabs.com href
   }
 });
 
+// Whole-page guard (ember-6): the href-only checks above miss JSON-LD
+// (`url`/`sameAs`), canonical/og:url meta, and any trackingUrl string that
+// the product page renders as text or attributes. While Lamplit Light is
+// In development the exported /products/light page must not mention
+// ai.lamplitlabs.com anywhere. Once Light is Live it must mention it.
+test("static export (out/) /products/light page has zero ai.lamplitlabs.com mentions anywhere (JSON-LD, meta, text) while Light is in development", () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "products", "light.html"), "utf8");
+  const mentions = html.match(/ai\.lamplitlabs\.com/g) ?? [];
+  if (light === "In development") {
+    assert.equal(mentions.length, 0, `/products/light mentions ai.lamplitlabs.com ${mentions.length} time(s) (whole page, incl. JSON-LD/meta) while Light is in development`);
+  } else {
+    assert.ok(mentions.length >= 1, "live Light product page should mention ai.lamplitlabs.com");
+  }
+});
+
 // Footer Products list: an in-development product must not link out to its
 // not-yet-public domain from every page; it links to its internal
 // /products/<slug> page instead. Guards ai.lamplitlabs.com leaking as a footer

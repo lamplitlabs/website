@@ -119,3 +119,20 @@ test("every product slug is ASCII, unique and derived from the diacritic-folded 
     }
   }
 });
+
+// Drift guard (both directions): the README product table lists exactly the
+// products in lib/site-data.ts — no missing rows, no stale rows for removed or
+// renamed products, and no duplicate rows. Add a product to both places, or
+// remove it from both.
+const readmeRowNames = [...readme.matchAll(/^\|\s*\*\*([^*]+)\*\*\s*\|/gm)].map((m) => fold(m[1].trim()));
+
+test("README product table lists exactly the products in lib/site-data.ts, once each", () => {
+  const productNames = products.map((p) => fold(p.name));
+  assert.deepEqual(
+    [...readmeRowNames].sort(),
+    [...productNames].sort(),
+    "README product rows must correspond one-to-one with lib/site-data.ts products",
+  );
+  assert.equal(new Set(readmeRowNames).size, readmeRowNames.length, "README has duplicate product rows");
+  assert.equal(new Set(productNames).size, productNames.length, "lib/site-data.ts has duplicate product names");
+});

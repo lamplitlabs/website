@@ -113,6 +113,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   const isInDevelopment = isProductInDevelopment(product);
+  // While a product is in development its URL is not live yet, so every CTA
+  // points at the on-page About section instead of the external product URL.
+  const ctaHref = isInDevelopment ? "#about" : product.url;
+  const ctaExternalProps = isInDevelopment
+    ? {}
+    : { target: "_blank", rel: "noopener noreferrer" };
 
   return (
     <>
@@ -120,9 +126,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <SiteNav>
         <OutboundLink
-          href={product.url}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={ctaHref}
+          {...ctaExternalProps}
           trackingTarget={product.slug}
           trackingContext="product_page_nav_cta"
           trackingUrl={product.url}
@@ -184,9 +189,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="mt-10 flex flex-wrap gap-4">
               <Button size="lg" asChild>
                 <OutboundLink
-                  href={product.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={ctaHref}
+                  {...ctaExternalProps}
                   trackingTarget={product.slug}
                   trackingContext="product_page_hero_cta"
                   trackingUrl={product.url}
@@ -219,7 +223,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </section>
 
         {/* ── About section ────────────────────────────────── */}
-        <section className="border-b">
+        <section id="about" className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
             <div className="mx-auto max-w-3xl">
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
@@ -274,9 +278,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="mt-8">
                 <Button size="lg" asChild>
                   <OutboundLink
-                    href={product.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={ctaHref}
+                    {...ctaExternalProps}
                     trackingTarget={product.slug}
                     trackingContext="product_page_bottom_cta"
                     trackingUrl={product.url}

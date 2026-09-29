@@ -28,13 +28,13 @@ npm run dev          # Start local dev server at http://localhost:3000
 npm run build        # Build static export to ./out
 npm run lint         # Lint with ESLint
 npm run typecheck    # Run TypeScript type checker
-npm run test         # Run smoke tests (node --test, tests/**/*.test.mjs)
-npm run test:e2e     # Build static export, then run all smoke tests incl. out/ check (never skipped)
-                     # NOTE: run `npm run build` before a bare `npm run test`; the out/ export tests
-                     # (tests/routes.test.mjs) need ./out and are skipped without it. Use test:e2e or check.
+npm run test         # Build static export, then run all smoke tests (node --test, tests/**/*.test.mjs)
+                     # incl. the out/ export tests in tests/routes.test.mjs (never skipped)
+npm run test:unit    # Run smoke tests without building; the 3 out/-dependent tests skip if ./out is absent
+npm run test:e2e     # Alias of `npm run test` (kept for existing docs/scripts)
 npm run clean        # Clean build artifacts
-npm run check        # Full verification: lint → typecheck → build → test (one command; build runs
-                     # before test so the out/ export test in tests/routes.test.mjs is never skipped)
+npm run check        # Full verification: lint → typecheck → test (test builds first, so the out/
+                     # export tests in tests/routes.test.mjs are never skipped)
 ```
 
 **Verification:**

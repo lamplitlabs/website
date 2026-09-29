@@ -98,9 +98,7 @@ function ProductCard({
           <div className={styles.footer}>
             <OutboundLink
               href={product.url}
-              aria-label={`${
-                isInDevelopment ? "Follow development" : "Visit site"
-              }: ${product.name}`}
+              aria-label={`Visit site: ${product.name}`}
               target="_blank"
               rel="noopener noreferrer"
               trackingTarget={product.slug}
@@ -108,7 +106,7 @@ function ProductCard({
               trackingUrl={product.url}
               className={styles.action}
             >
-              {isInDevelopment ? "Follow development" : "Visit site"}
+              Visit site
               <ArrowUpRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             </OutboundLink>
             <a

@@ -20,12 +20,16 @@ import styles from "./ai-section.module.css";
 
 const lightProduct = getProductBySlug("light");
 const lightStatus = lightProduct?.status ?? "In development";
+// Single source of truth for the Light domain: lib/site-data.ts `url`, the
+// same field app/layout.tsx feeds into the JSON-LD schema, so the domain
+// string is written once and the status copy can never drift from it.
+const lightHomeUrl = lightProduct?.url ?? "https://ai.lamplitlabs.com";
+const lightDomain = new URL(lightHomeUrl).hostname;
 const lightStatusLabel =
   lightStatus === "Live"
-    ? "Live \u00b7 public site at ai.lamplitlabs.com"
-    : "In development \u00b7 public site coming to ai.lamplitlabs.com";
-const lightHomeUrl = "https://ai.lamplitlabs.com";
-const lightTryUrl = "https://ai.lamplitlabs.com/try";
+    ? `Live \u00b7 public site at ${lightDomain}`
+    : `In development \u00b7 public site coming to ${lightDomain}`;
+const lightTryUrl = `${lightHomeUrl}/try`;
 // The /try playground only exists once the product is Live; while it is In
 // development the CTA would be a dead-end click, so it is gated on status.
 const lightIsLive = lightProduct ? isProductLive(lightProduct) : false;

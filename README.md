@@ -60,7 +60,7 @@ npm run clean
 npm run test
 ```
 
-The smoke tests live in `tests/` and need no build step or extra dependencies. Lint and typecheck with `npm run lint` and `npm run typecheck`.
+The smoke tests live in `tests/` and need no extra dependencies. The static-export tests in `tests/routes.test.mjs` need `./out` and are skipped without it, so run `npm run build` first (or use `npm run test:e2e` / `npm run check`, which build before testing). Lint and typecheck with `npm run lint` and `npm run typecheck`.
 
 ## Project Structure
 

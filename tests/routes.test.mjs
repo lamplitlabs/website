@@ -185,3 +185,26 @@ test("static export (out/) footer block contains no ai.lamplitlabs.com text whil
     assert.ok(mentions.length >= 1, "live Light should be advertised in the footer domain line");
   }
 });
+
+// AI section Explore CTA (delta-15): while Lamplit Light is In development the
+// "Explore Lamplit Light" button in the exported #ai section must point at the
+// internal /products/light page, not at the not-yet-public ai.lamplitlabs.com.
+// Once Light is Live it must link out to https://ai.lamplitlabs.com.
+test("static export (out/) AI section Explore CTA links to /products/light while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const start = html.indexOf('<section id="ai"');
+  const end = html.indexOf("<section", start + 1);
+  assert.ok(start >= 0 && end > start, "expected a <section id=\"ai\"> block in out/index.html");
+  const section = html.slice(start, end);
+  const ctas = [...section.matchAll(/<a\s([^>]*)>(?:(?!<\/a>)[\s\S])*?Explore Lamplit Light/g)];
+  assert.equal(ctas.length, 1, `expected exactly one Explore Lamplit Light CTA in the AI section, found ${ctas.length}`);
+  const href = ctas[0][1].match(/href="([^"]*)"/)?.[1];
+  assert.ok(href, "Explore CTA has no href");
+  if (light === "In development") {
+    assert.equal(href, "/products/light", `Explore CTA links to ${href} while Light is in development`);
+  } else {
+    assert.equal(href, "https://ai.lamplitlabs.com", `live Light Explore CTA should link out, got ${href}`);
+  }
+});

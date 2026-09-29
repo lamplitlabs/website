@@ -225,3 +225,19 @@ test("static export (out/) AI section Explore CTA links to /products/light while
     assert.equal(href, "https://ai.lamplitlabs.com", `live Light Explore CTA should link out, got ${href}`);
   }
 });
+
+// Product page guard (umber-4): while Lamplit Light is In development its own
+// /products/light page must not link out to the not-yet-public
+// ai.lamplitlabs.com from any CTA (hero, bottom, nav). Once Light is Live the
+// page must link out to it at least once.
+test("static export (out/) product page has zero ai.lamplitlabs.com hrefs while Light is in development", () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "products", "light.html"), "utf8");
+  const hrefs = html.match(/href="https:\/\/ai\.lamplitlabs\.com[^"]*"/g) ?? [];
+  if (light === "In development") {
+    assert.equal(hrefs.length, 0, `product page links to ai.lamplitlabs.com ${hrefs.length} time(s) while Light is in development: ${hrefs.join(", ")}`);
+  } else {
+    assert.ok(hrefs.length >= 1, "live Light should be linked from its product page");
+  }
+});

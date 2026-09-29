@@ -40,6 +40,13 @@ export interface Product {
   highlights: ProductHighlight[];
   featured?: boolean;
   status: ProductStatus;
+  /**
+   * Where a visitor can follow real progress on an unreleased product: an
+   * https URL or a repository-relative doc path. tests/site-data.test.mjs
+   * requires it for every product whose status is "In development", so a
+   * stale status label can never ship without a live place to track it.
+   */
+  trackingDoc?: string;
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
@@ -183,6 +190,7 @@ export const products: Product[] = [
     ],
     featured: true,
     status: "In development",
+    trackingDoc: "https://huggingface.co/lamplitlabs",
     metaTitle: "Lamplit Light - Small AI Models You Host Yourself",
     metaDescription:
       "Small, specialised AI models you host in browsers, apps, private clouds, laptops, on-prem, or at the edge. Your data never leaves.",

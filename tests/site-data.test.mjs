@@ -6,7 +6,7 @@
 // comparisons) so the two drift apart.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
@@ -176,4 +176,30 @@ test("README product table lists exactly the products in lib/site-data.ts, once 
   );
   assert.equal(new Set(readmeRowNames).size, readmeRowNames.length, "README has duplicate product rows");
   assert.equal(new Set(productNames).size, productNames.length, "lib/site-data.ts has duplicate product names");
+});
+
+// Every "In development" product must link a real place to follow progress
+// (`trackingDoc`): an https URL or a repository-relative doc that exists.
+// Without it, a product can sit behind a stale status label indefinitely
+// and the "Follow development" CTA has nothing real to point at.
+test("every In development product links a real trackingDoc", () => {
+  const inDev = products.filter((p) => isProductInDevelopment(p));
+  assert.ok(inDev.length > 0, "expected at least one In development product in the catalog");
+  for (const product of inDev) {
+    assert.equal(
+      typeof product.trackingDoc,
+      "string",
+      `${product.slug}: In development products must set trackingDoc`,
+    );
+    const doc = product.trackingDoc.trim();
+    assert.ok(doc.length > 0, `${product.slug}: trackingDoc must not be empty`);
+    if (/^https:\/\//.test(doc)) {
+      assert.doesNotThrow(() => new URL(doc), `${product.slug}: trackingDoc "${doc}" is not a valid URL`);
+    } else {
+      assert.ok(
+        existsSync(resolve(root, doc)),
+        `${product.slug}: trackingDoc "${doc}" is neither an https URL nor an existing repo file`,
+      );
+    }
+  }
 });

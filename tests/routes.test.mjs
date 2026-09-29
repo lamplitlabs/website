@@ -150,3 +150,22 @@ test("static export (out/) footer Products list has no ai.lamplitlabs.com href w
     assert.ok(hrefs.length >= 1, "live Light should link out from the footer");
   }
 });
+
+// Footer text: beyond <a href>, the footer's domain line ("lamplitlabs.com ·
+// ai.lamplitlabs.com") must not advertise the AI domain as plain text while
+// Lamplit Light is In development; only the AI section carries that copy then.
+test("static export (out/) footer block contains no ai.lamplitlabs.com text while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const start = html.indexOf("<footer");
+  const end = html.indexOf("</footer>");
+  assert.ok(start >= 0 && end > start, "expected a <footer> block in out/index.html");
+  const footer = html.slice(start, end);
+  const mentions = footer.match(/ai\.lamplitlabs\.com/g) ?? [];
+  if (light === "In development") {
+    assert.equal(mentions.length, 0, `footer mentions ai.lamplitlabs.com ${mentions.length} time(s) while Light is in development`);
+  } else {
+    assert.ok(mentions.length >= 1, "live Light should be advertised in the footer domain line");
+  }
+});

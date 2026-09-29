@@ -3,6 +3,7 @@ import { OutboundLink } from "@/components/outbound-link";
 import { socialPlatforms } from "@/components/social-platforms";
 import {
   isProductInDevelopment,
+  isProductLive,
   navLinks,
   products,
   socialLinks,
@@ -34,17 +35,9 @@ export function Footer() {
           <div>
             <h4 className="mb-3 text-sm font-semibold">Products</h4>
             <ul className="space-y-2">
-              {products.map((product) => (
-                <li key={product.name}>
-                  <OutboundLink
-                    href={product.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    trackingTarget={product.slug}
-                    trackingContext="footer_product"
-                    trackingUrl={product.url}
-                  >
+              {products.map((product) => {
+                const label = (
+                  <>
                     {product.name}
                     {isProductInDevelopment(product) && (
                       <span
@@ -54,9 +47,36 @@ export function Footer() {
                         soon
                       </span>
                     )}
-                  </OutboundLink>
-                </li>
-              ))}
+                  </>
+                );
+                const className =
+                  "text-sm text-muted-foreground transition-colors hover:text-foreground";
+                // Only a live product links out to its own site from the
+                // footer. A product still in development points at its
+                // internal /products/<slug> page instead, so a not-yet-public
+                // domain (e.g. ai.lamplitlabs.com) is never linked site-wide.
+                return (
+                  <li key={product.name}>
+                    {isProductLive(product) ? (
+                      <OutboundLink
+                        href={product.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={className}
+                        trackingTarget={product.slug}
+                        trackingContext="footer_product"
+                        trackingUrl={product.url}
+                      >
+                        {label}
+                      </OutboundLink>
+                    ) : (
+                      <Link href={`/products/${product.slug}`} className={className}>
+                        {label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

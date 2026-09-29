@@ -131,3 +131,22 @@ test("product page hero CTA copy is distinct per status and labels in-developmen
   assert.equal(live, "Get started");
   assert.notEqual(inDevelopment, live, "hero CTA copy must differ per status");
 });
+
+// Footer Products list: an in-development product must not link out to its
+// not-yet-public domain from every page; it links to its internal
+// /products/<slug> page instead. Guards ai.lamplitlabs.com leaking as a footer
+// <a href> while Lamplit Light is In development.
+test("static export (out/) footer Products list has no ai.lamplitlabs.com href while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const footer = html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
+  assert.ok(footer.includes("Products"), "expected a Products list in the footer");
+  const hrefs = footer.match(/href="https:\/\/ai\.lamplitlabs\.com[^"]*"/g) ?? [];
+  if (light === "In development") {
+    assert.equal(hrefs.length, 0, `footer links to ai.lamplitlabs.com ${hrefs.length} time(s) while Light is in development`);
+    assert.ok(footer.includes('href="/products/light"'), "footer should link to the internal /products/light page");
+  } else {
+    assert.ok(hrefs.length >= 1, "live Light should link out from the footer");
+  }
+});

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { OutboundLink } from "@/components/outbound-link";
 import { socialPlatforms } from "@/components/social-platforms";
 import {
+  getProductBySlug,
   isProductInDevelopment,
   isProductLive,
   navLinks,
@@ -13,8 +14,11 @@ import { Logo } from "@/components/logo";
 export function Footer() {
   // The AI domain is only advertised in the footer once Lamplit Light is Live;
   // while In development the AI section alone carries the "coming to" copy.
-  const light = products.find((product) => product.slug === "light");
+  // The hostname is derived from the product's url in lib/site-data so the
+  // footer never carries its own copy of the AI domain.
+  const light = getProductBySlug("light");
   const showAiDomain = light ? isProductLive(light) : false;
+  const aiDomain = light ? new URL(light.url).hostname : null;
   return (
     <footer>
       <div
@@ -58,7 +62,7 @@ export function Footer() {
                 // Only a live product links out to its own site from the
                 // footer. A product still in development points at its
                 // internal /products/<slug> page instead, so a not-yet-public
-                // domain (e.g. ai.lamplitlabs.com) is never linked site-wide.
+                // domain is never linked site-wide.
                 return (
                   <li key={product.name}>
                     {isProductLive(product) ? (
@@ -129,7 +133,7 @@ export function Footer() {
           <p>&copy; {new Date().getFullYear()} Lamplit Labs. All rights reserved.</p>
           <p className="mono-label mt-3 text-muted-foreground/60">
             lamplitlabs.com
-            {showAiDomain && <> &middot; ai.lamplitlabs.com</>}
+            {showAiDomain && aiDomain && <> &middot; {aiDomain}</>}
           </p>
         </div>
       </div>

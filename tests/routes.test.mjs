@@ -96,3 +96,22 @@ test("static export (out/) home page renders exactly one status badge per produc
     assert.equal(badges.length, 1, `${name} renders ${badges.length} status badges (expected exactly 1)`);
   }
 });
+
+// Product-card CTA copy per status. The in-development details link goes to the
+// same internal /products/<slug> page as "Learn more", so its label must say it
+// leads to progress on an unfinished product rather than sounding like a launch.
+test("product card details CTA copy is distinct per status and internal", () => {
+  const grid = read("components/product-grid.tsx");
+  const cta = grid.match(
+    /isInDevelopment \? "([^"]+)" : "([^"]+)"\}\s*<ArrowRight/
+  );
+  assert.ok(cta, "expected a status-branched details CTA in product-grid.tsx");
+  const [, inDevelopment, live] = cta;
+  assert.equal(inDevelopment, "See progress");
+  assert.equal(live, "Learn more");
+  assert.notEqual(inDevelopment, live, "CTA copy must differ per status");
+  assert.ok(
+    grid.includes(`aria-label={\`\${\n                isInDevelopment ? "${inDevelopment}" : "${live}"\n              }: \${product.name}\`}`),
+    "aria-label must reuse the same visible CTA copy"
+  );
+});

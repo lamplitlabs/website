@@ -114,11 +114,11 @@ function ProductCard({
             <a
               href={`/products/${product.slug}`}
               aria-label={`${
-                isInDevelopment ? "Explore product" : "Learn more"
+                isInDevelopment ? "See progress" : "Learn more"
               }: ${product.name}`}
               className={styles.action}
             >
-              {isInDevelopment ? "Explore product" : "Learn more"}
+              {isInDevelopment ? "See progress" : "Learn more"}
               <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             </a>
           </div>

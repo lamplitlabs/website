@@ -205,19 +205,23 @@ test("every In development product links a real trackingDoc", () => {
 });
 
 // `trackingDoc` is test-only data until an ADR covers rendering it in the UI
-// (ripple-5, nimbus-6). Rendering it on a page (a "why not yet live" note, a
-// progress link) is a product-surface decision, so any UI file that reads it
-// must cite the ADR in docs/decisions/ that allows it. Scan every home section
-// and the product detail page, not just the product grid.
-test("no UI file renders trackingDoc unless an ADR in docs/decisions/ covers it", () => {
+// (ripple-5, nimbus-6, harbor-9; folded into one guard by juniper-5). Rendering
+// it on a page (a "why not yet live" note, a progress link) is a product-surface
+// decision, so any UI file that reads it must cite an ADR in docs/decisions/
+// that mentions trackingDoc. Scan every components/**/*.tsx and app/**/page.tsx
+// via readdir so a new section or route is covered without editing this list.
+test("no UI file (components/**/*.tsx, app/**/page.tsx) renders trackingDoc unless an ADR in docs/decisions/ covers it", () => {
   const uiFiles = [
-    "components/product-grid.tsx",
-    ...readdirSync(resolve(root, "components/home"))
+    ...readdirSync(resolve(root, "components"), { recursive: true })
       .filter((f) => f.endsWith(".tsx"))
-      .map((f) => `components/home/${f}`),
-    "app/products/[slug]/page.tsx",
-  ].filter((f) => existsSync(resolve(root, f)));
-  assert.ok(uiFiles.length > 2, "expected product-grid, home sections and the product page to exist");
+      .map((f) => `components/${f}`),
+    ...readdirSync(resolve(root, "app"), { recursive: true })
+      .filter((f) => f === "page.tsx" || f.endsWith("/page.tsx"))
+      .map((f) => `app/${f}`),
+  ];
+  for (const must of ["components/product-grid.tsx", "components/home/products-section.tsx", "app/products/[slug]/page.tsx"]) {
+    assert.ok(uiFiles.includes(must), `${must} must be in the scanned UI files`);
+  }
   const adrs = readdirSync(resolve(root, "docs/decisions"))
     .filter((f) => f.endsWith(".md") && !f.startsWith("_"))
     .filter((f) => /trackingDoc/.test(readFileSync(resolve(root, "docs/decisions", f), "utf8")));
@@ -249,28 +253,6 @@ test("AI section gates the /try CTA on isProductLive so In development does not 
     assert.ok(tryHrefs > 0, "Live light product must render the /try CTA on the home page");
   } else {
     assert.equal(tryHrefs, 0, `light is "${light.status}" but the home page still links to ai.lamplitlabs.com/try ${tryHrefs}x`);
-  }
-});
-
-// trackingDoc is catalog metadata verified by the test above; no ADR covers
-// rendering it in the UI. Keep it test-only across the home sections and the
-// product detail page (one file list; a new surface is one line) so a "Follow development" link cannot slip in
-// unreviewed (harbor-9, extending the product-grid guard of ripple-5).
-test("product grid, home sections and the product page never read trackingDoc (test-only until an ADR covers UI use)", () => {
-  const homeDir = resolve(root, "components/home");
-  const uiFiles = [
-    resolve(root, "components/product-grid.tsx"),
-    ...readdirSync(homeDir).filter((f) => f.endsWith(".tsx")).map((f) => resolve(homeDir, f)),
-    resolve(root, "app/products/[slug]/page.tsx"),
-  ];
-  assert.ok(uiFiles.length > 2, "expected product-grid, components/home/*.tsx and app/products/[slug]/page.tsx to exist");
-  for (const file of uiFiles) {
-    assert.ok(existsSync(file), `${file} is missing`);
-    const src = readFileSync(file, "utf8");
-    assert.ok(
-      !/\btrackingDoc\b/.test(src),
-      `${file.slice(root.length + 1)} reads trackingDoc; UI use of the tracking link needs an ADR first`,
-    );
   }
 });
 

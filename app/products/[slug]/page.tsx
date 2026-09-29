@@ -116,6 +116,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // While a product is in development its URL is not live yet, so every CTA
   // points at the on-page About section instead of the external product URL.
   const ctaHref = isInDevelopment ? "#about" : product.url;
+  // Analytics should record where the click actually goes: the internal
+  // product page while in development, the live product domain otherwise.
+  const ctaTrackingUrl = isInDevelopment
+    ? `https://www.lamplitlabs.com/products/${product.slug}`
+    : product.url;
   const ctaExternalProps = isInDevelopment
     ? {}
     : { target: "_blank", rel: "noopener noreferrer" };
@@ -130,7 +135,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           {...ctaExternalProps}
           trackingTarget={product.slug}
           trackingContext="product_page_nav_cta"
-          trackingUrl={product.url}
+          trackingUrl={ctaTrackingUrl}
           className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           {isInDevelopment ? "Follow development" : `Visit ${product.name}`}
@@ -193,7 +198,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   {...ctaExternalProps}
                   trackingTarget={product.slug}
                   trackingContext="product_page_hero_cta"
-                  trackingUrl={product.url}
+                  trackingUrl={ctaTrackingUrl}
                 >
                   {isInDevelopment
                     ? `Visit ${product.name} (in development)`
@@ -282,7 +287,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     {...ctaExternalProps}
                     trackingTarget={product.slug}
                     trackingContext="product_page_bottom_cta"
-                    trackingUrl={product.url}
+                    trackingUrl={ctaTrackingUrl}
                   >
                     {isInDevelopment
                       ? "Follow development"

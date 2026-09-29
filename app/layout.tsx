@@ -3,7 +3,11 @@ import { Fraunces, Inter } from "next/font/google";
 import Script from "next/script";
 import { CookieConsent } from "@/components/cookie-consent";
 import { GoogleAnalytics } from "@/components/google-analytics";
-import { products, socialLinks } from "@/lib/site-data";
+import {
+  isProductInDevelopment,
+  products,
+  socialLinks,
+} from "@/lib/site-data";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -151,7 +155,11 @@ const productJsonLd = products.map((product) => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: product.schema?.name ?? product.name,
-  url: product.canonicalUrl ?? product.url,
+  // An in-development product's domain is not launched yet, so structured
+  // data points at the internal product page until the product goes live.
+  url: isProductInDevelopment(product)
+    ? `https://www.lamplitlabs.com/products/${product.slug}`
+    : (product.canonicalUrl ?? product.url),
   applicationCategory:
     product.schema?.applicationCategory ?? "UtilitiesApplication",
   description: product.metaDescription ?? product.longDescription,

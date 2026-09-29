@@ -15,7 +15,7 @@ import Link from "next/link";
 import { HuggingFaceIcon } from "@/components/icons";
 import { OutboundLink } from "@/components/outbound-link";
 import { RevealSection } from "@/components/home/reveal-section";
-import { getProductBySlug, socialLinks } from "@/lib/site-data";
+import { getProductBySlug, isProductLive, socialLinks } from "@/lib/site-data";
 import styles from "./ai-section.module.css";
 
 const lightProduct = getProductBySlug("light");
@@ -26,6 +26,9 @@ const lightStatusLabel =
     : "In development \u00b7 public site coming to ai.lamplitlabs.com";
 const lightHomeUrl = "https://ai.lamplitlabs.com";
 const lightTryUrl = "https://ai.lamplitlabs.com/try";
+// The /try playground only exists once the product is Live; while it is In
+// development the CTA would be a dead-end click, so it is gated on status.
+const lightIsLive = lightProduct ? isProductLive(lightProduct) : false;
 
 interface RuntimeCard {
   index: string;
@@ -377,17 +380,19 @@ export function AiSection() {
                   Explore Lamplit Light
                   <ArrowUpRight className="h-4 w-4" />
                 </OutboundLink>
-                <OutboundLink
-                  href={lightTryUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  trackingTarget="light_try"
-                  trackingContext="ai_section"
-                  trackingUrl={lightTryUrl}
-                  className="inline-flex items-center justify-center rounded-lg border px-6 py-3 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                >
-                  Try a model in your browser
-                </OutboundLink>
+                {lightIsLive ? (
+                  <OutboundLink
+                    href={lightTryUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    trackingTarget="light_try"
+                    trackingContext="ai_section"
+                    trackingUrl={lightTryUrl}
+                    className="inline-flex items-center justify-center rounded-lg border px-6 py-3 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    Try a model in your browser
+                  </OutboundLink>
+                ) : null}
                 <OutboundLink
                   href={socialLinks.huggingface}
                   target="_blank"

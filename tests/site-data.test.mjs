@@ -203,3 +203,24 @@ test("every In development product links a real trackingDoc", () => {
     }
   }
 });
+
+// AI section "Try a model in your browser" CTA: the /try playground only exists
+// once Lamplit Light is Live. While the product is In development the CTA must
+// not render, so users are not sent on a dead-end click (nimbus-5).
+test("AI section gates the /try CTA on isProductLive so In development does not render it", async () => {
+  const src = readFileSync(resolve(root, "components/home/ai-section.tsx"), "utf8");
+  assert.match(src, /import \{[^}]*\bisProductLive\b[^}]*\} from "@\/lib\/site-data"/, "ai-section.tsx must import isProductLive");
+  assert.match(src, /const lightIsLive = lightProduct \? isProductLive\(lightProduct\) : false;/);
+  assert.match(src, /\{lightIsLive \? \(\s*<OutboundLink\s+href=\{lightTryUrl\}/, "the /try OutboundLink must be rendered only when lightIsLive");
+  const light = products.find((p) => p.slug === "light");
+  assert.ok(light, "catalog has a light product");
+  const home = resolve(root, "out", "index.html");
+  if (!existsSync(home)) return; // built-output half only runs after `npm run build`
+  const html = readFileSync(home, "utf8");
+  const tryHrefs = (html.match(/href="https:\/\/ai\.lamplitlabs\.com\/try"/g) ?? []).length;
+  if (isProductLive(light)) {
+    assert.ok(tryHrefs > 0, "Live light product must render the /try CTA on the home page");
+  } else {
+    assert.equal(tryHrefs, 0, `light is "${light.status}" but the home page still links to ai.lamplitlabs.com/try ${tryHrefs}x`);
+  }
+});

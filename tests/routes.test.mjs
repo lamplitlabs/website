@@ -132,6 +132,22 @@ test("product page hero CTA copy is distinct per status and labels in-developmen
   assert.notEqual(inDevelopment, live, "hero CTA copy must differ per status");
 });
 
+// Whole-page guard (kestrel-10): while Lamplit Light is In development its
+// not-yet-public domain must not appear as an <a href> anywhere on the home
+// page - footer, AI section CTAs or any future component. Once Light is Live
+// the page must link out to it at least once.
+test("static export (out/) home page has zero ai.lamplitlabs.com hrefs while Light is in development", { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" }, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const hrefs = html.match(/href="https:\/\/ai\.lamplitlabs\.com[^"]*"/g) ?? [];
+  if (light === "In development") {
+    assert.equal(hrefs.length, 0, `home page links to ai.lamplitlabs.com ${hrefs.length} time(s) while Light is in development: ${hrefs.join(", ")}`);
+  } else {
+    assert.ok(hrefs.length >= 1, "live Light should be linked from the home page");
+  }
+});
+
 // Footer Products list: an in-development product must not link out to its
 // not-yet-public domain from every page; it links to its internal
 // /products/<slug> page instead. Guards ai.lamplitlabs.com leaking as a footer

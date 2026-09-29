@@ -64,6 +64,39 @@ test("helpers reject unknown or missing status values", () => {
   }
 });
 
+// Regression guard for lib/site-data.ts isProductInDevelopment: only the exact
+// literal "In development" flips the in-development CTA/badge. A typo, case or
+// whitespace change, a renamed status, or any other truthy value must be false.
+test("isProductInDevelopment returns true only for the exact literal \"In development\"", () => {
+  assert.equal(isProductInDevelopment({ status: "In development" }), true);
+  const nearMisses = [
+    "in development",
+    "IN DEVELOPMENT",
+    "In Development",
+    "In development ",
+    " In development",
+    "In-development",
+    "Indevelopment",
+    "In dev",
+    "Development",
+    "In developement",
+    "Live",
+    true,
+    1,
+    {},
+    [],
+    ["In development"],
+    null,
+  ];
+  for (const status of nearMisses) {
+    assert.equal(
+      isProductInDevelopment({ status }),
+      false,
+      `status ${JSON.stringify(status)} must not count as In development`,
+    );
+  }
+});
+
 // Drift guard: every product status is a ProductStatus member, and the README
 // product table agrees with lib/site-data.ts. Every README row must carry an
 // explicit `— **Status**` marker equal to the product's status, so the README

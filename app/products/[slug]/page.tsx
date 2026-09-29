@@ -77,7 +77,11 @@ function ProductJsonLd({ slug }: { slug: string }) {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: product.schema?.name ?? product.name,
-    url: product.canonicalUrl ?? product.url,
+    // While a product is still in development, point structured data at the
+    // internal product page instead of the not-yet-public product domain.
+    url: isProductInDevelopment(product)
+      ? `https://www.lamplitlabs.com/products/${product.slug}`
+      : (product.canonicalUrl ?? product.url),
     applicationCategory:
       product.schema?.applicationCategory ?? "UtilitiesApplication",
     description: product.metaDescription ?? product.longDescription,

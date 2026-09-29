@@ -227,15 +227,16 @@ test("AI section gates the /try CTA on isProductLive so In development does not 
 
 // trackingDoc is catalog metadata verified by the test above; no ADR covers
 // rendering it in the UI. Keep it test-only across the home sections and the
-// product detail page so a "Follow development" link cannot slip in
+// product detail page (one file list; a new surface is one line) so a "Follow development" link cannot slip in
 // unreviewed (harbor-9, extending the product-grid guard of ripple-5).
-test("home sections and the product page never read trackingDoc (test-only until an ADR covers UI use)", () => {
+test("product grid, home sections and the product page never read trackingDoc (test-only until an ADR covers UI use)", () => {
   const homeDir = resolve(root, "components/home");
   const uiFiles = [
+    resolve(root, "components/product-grid.tsx"),
     ...readdirSync(homeDir).filter((f) => f.endsWith(".tsx")).map((f) => resolve(homeDir, f)),
     resolve(root, "app/products/[slug]/page.tsx"),
   ];
-  assert.ok(uiFiles.length > 1, "expected components/home/*.tsx and app/products/[slug]/page.tsx to exist");
+  assert.ok(uiFiles.length > 2, "expected product-grid, components/home/*.tsx and app/products/[slug]/page.tsx to exist");
   for (const file of uiFiles) {
     assert.ok(existsSync(file), `${file} is missing`);
     const src = readFileSync(file, "utf8");

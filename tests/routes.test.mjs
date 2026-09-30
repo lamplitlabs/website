@@ -125,6 +125,32 @@ test("static export (out/) home page renders a 'Learn more' details CTA on every
   assert.ok(!html.includes("See progress"), "dead 'See progress' copy must not reach the export");
 });
 
+// Source-level guard for the product-card "See progress" CTA (no build
+// needed). The copy may only ever be reached through the isInDevelopment
+// ternary, isInDevelopment must come from isProductInDevelopment(product),
+// and that helper must be a strict equality on "In development" - so no
+// product whose status contains "Live" can ever render "See progress".
+test("product grid gates 'See progress' strictly on an In-development status, never on a Live product", () => {
+  const grid = read("components/product-grid.tsx");
+  const total = (grid.match(/See progress/g) ?? []).length;
+  const gated = (grid.match(/isInDevelopment \? "See progress"/g) ?? []).length;
+  assert.equal(total, gated, "'See progress' must only appear behind the isInDevelopment ternary");
+  assert.match(grid, /const isInDevelopment = isProductInDevelopment\(product\);/);
+  const helper = siteData.match(/export function isProductInDevelopment\([\s\S]*?\n\}/)?.[0];
+  assert.ok(helper, "expected isProductInDevelopment in lib/site-data.ts");
+  const literal = helper.match(/product\.status === "([^"]+)"/)?.[1];
+  assert.equal(literal, "In development", "isProductInDevelopment must be a strict equality on the status literal");
+  const statuses = [...siteData.matchAll(/^\s*status:\s*"([^"]+)"/gm)].map((m) => m[1]);
+  assert.equal(statuses.length, slugs.length, "every product needs a status");
+  const inDevelopment = (status) => status === literal;
+  for (const status of statuses) {
+    if (status.includes("Live")) {
+      assert.equal(inDevelopment(status), false, `Live status "${status}" would render 'See progress'`);
+    }
+  }
+  assert.ok(statuses.some((s) => s.includes("Live")), "expected at least one Live product to exercise the guard");
+});
+
 // PDP hero CTA copy per status. The hero button is an outbound link to the
 // product's own site, so an in-development product must be labelled the same
 // way the card footer and nav/bottom CTAs are: as an unfinished destination,

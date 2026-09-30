@@ -48,7 +48,12 @@ npm run check        # Full verification: lint → typecheck → test (test buil
 3. **Plan** — Create plans in `docs/plans/` for non-trivial work.
 4. **Specify** — Describe features in `docs/features/`.
 5. **Build** — Implement product code only after decisions and plans are clear.
-6. **Verify** — Run `npm run check` (lint → typecheck → build → test), or the four commands individually.
+6. **Verify** — Run `npm run check`. It is the canonical, sufficient verify sequence: it runs
+   lint → typecheck → test, and `npm test` itself builds the static export first, so `check`
+   already covers `npm run build` and everything `npm run test:unit` covers (plus the 11 out/-dependent
+   export tests in `tests/routes.test.mjs`, which `test:unit` skips when `./out` is absent). Running
+   only `npm run lint` and `npm run typecheck` is **not** enough — it skips those export tests. Run the
+   individual commands only for a faster local loop, and finish with `npm run check` before committing.
 7. **Learn** — Record patterns and lessons in `docs/memory/`.
 
 ## Critical Rules

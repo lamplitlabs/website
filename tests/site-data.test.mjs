@@ -308,3 +308,11 @@ test("literal 'ai.lamplitlabs.com' appears only in lib/site-data.ts (single sour
   assert.deepEqual(offenders, [], `'ai.lamplitlabs.com' must only live in lib/site-data.ts; found in: ${offenders.join(", ")}`);
   assert.ok(source.includes("ai.lamplitlabs.com"), "lib/site-data.ts should still define the ai.lamplitlabs.com URL");
 });
+
+test("package.json engines.node matches .nvmrc", () => {
+  const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
+  const nvmrc = readFileSync(resolve(root, ".nvmrc"), "utf8").trim();
+  assert.equal(typeof pkg.engines?.node, "string");
+  assert.ok(nvmrc.length > 0, ".nvmrc must not be empty");
+  assert.equal(pkg.engines.node, nvmrc);
+});

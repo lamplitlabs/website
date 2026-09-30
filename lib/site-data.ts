@@ -198,7 +198,7 @@ export const products: Product[] = [
     schema: {
       name: "Lamplit Light sovereign AI models",
       applicationCategory: "BusinessApplication",
-      creativeWorkStatus: "Published",
+      creativeWorkStatus: "In development",
       featureList: [
         "Self-hosted small AI models",
         "Single-purpose specialised models",

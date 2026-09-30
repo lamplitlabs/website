@@ -281,3 +281,30 @@ test("every In development product resolves its canonical URL to the internal /p
     );
   }
 });
+
+// Regression guard: lib/site-data.ts is the single source of truth for the
+// Light product's external URL. Any other source file (components/, app/, lib/)
+// that hard-codes 'ai.lamplitlabs.com' bypasses the status gating in site-data
+// and can leak the not-yet-public host into the export.
+test("literal 'ai.lamplitlabs.com' appears only in lib/site-data.ts (single source of truth)", () => {
+  const skip = new Set(["node_modules", ".next", "out"]);
+  const files = [];
+  for (const dir of ["components", "app", "lib"]) {
+    const base = resolve(root, dir);
+    if (!existsSync(base)) continue;
+    for (const entry of readdirSync(base, { recursive: true, withFileTypes: true })) {
+      if (!entry.isFile()) continue;
+      const full = resolve(entry.parentPath ?? entry.path, entry.name);
+      const rel = full.slice(root.length + 1);
+      if (rel.split("/").some((seg) => skip.has(seg))) continue;
+      if (!/\.(tsx?|mjs|cjs|jsx?|json)$/.test(entry.name)) continue; // code only; app/globals.css has a prose comment naming the host
+      files.push(rel);
+    }
+  }
+  assert.ok(files.length > 0, "expected to scan at least one source file");
+  const offenders = files.filter(
+    (rel) => rel !== "lib/site-data.ts" && readFileSync(resolve(root, rel), "utf8").includes("ai.lamplitlabs.com"),
+  );
+  assert.deepEqual(offenders, [], `'ai.lamplitlabs.com' must only live in lib/site-data.ts; found in: ${offenders.join(", ")}`);
+  assert.ok(source.includes("ai.lamplitlabs.com"), "lib/site-data.ts should still define the ai.lamplitlabs.com URL");
+});

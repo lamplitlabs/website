@@ -30,7 +30,7 @@ npm run lint         # Lint with ESLint
 npm run typecheck    # Run TypeScript type checker
 npm run test         # Build static export, then run all smoke tests (node --test, tests/**/*.test.mjs)
                      # incl. the out/ export tests in tests/routes.test.mjs (never skipped)
-npm run test:unit    # Run smoke tests without building; the 3 out/-dependent tests skip if ./out is absent
+npm run test:unit    # Run smoke tests without building; the 11 out/-dependent tests skip if ./out is absent
 npm run test:e2e     # Alias of `npm run test` (kept for existing docs/scripts)
 npm run clean        # Clean build artifacts
 npm run check        # Full verification: lint → typecheck → test (test builds first, so the out/

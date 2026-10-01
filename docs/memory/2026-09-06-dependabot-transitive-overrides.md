@@ -3,6 +3,7 @@
 **Date:** 2026-09-06  
 **Type:** Lesson  
 **Scope:** Dependencies (`package.json`, `tools/vercel-cli/package.json`, Dependabot)
+**Resolution:** resolved (npm `overrides` block present in package.json)  
 
 ## Summary
 

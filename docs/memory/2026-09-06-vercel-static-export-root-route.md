@@ -3,6 +3,7 @@
 **Date:** 2026-09-06  
 **Type:** Lesson  
 **Scope:** Deployment / Vercel routing (`vercel.json`, `.github/workflows/deploy-web-vercel.yml`)
+**Resolution:** resolved (vercel.json rewrites `/` → `/index`)  
 
 ## Summary
 

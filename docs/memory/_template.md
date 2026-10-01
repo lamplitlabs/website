@@ -2,7 +2,8 @@
 
 **Date:** YYYY-MM-DD  
 **Type:** Pattern / Convention / Lesson / Anti-pattern  
-**Scope:** [Component/Layer/Feature]
+**Scope:** [Component/Layer/Feature]  
+**Resolution:** open | resolved (commit/PR ref) — optional; `resolved` means the fix is already in the codebase, so reflect jobs grep `resolution: resolved` and skip re-suggesting it  
 
 ## Summary
 

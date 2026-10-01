@@ -3,6 +3,7 @@
 **Date:** 2026-09-11  
 **Type:** Convention  
 **Scope:** Catalog copy / Homepage sections / Cover art / Metadata
+**Resolution:** open (standing convention, not a one-off fix)  
 
 ## Summary
 

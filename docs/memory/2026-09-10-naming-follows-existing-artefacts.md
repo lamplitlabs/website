@@ -3,6 +3,7 @@
 **Date:** 2026-09-10  
 **Type:** Lesson  
 **Scope:** Product naming / Catalog / AI product line
+**Resolution:** open (standing convention, not a one-off fix)  
 
 ## Summary
 

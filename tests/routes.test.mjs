@@ -346,3 +346,29 @@ test("static export (out/) product page has zero ai.lamplitlabs.com hrefs while 
     assert.ok(hrefs.length >= 1, "live Light should be linked from its product page");
   }
 });
+
+// CTA copy guard (aurora-2): while a product is In development, "Follow
+// development" is a CTA to an on-page anchor, not a working product link. A
+// visible "In development" note must sit next to every "Follow development"
+// CTA so a first-time visitor doesn't read the button as a live product link.
+test("static export (out/) /products/light renders an 'In development' note next to each 'Follow development' CTA while Light is in development", skipWithoutOut, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  // Strip the inlined RSC payload (<script>self.__next_f...) so only the
+  // rendered HTML is counted, not its serialized duplicate.
+  const html = readFileSync(resolve(root, "out", "products", "light.html"), "utf8")
+    .replace(/<script[\s\S]*?<\/script>/g, "");
+  const ctas = html.match(/>Follow development</g) ?? [];
+  const notes = html.match(/data-testid="product-dev-note"[^>]*>In development/g) ?? [];
+  if (light === "In development") {
+    assert.ok(ctas.length >= 1, "expected a Follow development CTA while Light is in development");
+    assert.equal(notes.length, ctas.length, `expected one In development note per Follow development CTA (${notes.length} notes vs ${ctas.length} CTAs)`);
+    for (const idx of [...html.matchAll(/>Follow development</g)].map((m) => m.index)) {
+      const before = html.slice(Math.max(0, idx - 1200), idx);
+      assert.ok(/data-testid="product-dev-note"[^>]*>In development/.test(before), "each Follow development CTA must be immediately preceded by a visible In development note");
+    }
+  } else {
+    assert.equal(ctas.length, 0, "live Light should not show a Follow development CTA");
+    assert.equal(notes.length, 0, "live Light should not show an In development note");
+  }
+});

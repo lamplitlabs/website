@@ -135,6 +135,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <ProductJsonLd slug={slug} />
 
       <SiteNav>
+        {isInDevelopment && (
+          <span
+            data-testid="product-dev-note"
+            className="mr-3 hidden text-xs font-medium uppercase tracking-wider text-muted-foreground sm:inline"
+          >
+            In development
+          </span>
+        )}
         <OutboundLink
           href={ctaHref}
           {...ctaExternalProps}
@@ -286,6 +294,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {product.description}
               </p>
               <div className="mt-8">
+                {isInDevelopment && (
+                  <p
+                    data-testid="product-dev-note"
+                    className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                  >
+                    In development — not yet available
+                  </p>
+                )}
                 <Button size="lg" asChild>
                   <OutboundLink
                     href={ctaHref}

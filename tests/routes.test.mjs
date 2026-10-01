@@ -188,6 +188,23 @@ test("product page uses #about as ctaHref while the product is in development", 
   assert.ok(hrefs.length >= 1, "expected at least one CTA to use href={ctaHref}");
 });
 
+// Source-level gate (nimbus-2): the in-development CTAs anchor to #about on
+// the same page, so they must not carry an "opens externally" icon
+// (ExternalLink / ArrowUpRight). The icon is decorative and hidden from AT.
+test("product page CTAs swap the external-link icon for an in-page icon while in development", () => {
+  const page = read("app/products/[slug]/page.tsx");
+  const cta = page.match(/const CtaIcon = isInDevelopment\s*\?\s*(\w+)\s*:\s*ArrowUpRight;/);
+  assert.ok(cta, "expected CtaIcon to branch on isInDevelopment in app/products/[slug]/page.tsx");
+  assert.notEqual(cta[1], "ArrowUpRight", "in-development CTA icon must not be ArrowUpRight");
+  const nav = page.match(/const NavCtaIcon = isInDevelopment\s*\?\s*(\w+)\s*:\s*ExternalLink;/);
+  assert.ok(nav, "expected NavCtaIcon to branch on isInDevelopment");
+  assert.notEqual(nav[1], "ExternalLink", "in-development nav CTA icon must not be ExternalLink");
+  assert.equal(cta[1], nav[1], "nav and bottom/hero CTAs should share the in-page icon");
+  assert.doesNotMatch(page, /<(ExternalLink|ArrowUpRight) className/, "icons must be rendered via the status-branched components");
+  const icons = page.match(/<(?:Nav)?CtaIcon aria-hidden="true"/g) ?? [];
+  assert.equal(icons.length, 3, "nav, hero and bottom CTA icons must be aria-hidden");
+});
+
 // Whole-page guard (kestrel-10): while Lamplit Light is In development its
 // not-yet-public domain must not appear as an <a href> anywhere on the home
 // page - footer, AI section CTAs or any future component. Once Light is Live

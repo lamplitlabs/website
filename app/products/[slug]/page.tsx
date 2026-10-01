@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ExternalLink } from "lucide-react";
 import { OutboundLink } from "@/components/outbound-link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
@@ -117,6 +117,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // While a product is in development its URL is not live yet, so every CTA
   // points at the on-page About section instead of the external product URL.
   const ctaHref = isInDevelopment ? "#about" : product.url;
+  // In development the CTAs anchor to #about on this page, so the icon must
+  // not promise an external destination: show a same-page arrow instead.
+  const CtaIcon = isInDevelopment ? ArrowDown : ArrowUpRight;
+  const NavCtaIcon = isInDevelopment ? ArrowDown : ExternalLink;
   // Analytics should record where the click actually goes: the internal
   // product page while in development, the live product domain otherwise.
   const ctaTrackingUrl = isInDevelopment
@@ -140,7 +144,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           {isInDevelopment ? "Follow development" : `Visit ${product.name}`}
-          <ExternalLink className="h-3.5 w-3.5" />
+          <NavCtaIcon aria-hidden="true" className="h-3.5 w-3.5" />
         </OutboundLink>
       </SiteNav>
 
@@ -204,7 +208,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   {isInDevelopment
                     ? `Visit ${product.name} (in development)`
                     : "Get started"}
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
+                  <CtaIcon aria-hidden="true" className="ml-2 h-4 w-4" />
                 </OutboundLink>
               </Button>
               <Button size="lg" variant="outline" asChild>
@@ -293,7 +297,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     {isInDevelopment
                       ? "Follow development"
                       : `Visit ${product.name}`}
-                    <ArrowUpRight className="ml-2 h-4 w-4" />
+                    <CtaIcon aria-hidden="true" className="ml-2 h-4 w-4" />
                   </OutboundLink>
                 </Button>
               </div>

@@ -9,6 +9,7 @@ import { SiteNav } from "@/components/site-nav";
 import {
   getProductBySlug,
   isProductInDevelopment,
+  productCreativeWorkStatus,
   products,
 } from "@/lib/site-data";
 
@@ -85,7 +86,7 @@ function ProductJsonLd({ slug }: { slug: string }) {
     applicationCategory:
       product.schema?.applicationCategory ?? "UtilitiesApplication",
     description: product.metaDescription ?? product.longDescription,
-    creativeWorkStatus: product.schema?.creativeWorkStatus,
+    creativeWorkStatus: productCreativeWorkStatus(product),
     featureList: product.schema?.featureList,
     operatingSystem: "Web",
     image: `https://www.lamplitlabs.com${product.cover}`,

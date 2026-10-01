@@ -23,7 +23,6 @@ export const productCategories: ProductCategory[] = [
 export interface ProductSchema {
   name: string;
   applicationCategory: "BusinessApplication" | "UtilitiesApplication";
-  creativeWorkStatus: ProductCreativeWorkStatus;
   featureList: string[];
 }
 
@@ -62,6 +61,17 @@ export function isProductInDevelopment(
   product: Pick<Product, "status">,
 ): boolean {
   return product.status === "In development";
+}
+
+/**
+ * JSON-LD `creativeWorkStatus`, derived from `status` so the structured data
+ * can never drift from the catalog label (the class of bug fixed in 3e043b8).
+ * It is intentionally not a literal field on ProductSchema.
+ */
+export function productCreativeWorkStatus(
+  product: Pick<Product, "status">,
+): ProductCreativeWorkStatus {
+  return isProductLive(product) ? "Published" : "In development";
 }
 
 export interface NavLink {
@@ -137,7 +147,6 @@ export const products: Product[] = [
     schema: {
       name: "Amistio visual AI agent builder",
       applicationCategory: "BusinessApplication",
-      creativeWorkStatus: "Published",
       featureList: [
         "Visual drag-and-drop agent flow builder",
         "Starter templates and goal-to-draft generation",
@@ -198,7 +207,6 @@ export const products: Product[] = [
     schema: {
       name: "Lamplit Light sovereign AI models",
       applicationCategory: "BusinessApplication",
-      creativeWorkStatus: "In development",
       featureList: [
         "Self-hosted small AI models",
         "Single-purpose specialised models",

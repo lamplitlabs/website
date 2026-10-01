@@ -5,6 +5,7 @@ import { CookieConsent } from "@/components/cookie-consent";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import {
   isProductInDevelopment,
+  productCreativeWorkStatus,
   products,
   socialLinks,
 } from "@/lib/site-data";
@@ -163,7 +164,7 @@ const productJsonLd = products.map((product) => ({
   applicationCategory:
     product.schema?.applicationCategory ?? "UtilitiesApplication",
   description: product.metaDescription ?? product.longDescription,
-  creativeWorkStatus: product.schema?.creativeWorkStatus,
+  creativeWorkStatus: productCreativeWorkStatus(product),
   featureList: product.schema?.featureList,
   operatingSystem: "Web",
   creator: {

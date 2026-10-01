@@ -19,7 +19,7 @@ const { outputText } = ts.transpileModule(source, {
 const siteData = await import(
   `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
 );
-const { products, isProductLive, isProductInDevelopment } = siteData;
+const { products, isProductLive, isProductInDevelopment, productCreativeWorkStatus } = siteData;
 
 const literalStatuses = [...source.matchAll(/^\s*status:\s*"([^"]+)"/gm)].map((m) => m[1]);
 
@@ -49,20 +49,22 @@ test("isProductLive/isProductInDevelopment agree with each product's literal sta
   }
 });
 
-test("schema.creativeWorkStatus stays in sync with status/isProductInDevelopment", () => {
+test("creativeWorkStatus is derived from status, never hand-set in the catalog", () => {
+  assert.equal(typeof productCreativeWorkStatus, "function");
+  // The literal field must not come back: JSON-LD derives it from `status`.
+  assert.equal(source.includes("creativeWorkStatus:"), false, "lib/site-data.ts must not hand-set creativeWorkStatus");
+  assert.equal(productCreativeWorkStatus({ status: "Live" }), "Published");
+  assert.equal(productCreativeWorkStatus({ status: "In development" }), "In development");
   let checked = 0;
   for (const product of products) {
-    // schema is optional (Product.schema?: ProductSchema); only products that
-    // emit JSON-LD must keep creativeWorkStatus in step with status.
     if (product.schema === undefined) continue;
     checked += 1;
-    const cws = product.schema.creativeWorkStatus;
+    const cws = productCreativeWorkStatus(product);
     if (isProductInDevelopment(product)) {
-      assert.equal(product.status, "In development", `${product.slug}: helper/status drift`);
-      assert.equal(cws, "In development", `${product.slug}: status "In development" needs schema.creativeWorkStatus "In development", got "${cws}"`);
+      assert.equal(cws, "In development", `${product.slug}: status "${product.status}" derived "${cws}"`);
     } else {
       assert.equal(product.status, "Live", `${product.slug}: helper/status drift`);
-      assert.equal(cws, "Published", `${product.slug}: status "Live" needs schema.creativeWorkStatus "Published", got "${cws}"`);
+      assert.equal(cws, "Published", `${product.slug}: status "Live" derived "${cws}"`);
     }
   }
   assert.ok(checked > 0, "expected at least one product with a schema block");

@@ -49,6 +49,25 @@ test("isProductLive/isProductInDevelopment agree with each product's literal sta
   }
 });
 
+test("schema.creativeWorkStatus stays in sync with status/isProductInDevelopment", () => {
+  let checked = 0;
+  for (const product of products) {
+    // schema is optional (Product.schema?: ProductSchema); only products that
+    // emit JSON-LD must keep creativeWorkStatus in step with status.
+    if (product.schema === undefined) continue;
+    checked += 1;
+    const cws = product.schema.creativeWorkStatus;
+    if (isProductInDevelopment(product)) {
+      assert.equal(product.status, "In development", `${product.slug}: helper/status drift`);
+      assert.equal(cws, "In development", `${product.slug}: status "In development" needs schema.creativeWorkStatus "In development", got "${cws}"`);
+    } else {
+      assert.equal(product.status, "Live", `${product.slug}: helper/status drift`);
+      assert.equal(cws, "Published", `${product.slug}: status "Live" needs schema.creativeWorkStatus "Published", got "${cws}"`);
+    }
+  }
+  assert.ok(checked > 0, "expected at least one product with a schema block");
+});
+
 test("every literal status string in the source is recognised by exactly one helper", () => {
   assert.ok(literalStatuses.length > 0, "expected at least one product status in source");
   for (const status of literalStatuses) {

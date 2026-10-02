@@ -76,3 +76,9 @@ test("footer exposes a consent-reset action that reopens the banner", () => {
   const privacy = readFileSync(resolve(root, "app/privacy/page.tsx"), "utf8");
   assert.doesNotMatch(privacy, /browser settings/, "privacy page must no longer send users to browser settings");
 });
+
+test("banner is announced to screen readers as a labelled dialog", () => {
+  const banner = readFileSync(resolve(root, "components/cookie-consent.tsx"), "utf8");
+  assert.match(banner, /role="dialog"/, "banner wrapper must be a dialog region");
+  assert.match(banner, /aria-label="Cookie preferences"/, "dialog must carry an accessible name");
+});

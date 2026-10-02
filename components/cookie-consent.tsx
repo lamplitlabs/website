@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 import { clearConsent, readConsent, writeConsent, type ConsentValue } from "@/lib/consent-storage";
@@ -43,10 +43,17 @@ export function CookieSettingsButton({ className }: { className?: string }) {
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const acceptRef = useRef<HTMLButtonElement>(null);
+  // True only when the banner reappears after a reset, so initial page load
+  // never steals focus but a "Cookie settings" click moves keyboard and
+  // screen-reader users from the footer into the reopened banner.
+  const reopenedRef = useRef(false);
 
   useEffect(() => {
-    function sync() {
-      setVisible(getConsent() === null);
+    function sync(event?: Event) {
+      const open = getConsent() === null;
+      if (open && event) reopenedRef.current = true;
+      setVisible(open);
     }
 
     sync();
@@ -54,6 +61,13 @@ export function CookieConsent() {
     window.addEventListener("consent-change", sync);
     return () => window.removeEventListener("consent-change", sync);
   }, []);
+
+  useEffect(() => {
+    if (visible && reopenedRef.current) {
+      reopenedRef.current = false;
+      acceptRef.current?.focus();
+    }
+  }, [visible]);
 
   function handleAccept() {
     setConsent("accepted");
@@ -85,7 +99,7 @@ export function CookieConsent() {
           <Button variant="outline" size="sm" onClick={handleDecline}>
             Decline
           </Button>
-          <Button size="sm" onClick={handleAccept}>
+          <Button ref={acceptRef} size="sm" onClick={handleAccept}>
             Accept
           </Button>
         </div>

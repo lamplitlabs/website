@@ -71,6 +71,8 @@ test("footer exposes a consent-reset action that reopens the banner", () => {
   assert.match(banner, /data-testid="cookie-settings"/, "control must be identifiable");
   assert.match(banner, /clearConsent\(/, "control must clear the stored consent");
   assert.match(banner, /addEventListener\("consent-change"/, "banner must reappear on reset");
+  assert.match(banner, /ref=\{acceptRef\}/, "Accept button must carry the focus ref");
+  assert.match(banner, /acceptRef\.current\?\.focus\(\)/, "reopened banner must move focus to Accept");
   const privacy = readFileSync(resolve(root, "app/privacy/page.tsx"), "utf8");
   assert.doesNotMatch(privacy, /browser settings/, "privacy page must no longer send users to browser settings");
 });

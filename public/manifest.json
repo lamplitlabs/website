@@ -1,7 +1,7 @@
 {
   "name": "Lamplit Labs",
   "short_name": "LamplitLabs",
-  "description": "Lamplit Labs builds Amistio for enterprise agent governance alongside practical education, career, developer, and compliance tools.",
+  "description": "Lamplit Labs builds practical tools that solve real problems, including the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, and practical tools across education, career, developer workflows, and Azure compliance.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

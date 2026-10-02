@@ -3,19 +3,17 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
-const CONSENT_KEY = "bib-cookie-consent";
+import { readConsent, writeConsent, type ConsentValue } from "@/lib/consent-storage";
 
-export type ConsentValue = "accepted" | "declined" | null;
+export type { ConsentValue };
 
 export function getConsent(): ConsentValue {
   if (typeof window === "undefined") return null;
-  const value = localStorage.getItem(CONSENT_KEY);
-  if (value === "accepted" || value === "declined") return value;
-  return null;
+  return readConsent(localStorage);
 }
 
 function setConsent(value: "accepted" | "declined") {
-  localStorage.setItem(CONSENT_KEY, value);
+  writeConsent(localStorage, value);
   window.dispatchEvent(new Event("consent-change"));
 }
 

@@ -100,6 +100,27 @@ test("static export (out/) home page renders exactly one status badge per produc
   }
 });
 
+// "What's next" link (umber-2): in-development cards are disabled, so the
+// grid must offer users a concrete next step. While any card is In
+// development the exported home page renders exactly one "See what's next"
+// link that anchors to the homepage AI section (#ai) - not to "#about", which
+// does not exist on the home page and would be a dead scroll - and the #ai
+// section must actually exist in the same page.
+test("static export (out/) home page links in-development users to #ai, not a dead #about scroll", skipWithoutOut, () => {
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const inDevelopmentCards = (html.match(/product-grid_status__[^"]*"[^>]*>(?:<[^>]*>)*\s*In development/g) ?? []).length;
+  const links = html.match(/<a href="([^"]+)" data-testid="in-development-whats-next"/g) ?? [];
+  if (inDevelopmentCards === 0) {
+    assert.equal(links.length, 0, "no product is In development but the grid still renders a What's next link");
+    return;
+  }
+  assert.equal(links.length, 1, `expected exactly one What's next link, found ${links.length}`);
+  const href = links[0].match(/href="([^"]+)"/)[1];
+  assert.equal(href, "#ai", "in-development What's next link must anchor to the AI section");
+  assert.notEqual(href, "#about", "home page has no #about section; that anchor would be a dead scroll");
+  assert.match(html, /<section id="ai"/, "home page must contain the #ai section the link targets");
+});
+
 // Product-card details CTA, asserted on the rendered export rather than on
 // source text. In-development cards render no footer (the whole card is
 // disabled), so only Live cards carry a details link, and its visible copy and

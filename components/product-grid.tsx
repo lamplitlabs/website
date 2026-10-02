@@ -155,6 +155,10 @@ export function ProductGrid({ products }: { products: Product[] }) {
     activeCategory === "All"
       ? products
       : products.filter((product) => product.category === activeCategory);
+  // In-development cards are deliberately not clickable, so give those users
+  // a concrete next step: the homepage AI section (#ai) explains what is
+  // coming and how to follow it. Rendered only while something is in development.
+  const hasInDevelopment = products.some(isProductInDevelopment);
 
   return (
     <div>
@@ -191,6 +195,21 @@ export function ProductGrid({ products }: { products: Product[] }) {
       <p aria-live="polite" className="sr-only">
         Showing {filteredProducts.length} of {products.length} products
       </p>
+      {hasInDevelopment && (
+        <p className="mb-8 text-center text-sm text-muted-foreground">
+          Products marked{" "}
+          <span className="text-foreground">In development</span> are not live
+          yet.{" "}
+          <a
+            href="#ai"
+            data-testid="in-development-whats-next"
+            className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            See what&apos;s next
+            <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          </a>
+        </p>
+      )}
       <div
         ref={ref}
         className={`reveal-stagger ${styles.grid} ${

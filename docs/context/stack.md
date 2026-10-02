@@ -2,7 +2,7 @@
 
 ## Core Framework & Language
 
-- **Node.js:** 20.x LTS only (`engines` in `package.json` is `>=20 <21`; `.nvmrc` pins the exact version). The Pulse CTX-environment recipe pins `node@v20.20.2` and `npm@10.9.9` so agent clones match and `npm ci` emits no EBADENGINE warning. Tooling note: local contributors may use nvm with `.nvmrc` (`nvm use`), while Pulse agent clones provision Node via mise per the CTX-environment recipe (ADR-026); neither tool is mandatory, but both must resolve to the same pinned Node 20 version.
+- **Node.js:** 20.x LTS only (`engines` in `package.json` is pinned to the exact version `20.20.2`, matching `.nvmrc`). The Pulse CTX-environment recipe pins `node@v20.20.2` and `npm@10.9.9` so agent clones match and `npm ci` emits no EBADENGINE warning. Tooling note: local contributors may use nvm with `.nvmrc` (`nvm use`), while Pulse agent clones provision Node via mise per the CTX-environment recipe (ADR-026); neither tool is mandatory, but both must resolve to the same pinned Node 20 version.
 - **Runtime:** Next.js 15.5.25 with static export (`output: "export"` in `next.config.js`)
 - **Language:** TypeScript 5.6.3 (strict mode)
 - **Package Manager:** npm (lock file tracked)
@@ -119,8 +119,8 @@ Both `package.json` and `tools/vercel-cli/package.json` carry an npm `overrides`
 1. **No server-side rendering** — Static export only; dynamic routes use client-side data fetching
 2. **No API routes** — This is a static site; external APIs only
 3. **No database** — All content is static or fetched from external sources
-4. **Node version lock** — `.nvmrc` specifies Node 20; CI uses this version
-5. **Pulse environment recipe** — the Pulse environment recipe (`CTX-environment`, ADR-026) must pin Node 20.x so `mise exec -- node -v` in agent clones matches `.nvmrc`, CI (`node-version: 20` / `node-version-file: .nvmrc`) and `package.json` `engines.node` (`>=20 <21`); a recipe pinning another major (e.g. 22.x) falls outside the engines range and produces npm `EBADENGINE` warnings on `npm ci`
+4. **Node version lock** — `.nvmrc` specifies Node 20.20.2; CI uses this version
+5. **Pulse environment recipe** — the Pulse environment recipe (`CTX-environment`, ADR-026) must pin Node 20.20.2 so `mise exec -- node -v` in agent clones matches `.nvmrc`, CI (`node-version: 20` / `node-version-file: .nvmrc`) and `package.json` `engines.node` (pinned to the exact version `20.20.2`); a recipe pinning another version (e.g. 22.x or even a different 20.x patch) falls outside the engines pin and produces npm `EBADENGINE` warnings on `npm ci`
 
 ## Development Workflow
 

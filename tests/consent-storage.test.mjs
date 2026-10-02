@@ -82,3 +82,9 @@ test("banner is announced to screen readers as a labelled dialog", () => {
   assert.match(banner, /role="dialog"/, "banner wrapper must be a dialog region");
   assert.match(banner, /aria-label="Cookie preferences"/, "dialog must carry an accessible name");
 });
+
+test("dialog is described by its explanatory paragraph so screen readers hear why cookies are used", () => {
+  const banner = readFileSync(resolve(root, "components/cookie-consent.tsx"), "utf8");
+  assert.match(banner, /aria-describedby="cookie-consent-description"/, "dialog must point at its description");
+  assert.match(banner, /<p id="cookie-consent-description"/, "explanatory paragraph must carry the matching id");
+});

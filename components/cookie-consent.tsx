@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
-import { readConsent, writeConsent, type ConsentValue } from "@/lib/consent-storage";
+import { clearConsent, readConsent, writeConsent, type ConsentValue } from "@/lib/consent-storage";
 
 export type { ConsentValue };
 
@@ -18,14 +18,41 @@ function setConsent(value: "accepted" | "declined") {
   window.dispatchEvent(new Event("consent-change"));
 }
 
+/** Forget the stored choice; the banner listens for the event and reappears. */
+export function resetConsent() {
+  clearConsent(localStorage);
+  window.dispatchEvent(new Event("consent-change"));
+}
+
+/**
+ * Footer control that lets a visitor who already accepted or declined
+ * revisit the choice without clearing browser data.
+ */
+export function CookieSettingsButton({ className }: { className?: string }) {
+  return (
+    <button
+      type="button"
+      data-testid="cookie-settings"
+      onClick={resetConsent}
+      className={className}
+    >
+      Cookie settings
+    </button>
+  );
+}
+
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const existing = getConsent();
-    if (!existing) {
-      setVisible(true);
+    function sync() {
+      setVisible(getConsent() === null);
     }
+
+    sync();
+    // Re-shown when the footer's "Cookie settings" control clears the choice.
+    window.addEventListener("consent-change", sync);
+    return () => window.removeEventListener("consent-change", sync);
   }, []);
 
   function handleAccept() {

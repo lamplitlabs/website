@@ -12,7 +12,7 @@ const source = readFileSync(resolve(root, "lib/consent-storage.ts"), "utf8");
 const { outputText } = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 });
-const { CONSENT_KEY, LEGACY_CONSENT_KEY, readConsent, writeConsent } = await import(
+const { CONSENT_KEY, LEGACY_CONSENT_KEY, readConsent, writeConsent, clearConsent } = await import(
   `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
 );
 
@@ -51,4 +51,26 @@ test("writeConsent stores under the new key and clears the legacy one", () => {
   const s = memoryStorage({ [LEGACY_CONSENT_KEY]: "declined" });
   writeConsent(s, "accepted");
   assert.deepEqual(s.entries(), { [CONSENT_KEY]: "accepted" });
+});
+
+// Consent reset (cinder-2): a visitor who accepted or declined can change
+// their mind from the site itself, not only via browser settings.
+test("clearConsent forgets the stored choice so the banner asks again", () => {
+  for (const choice of ["accepted", "declined"]) {
+    const s = memoryStorage({ [CONSENT_KEY]: choice, [LEGACY_CONSENT_KEY]: choice });
+    clearConsent(s);
+    assert.equal(readConsent(s), null, `${choice} must be forgotten`);
+    assert.deepEqual(s.entries(), {}, "no consent keys remain");
+  }
+});
+
+test("footer exposes a consent-reset action that reopens the banner", () => {
+  const footer = readFileSync(resolve(root, "components/home/footer.tsx"), "utf8");
+  assert.match(footer, /CookieSettingsButton/, "footer must render the Cookie settings control");
+  const banner = readFileSync(resolve(root, "components/cookie-consent.tsx"), "utf8");
+  assert.match(banner, /data-testid="cookie-settings"/, "control must be identifiable");
+  assert.match(banner, /clearConsent\(/, "control must clear the stored consent");
+  assert.match(banner, /addEventListener\("consent-change"/, "banner must reappear on reset");
+  const privacy = readFileSync(resolve(root, "app/privacy/page.tsx"), "utf8");
+  assert.doesNotMatch(privacy, /browser settings/, "privacy page must no longer send users to browser settings");
 });

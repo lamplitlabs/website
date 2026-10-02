@@ -97,8 +97,8 @@ export default function PrivacyPage() {
               local storage under the key <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{CONSENT_KEY}</code>{" "}
               so the banner does not reappear on every page. Nothing else is
               stored there and it is never sent to us. To change your mind,
-              clear this site&apos;s data in your browser settings and the
-              banner will show again on your next visit.
+              use the <strong>Cookie settings</strong> link in the footer: it
+              forgets your choice and shows the banner again right away.
             </p>
           </div>
 

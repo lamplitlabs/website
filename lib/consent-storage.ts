@@ -26,3 +26,11 @@ export function writeConsent(storage: Storage, value: "accepted" | "declined") {
   storage.setItem(CONSENT_KEY, value);
   storage.removeItem(LEGACY_CONSENT_KEY);
 }
+
+// Forget the stored choice so the banner asks again. Used by the footer's
+// "Cookie settings" control so a visitor can change their mind on the site
+// itself instead of clearing site data in browser settings.
+export function clearConsent(storage: Storage) {
+  storage.removeItem(CONSENT_KEY);
+  storage.removeItem(LEGACY_CONSENT_KEY);
+}

@@ -10,6 +10,7 @@ import {
   socialLinks,
 } from "@/lib/site-data";
 import { Logo } from "@/components/logo";
+import { CookieSettingsButton } from "@/components/cookie-consent";
 
 export function Footer() {
   // The AI domain is only advertised in the footer once Lamplit Light is Live;
@@ -139,6 +140,8 @@ export function Footer() {
             >
               Privacy &amp; cookies
             </Link>
+            {" "}&middot;{" "}
+            <CookieSettingsButton className="underline underline-offset-4 transition-colors hover:text-foreground" />
           </p>
           <p className="mono-label mt-3 text-muted-foreground/60">
             lamplitlabs.com

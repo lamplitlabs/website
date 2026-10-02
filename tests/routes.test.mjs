@@ -15,7 +15,23 @@ const read = (p) => readFileSync(resolve(root, p), "utf8");
 const siteData = read("lib/site-data.ts");
 const slugs = [...siteData.matchAll(/^\s*slug:\s*"([^"]+)"/gm)].map((m) => m[1]);
 const covers = [...siteData.matchAll(/^\s*cover:\s*"([^"]+)"/gm)].map((m) => m[1]);
-const routes = ["/", ...slugs.map((s) => `/products/${s}`)];
+// Static (non-product) routes exported from app/: each needs an app/<route>/page.tsx.
+const staticRoutes = ["/privacy"];
+const routes = ["/", ...staticRoutes, ...slugs.map((s) => `/products/${s}`)];
+
+// Cookie banner trust gap (kestrel-2): "We use cookies for analytics" must
+// link to a real /privacy page explaining what is collected and why, and the
+// footer must carry the same link so the page stays reachable after the
+// banner is dismissed.
+test("cookie banner and footer link to an existing /privacy route", () => {
+  assert.ok(existsSync(resolve(root, "app", "privacy", "page.tsx")), "app/privacy/page.tsx must exist");
+  assert.match(read("components/cookie-consent.tsx"), /href="\/privacy"/, "cookie banner must link to /privacy");
+  assert.match(read("components/home/footer.tsx"), /href="\/privacy"/, "footer must link to /privacy");
+  const privacy = read("app/privacy/page.tsx");
+  assert.match(privacy, /Plausible/, "privacy page must name the cookieless analytics that always runs");
+  assert.match(privacy, /Google Analytics/, "privacy page must name the consent-gated analytics");
+});
+
 
 test("site data defines products with unique slugs", () => {
   assert.ok(slugs.length > 0, "expected at least one product slug");

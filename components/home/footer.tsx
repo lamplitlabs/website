@@ -130,7 +130,16 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Lamplit Labs. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Lamplit Labs. All rights reserved.
+            {" "}&middot;{" "}
+            <Link
+              href="/privacy"
+              className="underline underline-offset-4 transition-colors hover:text-foreground"
+            >
+              Privacy &amp; cookies
+            </Link>
+          </p>
           <p className="mono-label mt-3 text-muted-foreground/60">
             lamplitlabs.com
             {showAiDomain && aiDomain && <> &middot; {aiDomain}</>}

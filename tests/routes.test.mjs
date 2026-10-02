@@ -372,3 +372,16 @@ test("static export (out/) /products/light renders an 'In development' note next
     assert.equal(notes.length, 0, "live Light should not show an In development note");
   }
 });
+
+// Contact section (delta-2): a visitor who emails hello@lamplitlabs.com should
+// know what to expect, so the exported home page must carry a visible
+// response-time note next to the mailto link.
+test("static export (out/) contact section shows a response-time note near the mailto link", skipWithoutOut, () => {
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const start = html.indexOf('<section id="contact"');
+  assert.ok(start >= 0, "expected a <section id=\"contact\"> block in out/index.html");
+  const end = html.indexOf("</section>", start);
+  const contact = html.slice(start, end);
+  assert.ok(contact.includes("mailto:hello@lamplitlabs.com"), "contact section must link to hello@lamplitlabs.com");
+  assert.match(contact, /usually reply within a few business days/, "contact section must tell visitors when to expect a reply");
+});

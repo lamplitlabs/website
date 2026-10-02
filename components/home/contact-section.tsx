@@ -33,6 +33,12 @@ export function ContactSection() {
                 hello@lamplitlabs.com
               </OutboundLink>
             </Button>
+            <p
+              data-testid="contact-response-note"
+              className="mt-4 text-sm text-muted-foreground"
+            >
+              We read every message and usually reply within a few business days.
+            </p>
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <OutboundLink

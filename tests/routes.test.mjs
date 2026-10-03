@@ -55,10 +55,16 @@ test("icons and og image referenced from app/layout.tsx exist in public/", () =>
   }
 });
 
-test("public/sitemap.xml lists exactly the routes the app exports", () => {
-  const sitemap = read("public/sitemap.xml");
-  const locs = [...sitemap.matchAll(/<loc>https:\/\/www\.lamplitlabs\.com(\/[^<]*)<\/loc>/g)].map((m) => m[1]);
-  assert.deepEqual(new Set(locs), new Set(routes));
+// app/sitemap.ts generates sitemap.xml from lib/site-data.ts at build time, so a
+// hand-maintained public/sitemap.xml must not shadow it (silent drift).
+test("app/sitemap.ts derives product URLs from lib/site-data.ts and no static sitemap shadows it", () => {
+  assert.ok(!existsSync(resolve(root, "public", "sitemap.xml")), "public/sitemap.xml must not exist; app/sitemap.ts generates it");
+  const src = read("app/sitemap.ts");
+  assert.match(src, /from "@\/lib\/site-data"/, "app/sitemap.ts must import the product catalog");
+  assert.match(src, /products\.map\(/, "app/sitemap.ts must map over products");
+  for (const route of staticRoutes) {
+    assert.ok(src.includes(`"${route}"`), `app/sitemap.ts must list static route ${route}`);
+  }
 });
 
 test("internal links in app/ and components/ point at known routes", () => {
@@ -84,6 +90,13 @@ test("internal links in app/ and components/ point at known routes", () => {
 // Only runs against a real static export; `npm run build` produces out/.
 // `npm test` builds first so these never skip there; `npm run test:unit` skips them when out/ is absent.
 const skipWithoutOut = { skip: !existsSync(resolve(root, "out")) && "run `npm run build` first" };
+
+test("static export (out/) sitemap.xml lists exactly the routes the app exports", skipWithoutOut, () => {
+  const sitemap = readFileSync(resolve(root, "out", "sitemap.xml"), "utf8");
+  const locs = [...sitemap.matchAll(/<loc>https:\/\/www\.lamplitlabs\.com(\/[^<]*)<\/loc>/g)].map((m) => m[1]);
+  assert.deepEqual(new Set(locs), new Set(routes));
+  assert.equal(locs.length, routes.length, "sitemap must not repeat a route");
+});
 
 test("static export (out/) has HTML for each route and no dangling local assets", skipWithoutOut, () => {
   const out = resolve(root, "out");

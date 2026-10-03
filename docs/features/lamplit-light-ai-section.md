@@ -31,7 +31,7 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 - Gate the primary "Explore Lamplit Light" CTA (tracking target `light`) on `isProductLive(light)`: it links to the internal `/products/light` page while the catalog status is `In development`, and to `https://ai.lamplitlabs.com` once the status is `Live`. On `main` today the CTA still points at `https://ai.lamplitlabs.com` unconditionally; the fallback lands via the delta-15 branch (thread evolution/job-20260929t113059z-ce497c), which adds the `routes.test.mjs` assertion (test count 27 -> 28) that goes red if the outbound href returns while `In development`.
 - Add the Hugging Face organisation to `socialLinks`/`SocialLinks` (`huggingface`) and to `socialPlatforms` with a monochrome brand icon in [`components/icons.tsx`](../../components/icons.tsx), so it appears wherever the shared social row renders (hero social bar, contact section, footer) and in the Organization JSON-LD `sameAs` list derived from `socialLinks`.
 - Modernize the hero, header, products grid, journey/about/footer copy, and shared CSS utilities only as needed to introduce the AI story and keep the homepage visual language coherent.
-- Add `/products/light` to [`public/sitemap.xml`](../../public/sitemap.xml) and update [`app/layout.tsx`](../../app/layout.tsx) metadata so Lamplit Light is included in descriptions and keywords; product JSON-LD remains derived from the catalog.
+- Add `/products/light` to the catalog (the sitemap is generated from it by [`app/sitemap.ts`](../../app/sitemap.ts)) and update [`app/layout.tsx`](../../app/layout.tsx) metadata so Lamplit Light is included in descriptions and keywords; product JSON-LD remains derived from the catalog.
 
 ### Non-Functional Requirements
 
@@ -51,7 +51,7 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 - Product grid and products section filtering in [`components/product-grid.tsx`](../../components/product-grid.tsx) and [`components/home/products-section.tsx`](../../components/home/products-section.tsx)
 - Shared homepage styling utilities in [`app/globals.css`](../../app/globals.css)
 - Metadata in [`app/layout.tsx`](../../app/layout.tsx)
-- Static assets and export discovery in [`public/covers/light.svg`](../../public/covers/light.svg) and [`public/sitemap.xml`](../../public/sitemap.xml)
+- Static assets and export discovery in [`public/covers/light.svg`](../../public/covers/light.svg) and [`app/sitemap.ts`](../../app/sitemap.ts) (generates `sitemap.xml` from the catalog)
 - PULSE documentation for the feature, decision, product context, architecture, README, and memory
 
 ## Out of Scope
@@ -91,7 +91,7 @@ Add Lamplit Light to the Lamplit Labs website as the company's AI lab and produc
 - [x] Product category chips include All plus all five categories, use buttons with correct `aria-pressed` state, and filter cards client-side while preserving card links, labels, statuses, tags, and outbound tracking.
 - [x] Featured cards, status/tag badges, hero/header copy, journey/about/footer refreshes, and shared glass/lab-grid utilities render coherently in light and dark themes.
 - [x] Existing accessibility repairs remain intact: named hero scroll link, product card action names, mobile menu scroll lock, mobile menu expanded state, and current-section `aria-current`.
-- [x] Static export includes `/products/light`, and `public/sitemap.xml` includes `/products/light`.
+- [x] Static export includes `/products/light`, and the generated `out/sitemap.xml` includes `/products/light`.
 - [x] Metadata descriptions and keywords mention Lamplit Light, with no claim that the AI site is live before DNS and status are updated.
 - [x] The Hugging Face organisation link (`https://huggingface.co/lamplitlabs`) renders in the hero social bar, contact section, footer, AI section CTA, and the Organization JSON-LD `sameAs` list, with the accessible name `Hugging Face` on icon-only links.
 - [x] The "Explore Lamplit Light" CTA (tracking target `light`) links to `/products/light` while `isProductLive(light)` is false and to `https://ai.lamplitlabs.com` when it is true. Landed on `main`: `npm test` (`tests/routes.test.mjs`, "static export (out/) AI section Explore CTA links to /products/light while Light is in development") asserts the `/products/light` href while `In development`.
@@ -205,7 +205,7 @@ After the static export, inspect `out/index.html` for the `#ai` section, the AI 
 
 Revert the change-set commit or commits with `git revert`; do not reset the branch or discard concurrent worker changes. No dependency, config, or deployment rollback is required.
 
-If only the Lamplit Light product must be pulled, delete its object from `lib/site-data.ts`, remove its sitemap `<url>`, and remove `public/covers/light.svg`; the generated product page and product JSON-LD disappear with the catalog entry. The `category` field and AI nav link are additive and can remain unless they are part of the rollback trigger.
+If only the Lamplit Light product must be pulled, delete its object from `lib/site-data.ts`, and remove `public/covers/light.svg`; the generated product page and product JSON-LD disappear with the catalog entry. The `category` field and AI nav link are additive and can remain unless they are part of the rollback trigger.
 
 ## Open Human Steps
 

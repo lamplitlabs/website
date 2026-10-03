@@ -30,7 +30,7 @@ npm run lint         # Lint with ESLint
 npm run typecheck    # Run TypeScript type checker
 npm run test         # Build static export, then run all smoke tests (node --test, tests/**/*.test.mjs)
                      # incl. the out/ export tests in tests/routes.test.mjs (never skipped)
-npm run test:unit    # Run smoke tests without building; the 14 out/-dependent tests skip if ./out is absent
+npm run test:unit    # Run smoke tests without building; the 15 out/-dependent tests skip if ./out is absent
 npm run test:e2e     # Alias of `npm run test` (kept for existing docs/scripts)
 npm run clean        # Clean build artifacts
 npm run check        # Full verification: lint → typecheck → test (test builds first, so the out/
@@ -50,7 +50,7 @@ npm run check        # Full verification: lint → typecheck → test (test buil
 5. **Build** — Implement product code only after decisions and plans are clear.
 6. **Verify** — Run `npm run check`. It is the canonical, sufficient verify sequence: it runs
    lint → typecheck → test, and `npm test` itself builds the static export first, so `check`
-   already covers `npm run build` and everything `npm run test:unit` covers (plus the 14 out/-dependent
+   already covers `npm run build` and everything `npm run test:unit` covers (plus the 15 out/-dependent
    export tests in `tests/routes.test.mjs`, which `test:unit` skips when `./out` is absent). Running
    only `npm run lint` and `npm run typecheck` is **not** enough — it skips those export tests. Run the
    individual commands only for a faster local loop, and finish with `npm run check` before committing.

@@ -138,7 +138,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {isInDevelopment && (
           <span
             data-testid="product-dev-note"
-            className="mr-3 hidden text-xs font-medium uppercase tracking-wider text-muted-foreground sm:inline"
+            className="mr-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
           >
             In development
           </span>

@@ -404,6 +404,14 @@ test("static export (out/) /products/light renders an 'In development' note next
       const before = html.slice(Math.max(0, idx - 1200), idx);
       assert.ok(/data-testid="product-dev-note"[^>]*>In development/.test(before), "each Follow development CTA must be immediately preceded by a visible In development note");
     }
+    // Mobile visibility guard (meridian): the note must be visible at every
+    // viewport, so no responsive-hiding class (e.g. `hidden sm:inline`) may be
+    // on it - otherwise phone visitors read the CTA as a live product link.
+    for (const note of html.matchAll(/data-testid="product-dev-note"[^>]*class="([^"]*)"/g)) {
+      const classes = note[1].split(/\s+/);
+      assert.ok(!classes.includes("hidden"), `In development note must not be hidden on small viewports (class="${note[1]}")`);
+      assert.ok(!classes.some((c) => /^(sm|md|lg|xl|2xl):(inline|block|flex|inline-block)$/.test(c)), `In development note must not be viewport-gated (class="${note[1]}")`);
+    }
   } else {
     assert.equal(ctas.length, 0, "live Light should not show a Follow development CTA");
     assert.equal(notes.length, 0, "live Light should not show an In development note");

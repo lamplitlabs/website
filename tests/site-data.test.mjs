@@ -335,5 +335,11 @@ test("package.json engines.node matches .nvmrc", () => {
   const nvmrc = readFileSync(resolve(root, ".nvmrc"), "utf8").trim();
   assert.equal(typeof pkg.engines?.node, "string");
   assert.ok(nvmrc.length > 0, ".nvmrc must not be empty");
-  assert.equal(pkg.engines.node, nvmrc);
+  // engines.node is a major range ("24.x", Vercel's required form); .nvmrc names the same major
+  // (exact "24.1.0" or bare "24"). Compare majors so both files move together.
+  const engineMajor = pkg.engines.node.match(/^(\d+)(?:\.(?:x|\*|\d+)){0,2}$/)?.[1];
+  const nvmrcMajor = nvmrc.match(/^v?(\d+)(?:\.\d+){0,2}$/)?.[1];
+  assert.ok(engineMajor, `engines.node must be a plain version or N.x range, got ${pkg.engines.node}`);
+  assert.ok(nvmrcMajor, `.nvmrc must be a plain version, got ${nvmrc}`);
+  assert.equal(engineMajor, nvmrcMajor, `engines.node (${pkg.engines.node}) and .nvmrc (${nvmrc}) must share a Node major`);
 });

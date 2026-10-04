@@ -316,6 +316,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     <CtaIcon aria-hidden="true" className="ml-2 h-4 w-4" />
                   </OutboundLink>
                 </Button>
+                {isInDevelopment && (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Want to know when it ships?{" "}
+                    <a
+                      data-testid="product-notify-me"
+                      href={`mailto:hello@lamplitlabs.com?subject=${encodeURIComponent(`Notify me: ${product.name}`)}`}
+                      className="font-medium underline underline-offset-4 transition-colors hover:text-foreground"
+                    >
+                      Email us to be notified
+                    </a>
+                  </p>
+                )}
               </div>
             </div>
           </div>

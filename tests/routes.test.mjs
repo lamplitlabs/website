@@ -443,3 +443,18 @@ test("static export (out/) contact section shows a response-time note near the m
   assert.ok(contact.includes("mailto:hello@lamplitlabs.com"), "contact section must link to hello@lamplitlabs.com");
   assert.match(contact, /usually reply within a few business days/, "contact section must tell visitors when to expect a reply");
 });
+
+// Notify-me (cinder-2): while a product is In development its page offers a
+// mailto link so visitors can ask to be told when it ships instead of hitting
+// a dead end. Once Live the link must disappear.
+test("static export (out/) /products/light page offers a 'Notify me' mailto while Light is in development", skipWithoutOut, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const html = readFileSync(resolve(root, "out", "products", "light.html"), "utf8");
+  const links = html.match(/data-testid="product-notify-me"[^>]*href="mailto:hello@lamplitlabs\.com\?subject=Notify%20me%3A%20[^"]+"/g) ?? [];
+  if (light === "In development") {
+    assert.equal(links.length, 1, "in-development product page should render exactly one Notify-me mailto link");
+  } else {
+    assert.equal(links.length, 0, "live product page should not offer a Notify-me link");
+  }
+});

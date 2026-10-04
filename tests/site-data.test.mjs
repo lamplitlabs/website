@@ -343,3 +343,15 @@ test("package.json engines.node matches .nvmrc", () => {
   assert.ok(nvmrcMajor, `.nvmrc must be a plain version, got ${nvmrc}`);
   assert.equal(engineMajor, nvmrcMajor, `engines.node (${pkg.engines.node}) and .nvmrc (${nvmrc}) must share a Node major`);
 });
+
+test("every product has a dedicated, length-appropriate metaDescription distinct from longDescription", () => {
+  const seen = new Set();
+  for (const product of products) {
+    const d = product.metaDescription;
+    assert.equal(typeof d, "string", `${product.slug}: missing metaDescription (would fall back to longDescription)`);
+    assert.ok(d.length >= 50 && d.length <= 160, `${product.slug}: metaDescription length ${d.length} not in 50..160`);
+    assert.notEqual(d, product.longDescription, `${product.slug}: metaDescription must not reuse longDescription`);
+    assert.ok(!seen.has(d), `${product.slug}: duplicate metaDescription`);
+    seen.add(d);
+  }
+});

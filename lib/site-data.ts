@@ -238,6 +238,8 @@ export const products: Product[] = [
       { title: "German Medical Language", description: "Practice medical communication in German with realistic scenarios." },
     ],
     featured: true,
+    metaDescription:
+      "AI-powered Kenntnisprüfung training for foreign doctors in Germany: 7-step case simulation, instant feedback, spaced repetition and German medical language.",
   },
   {
     slug: "fachsprachprufung",
@@ -259,6 +261,8 @@ export const products: Product[] = [
       { title: "Exam-Ready Practice", description: "Covers all three FSP exam sections in a single training flow." },
     ],
     featured: true,
+    metaDescription:
+      "AI-powered Fachsprachprüfung (FSP) training for doctors in Germany: practice patient conversations, medical documentation and doctor-to-doctor handovers.",
   },
   {
     slug: "leben-in-deutschland",
@@ -280,6 +284,8 @@ export const products: Product[] = [
       { title: "Free to Use", description: "No account required, no paywalls. Just start practicing." },
     ],
     featured: true,
+    metaDescription:
+      "Free Einbürgerungstest preparation: practice all 310 official Leben in Deutschland questions plus Bundesland-specific ones, with progress tracking.",
   },
   {
     slug: "developer-tools",
@@ -301,6 +307,8 @@ export const products: Product[] = [
       { title: "Browser-Based", description: "All tools run entirely in your browser. Nothing is sent to a server." },
     ],
     featured: true,
+    metaDescription:
+      "Free browser-based developer utilities from Lamplit Labs: JSON formatter, Base64 encoder/decoder, UUID generator and more. Nothing leaves your browser.",
   },
   {
     slug: "resume-builder",
@@ -321,6 +329,8 @@ export const products: Product[] = [
       { title: "Quick Setup", description: "Fill in your details and get a polished resume in minutes." },
       { title: "Export Ready", description: "Download your resume as PDF, ready to submit." },
     ],
+    metaDescription:
+      "Build an ATS-friendly, recruiter-ready resume in minutes with professional templates, structured guidance and PDF export.",
   },
   {
     slug: "edmx-tools",
@@ -341,6 +351,8 @@ export const products: Product[] = [
       { title: "OpenAPI Converter", description: "Convert EDMX metadata to OpenAPI specification." },
       { title: "JSON Converter", description: "Transform EDMX XML into structured JSON for easier processing." },
     ],
+    metaDescription:
+      "Free EDMX and OData metadata tools: explore entity models, trim unused entities, and convert EDMX to OpenAPI or JSON in your browser.",
   },
   {
     slug: "azure-drawio-assets",
@@ -361,6 +373,8 @@ export const products: Product[] = [
       { title: "Draw.io Ready", description: "Icons formatted and ready to drag into your Draw.io diagrams." },
       { title: "Searchable Catalog", description: "Find the right icon quickly with built-in search." },
     ],
+    metaDescription:
+      "Searchable catalog of 643+ Azure architecture icons, auto-synced from official Microsoft icon sets and ready to drop into Draw.io diagrams.",
   },
   {
     slug: "azure-compliance-matrix",
@@ -381,6 +395,8 @@ export const products: Product[] = [
       { title: "Azure Government", description: "Includes compliance data for both Azure and Azure Government." },
       { title: "Always Current", description: "Data sourced and updated from official Microsoft documentation." },
     ],
+    metaDescription:
+      "Interactive compliance matrix for Azure and Azure Government services across 17 frameworks (ISO 27001, SOC, HIPAA, PCI DSS) with search and filtering.",
   },
 ];
 

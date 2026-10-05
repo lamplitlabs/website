@@ -406,3 +406,20 @@ test("product grid renders a visible empty-state message when a category filter 
   assert.match(block, /data-testid="product-grid-empty"/);
   assert.match(block, /setActiveCategory\("All"\)/);
 });
+
+// Build pipeline (ai-section.tsx) renders `buildSteps` twice: the decorative
+// desktop rail markers and the stage list. Both must go through the single
+// `mapBuildSteps` helper so they cannot drift apart (keys, stage count, array)
+// when the content is edited (granite-2).
+test("AI section renders buildSteps through one shared helper in both places", () => {
+  const src = readFileSync(resolve(root, "components/home/ai-section.tsx"), "utf8");
+  const helperUses = (src.match(/\{mapBuildSteps\(\(step, index\) => \(/g) ?? []).length;
+  assert.equal(helperUses, 2, "both build-step renders must call mapBuildSteps");
+  const directMaps = (src.match(/buildSteps\.map\(/g) ?? []).length;
+  assert.equal(directMaps, 1, "buildSteps.map must only appear inside mapBuildSteps");
+  assert.match(src, /function mapBuildSteps\([\s\S]*?return buildSteps\.map\(\(step, index\) => \(\s*<Fragment key=\{step\.index\}>/);
+  const block = src.match(/const buildSteps: BuildStep\[\] = \[([\s\S]*?)\n\];/);
+  assert.ok(block, "buildSteps array literal is present");
+  const stages = (block[1].match(/^\s*index: "\d\d",/gm) ?? []).length;
+  assert.equal(stages, 5, "rail markers are placed at 10 + index*20 %, which assumes 5 stages");
+});

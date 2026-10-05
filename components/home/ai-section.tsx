@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import {
   ArrowUpRight,
   Blocks,
@@ -129,6 +129,18 @@ function beamDelay(index: number): string {
   const seconds =
     (beamCycleSeconds * beamTravelFraction * index) / (buildSteps.length - 1);
   return `${seconds.toFixed(2)}s`;
+}
+
+// The build pipeline is rendered twice (decorative desktop rail markers and the
+// stage list that carries the content). Both go through this single helper so
+// they always iterate the same array with the same keys and stage count; a
+// content edit to `buildSteps` therefore updates both renders together.
+function mapBuildSteps(
+  render: (step: BuildStep, index: number) => ReactNode,
+): ReactNode[] {
+  return buildSteps.map((step, index) => (
+    <Fragment key={step.index}>{render(step, index)}</Fragment>
+  ));
 }
 
 const familyPoints: { key: string; text: ReactNode }[] = [
@@ -298,9 +310,8 @@ export function AiSection() {
                     <span className="absolute right-0 top-1/2 h-0.5 w-32 -translate-y-1/2 rounded-full bg-gradient-to-r from-transparent via-primary/70 to-primary shadow-[0_0_14px_hsl(var(--glow)/0.85)]" />
                   </span>
                 </div>
-                {buildSteps.map((step, index) => (
+                {mapBuildSteps((step, index) => (
                   <span
-                    key={step.index}
                     className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
                     style={{ left: `${10 + index * 20}%` }}
                   >
@@ -320,9 +331,8 @@ export function AiSection() {
               </div>
 
               <ol className="grid lg:grid-cols-5 lg:divide-x lg:divide-border/60 lg:border-t lg:border-border/60">
-                {buildSteps.map((step, index) => (
+                {mapBuildSteps((step, index) => (
                   <li
-                    key={step.index}
                     className="relative py-5 pl-14 pr-5 before:absolute before:bottom-0 before:left-8 before:top-10 before:w-px before:bg-border/70 after:absolute after:left-8 after:top-0 after:h-4 after:w-px after:bg-border/70 first:after:hidden last:before:hidden lg:p-5 lg:before:hidden lg:after:hidden"
                   >
                     <span

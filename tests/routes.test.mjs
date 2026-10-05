@@ -475,3 +475,37 @@ test("static export (out/) /products/light page offers a 'Notify me' mailto whil
     assert.equal(links.length, 0, "live product page should not offer a Notify-me link");
   }
 });
+
+// Footer section anchors (Products/AI/About/Contact) target ids that only
+// exist on the home page. On the home page they must stay plain "#id" (same-
+// page scroll); on every other exported route they must be "/#id" (or absent)
+// so the click navigates home and scrolls instead of doing nothing.
+test("static export (out/) footer section anchors are plain on the home page and /#-prefixed elsewhere", skipWithoutOut, () => {
+  const anchors = ["products", "ai", "about", "contact"];
+  const footerHrefs = (file) => {
+    const html = readFileSync(resolve(root, "out", file), "utf8");
+    const footer = html.slice(html.lastIndexOf("<footer"));
+    assert.ok(footer.startsWith("<footer"), `${file} has no <footer>`);
+    return [...footer.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+  };
+  const homeHtml = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const home = footerHrefs("index.html");
+  for (const id of anchors) {
+    assert.ok(home.includes(`#${id}`), `home footer must link #${id}`);
+    assert.ok(!home.includes(`/#${id}`), `home footer must not link /#${id}`);
+    assert.match(homeHtml, new RegExp(`id="${id}"`), `home page must contain id="${id}"`);
+  }
+  // /privacy renders the shared <Footer>; its anchors must be home-prefixed.
+  const privacy = footerHrefs("privacy.html");
+  for (const id of anchors) {
+    assert.ok(privacy.includes(`/#${id}`), `privacy footer must link /#${id}`);
+  }
+  // No non-home page may carry a bare "#id" footer anchor (a dead click).
+  const nonHome = routes.filter((r) => r !== "/").map((r) => `${r.slice(1)}.html`);
+  for (const file of nonHome) {
+    for (const href of footerHrefs(file)) {
+      assert.ok(!anchors.includes(href.replace(/^#/, "")) || !href.startsWith("#"),
+        `${file} footer links dead anchor ${href}`);
+    }
+  }
+});

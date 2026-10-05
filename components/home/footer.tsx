@@ -5,11 +5,11 @@ import {
   getProductBySlug,
   isProductInDevelopment,
   isProductLive,
-  navLinks,
   products,
   socialLinks,
 } from "@/lib/site-data";
 import { Logo } from "@/components/logo";
+import { FooterNavLinks } from "@/components/home/footer-nav-links";
 import { CookieSettingsButton } from "@/components/cookie-consent";
 
 export function Footer() {
@@ -91,21 +91,7 @@ export function Footer() {
 
           <div>
             <h4 className="mb-3 text-sm font-semibold">Navigation</h4>
-            <ul className="space-y-2">
-              {navLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    {...(link.external
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : {})}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <FooterNavLinks />
           </div>
 
           <div>

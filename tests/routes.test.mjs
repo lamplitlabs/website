@@ -509,3 +509,28 @@ test("static export (out/) footer section anchors are plain on the home page and
     }
   }
 });
+
+// Icon/CTA pairing guard (granite-3): app/products/[slug]/page.tsx picks the
+// CTA icon from the same status that picks the href (In development -> #about
+// + ArrowDown; otherwise external url + ArrowUpRight/ExternalLink). A future
+// status flip that updates one side but not the other must fail here instead
+// of shipping a down-arrow on an outbound link (or an outbound icon on an
+// on-page anchor).
+test("static export (out/) every product page CTA icon matches its href kind (#about -> arrow-down, external -> arrow-up-right/external-link)", skipWithoutOut, () => {
+  for (const slug of slugs) {
+    const html = readFileSync(resolve(root, "out", "products", `${slug}.html`), "utf8");
+    const anchors = [...html.matchAll(/<a href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)]
+      .filter((m) => /lucide-(arrow-down|arrow-up-right|external-link)/.test(m[2]));
+    assert.ok(anchors.length >= 1, `/products/${slug}: expected at least one CTA anchor carrying a direction icon`);
+    for (const [, href, inner] of anchors) {
+      const down = /lucide-arrow-down/.test(inner);
+      const out = /lucide-(arrow-up-right|external-link)/.test(inner);
+      assert.ok(down !== out, `/products/${slug}: CTA ${href} must carry exactly one icon kind`);
+      if (href.startsWith("#")) {
+        assert.ok(down && !out, `/products/${slug}: on-page CTA ${href} carries an outbound icon`);
+      } else {
+        assert.ok(out && !down, `/products/${slug}: outbound CTA ${href} carries the on-page arrow-down icon`);
+      }
+    }
+  }
+});

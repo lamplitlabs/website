@@ -272,6 +272,60 @@ test("product page CTAs swap the external-link icon for an in-page icon while in
   assert.equal(icons.length, 3, "nav, hero and bottom CTA icons must be aria-hidden");
 });
 
+// Explicit pairing per product (granite): the icon and the href are two
+// separate ternaries on isInDevelopment, so a future edit could leave them
+// mismatched (e.g. an ArrowDown icon on an external product.url link). Resolve
+// both for every product in site-data and assert the pair: In development ->
+// ArrowDown + "#about"; any other status -> ArrowUpRight + product.url. Both
+// branches must be exercised by at least one real product.
+test("product page icon and ctaHref pair up per product status for every product in site-data", () => {
+  const page = read("app/products/[slug]/page.tsx");
+  const helper = siteData.match(/export function isProductInDevelopment\([\s\S]*?\n\}/)?.[0];
+  const literal = helper?.match(/product\.status === "([^"]+)"/)?.[1];
+  assert.equal(literal, "In development", "isProductInDevelopment must be a strict equality on the status literal");
+  const href = page.match(/const ctaHref = isInDevelopment\s*\?\s*"([^"]+)"\s*:\s*(product\.url);/);
+  assert.ok(href, "expected ctaHref to branch on isInDevelopment between a literal and product.url");
+  const icon = page.match(/const CtaIcon = isInDevelopment\s*\?\s*(\w+)\s*:\s*(\w+);/);
+  assert.ok(icon, "expected CtaIcon to branch on isInDevelopment between two icon components");
+  const resolve = (product) => {
+    const isInDevelopment = product.status === literal;
+    return {
+      ctaHref: isInDevelopment ? href[1] : product.url,
+      CtaIcon: isInDevelopment ? icon[1] : icon[2],
+    };
+  };
+  const productsBlock = siteData.match(/export const products[^=]*=\s*\[([\s\S]*?)\n\];/)?.[1];
+  assert.ok(productsBlock, "expected a products array in lib/site-data.ts");
+  const products = productsBlock
+    .split(/\n\s*\{\s*\n\s*slug:/)
+    .slice(1)
+    .map((chunk) => ({
+      slug: chunk.match(/^\s*"([^"]+)"/)?.[1],
+      url: chunk.match(/^\s*url:\s*"([^"]+)"/m)?.[1],
+      status: chunk.match(/^\s*status:\s*"([^"]+)"/m)?.[1],
+    }));
+  assert.equal(products.length, slugs.length, "every product must be parsed");
+  let inDev = 0;
+  let live = 0;
+  for (const product of products) {
+    assert.ok(product.url && product.status, `product ${product.slug} needs url and status`);
+    const { ctaHref, CtaIcon } = resolve(product);
+    if (product.status === "In development") {
+      inDev += 1;
+      assert.equal(CtaIcon, "ArrowDown", `${product.slug}: in-development CTA icon must be ArrowDown`);
+      assert.equal(ctaHref, "#about", `${product.slug}: in-development CTA href must be #about`);
+    } else {
+      live += 1;
+      assert.equal(CtaIcon, "ArrowUpRight", `${product.slug}: ${product.status} CTA icon must be ArrowUpRight`);
+      assert.equal(ctaHref, product.url, `${product.slug}: ${product.status} CTA href must be the product url`);
+    }
+    // The pairing itself: an in-page arrow never sits on an external href and vice versa.
+    assert.equal(CtaIcon === "ArrowDown", ctaHref === "#about", `${product.slug}: icon/href pairing mismatch (${CtaIcon} with ${ctaHref})`);
+  }
+  assert.ok(inDev >= 1, "expected at least one In development product to exercise the #about branch");
+  assert.ok(live >= 1, "expected at least one Live product to exercise the product.url branch");
+});
+
 // Whole-page guard (kestrel-10): while Lamplit Light is In development its
 // not-yet-public domain must not appear as an <a href> anywhere on the home
 // page - footer, AI section CTAs or any future component. Once Light is Live

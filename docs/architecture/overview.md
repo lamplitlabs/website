@@ -63,7 +63,7 @@ Reusable UI building blocks organized by concern:
 - **ProductsSection** — Grid of products with category filter chips and links
 - **AboutSection** — Company story and mission
 - **JourneySection** — Timeline or history
-- **ContactSection** — Contact information and forms
+- **ContactSection** — Contact information and outbound links (mailto/social; no on-page form, see "Known Constraints & Limitations")
 - **EasterEggs** — Interactive elements
 
 #### Common Patterns

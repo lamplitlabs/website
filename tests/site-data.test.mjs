@@ -383,3 +383,16 @@ test("every product url is a well-formed https URL", () => {
     assert.equal(parsed.protocol, "https:", `${product.slug}: url "${product.url}" must use https://`);
   }
 });
+
+test("product grid renders a visible empty-state message when a category filter matches nothing", () => {
+  const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
+  // The empty state must be gated on the filtered list being empty, carry a
+  // user-readable message, and offer a way back to the full catalog.
+  const gate = grid.indexOf("filteredProducts.length === 0 && (");
+  assert.ok(gate !== -1, "empty state is conditional on zero filtered products");
+  const block = grid.slice(gate, grid.indexOf("</p>", gate));
+  assert.match(block, /No products in this category yet\./);
+  assert.match(block, /role="status"/);
+  assert.match(block, /data-testid="product-grid-empty"/);
+  assert.match(block, /setActiveCategory\("All"\)/);
+});

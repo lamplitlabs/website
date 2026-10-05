@@ -220,6 +220,22 @@ export function ProductGrid({ products }: { products: Product[] }) {
           <ProductCard key={product.slug} product={product} index={i} />
         ))}
       </div>
+      {filteredProducts.length === 0 && (
+        <p
+          role="status"
+          data-testid="product-grid-empty"
+          className="py-12 text-center text-sm text-muted-foreground"
+        >
+          No products in this category yet.{" "}
+          <button
+            type="button"
+            onClick={() => setActiveCategory("All")}
+            className="text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Show all products
+          </button>
+        </p>
+      )}
     </div>
   );
 }

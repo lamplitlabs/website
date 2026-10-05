@@ -355,3 +355,17 @@ test("every product has a dedicated, length-appropriate metaDescription distinct
     seen.add(d);
   }
 });
+
+// Product-detail hero image guard: every product's `cover` must be a
+// root-relative path to a file that exists under public/, so a mistyped
+// path or a renamed/deleted SVG under public/covers/ fails the test instead
+// of shipping a broken hero image to users.
+test("every product's cover file exists in public/", () => {
+  assert.ok(products.length > 0, "expected at least one product in the catalog");
+  for (const product of products) {
+    assert.equal(typeof product.cover, "string", `${product.slug}: cover must be a string`);
+    assert.ok(product.cover.startsWith("/"), `${product.slug}: cover "${product.cover}" must be root-relative`);
+    const file = resolve(root, "public", product.cover.replace(/^\/+/, ""));
+    assert.ok(existsSync(file), `${product.slug}: cover "${product.cover}" not found at public/${product.cover.replace(/^\/+/, "")}`);
+  }
+});

@@ -162,8 +162,9 @@ test("static export (out/) home page links in-development users to #ai, not a de
 
 // Product-card details CTA, asserted on the rendered export rather than on
 // source text. In-development cards render no footer (the whole card is
-// disabled), so only Live cards carry a details link, and its visible copy and
-// aria-label must both read "Learn more" and point at the internal PDP.
+// disabled), so they carry a body-level "See progress" link instead; Live
+// cards carry a details link whose visible copy and aria-label both read
+// "Learn more" and point at the internal PDP.
 test("static export (out/) home page renders a 'Learn more' details CTA on every live product card only", skipWithoutOut, () => {
   const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
   const cards = html.split(/(?=<[a-z]+ class="[^"]*\bproduct-grid_card__)/).slice(1);
@@ -174,7 +175,14 @@ test("static export (out/) home page renders a 'Learn more' details CTA on every
     const inDevelopment = /product-grid_status__[^"]*"[^>]*>(?:<[^>]*>)*\s*In development/.test(card);
     const details = card.match(/<a href="\/products\/([^"]+)" aria-label="([^"]+)"[^>]*>([^<]*)</g) ?? [];
     if (inDevelopment) {
-      assert.equal(details.length, 0, `${name} is In development but renders a details CTA`);
+      // comingSoon cards are not clickable as a whole, so the body must carry
+      // its own actionable "See progress" link to the internal PDP (lumen-2).
+      const progress = card.match(/<a href="\/products\/([^"]+)"[^>]*data-testid="coming-soon-see-progress"[^>]*>([^<]*)</g) ?? [];
+      assert.equal(progress.length, 1, `${name} is In development but renders ${progress.length} 'See progress' links (expected exactly 1)`);
+      const [, pSlug, pCopy] = progress[0].match(/<a href="\/products\/([^"]+)"[^>]*>([^<]*)</);
+      assert.ok(slugs.includes(pSlug), `${name} See progress link points at unknown slug ${pSlug}`);
+      assert.equal(pCopy.trim(), "See progress");
+      assert.ok(progress[0].includes(`aria-label="See progress: ${name}"`), "aria-label must reuse the visible CTA copy");
       continue;
     }
     live += 1;
@@ -185,7 +193,6 @@ test("static export (out/) home page renders a 'Learn more' details CTA on every
     assert.equal(label, `Learn more: ${name}`, "aria-label must reuse the visible CTA copy");
   }
   assert.ok(live > 0, "expected at least one live product card");
-  assert.ok(!html.includes("See progress"), "dead 'See progress' copy must not reach the export");
 });
 
 // Source-level guard for the product-card "See progress" CTA (no build

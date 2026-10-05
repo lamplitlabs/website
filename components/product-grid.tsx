@@ -89,7 +89,20 @@ function ProductCard({
       style={{ animationDelay: `${Math.min(index, 5) * 80}ms` }}
     >
       {isComingSoon ? (
-        <div className={styles.primary}>{inner}</div>
+        <div className={styles.primary}>
+          {inner}
+          <div className={styles.progress}>
+            <a
+              href={`/products/${product.slug}`}
+              className={styles.action}
+              aria-label={`${isInDevelopment ? "See progress" : "Learn more"}: ${product.name}`}
+              data-testid="coming-soon-see-progress"
+            >
+              {isInDevelopment ? "See progress" : "Learn more"}
+              <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
       ) : (
         <>
           <a href={`/products/${product.slug}`} className={styles.primary}>

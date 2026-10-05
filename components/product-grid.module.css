@@ -246,7 +246,7 @@
 }
 
 .comingSoon .content {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
   border-bottom: 1px solid hsl(0 0% 100% / 0.1);
   border-radius: 1rem;
 }
@@ -272,4 +272,10 @@
   .featured .content {
     padding: 1.35rem 1.25rem 1.6rem;
   }
+}
+
+.comingSoon .progress {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.35rem 0.75rem 0.75rem;
 }

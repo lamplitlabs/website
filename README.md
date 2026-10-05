@@ -34,7 +34,7 @@ Product descriptions, availability, and URLs follow the website catalog in [`lib
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 20 or later
+- [Node.js](https://nodejs.org/) 24 or later
 - npm
 
 ### Development

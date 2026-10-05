@@ -98,6 +98,16 @@ test("static export (out/) sitemap.xml lists exactly the routes the app exports"
   assert.equal(locs.length, routes.length, "sitemap must not repeat a route");
 });
 
+// app/robots.ts generates robots.txt from app/sitemap.ts's siteUrl so crawlers get
+// an explicit allow rule and sitemap pointer; a static public/robots.txt must not shadow it.
+test("static export (out/) robots.txt allows crawling and points at the sitemap", skipWithoutOut, () => {
+  assert.ok(!existsSync(resolve(root, "public", "robots.txt")), "public/robots.txt must not exist; app/robots.ts generates it");
+  const robots = readFileSync(resolve(root, "out", "robots.txt"), "utf8");
+  assert.match(robots, /^User-Agent: \*$/mi, "robots.txt must address all crawlers");
+  assert.match(robots, /^Allow: \/$/m, "robots.txt must allow crawling the site");
+  assert.match(robots, /^Sitemap: https:\/\/www\.lamplitlabs\.com\/sitemap\.xml$/m, "robots.txt must point at the sitemap");
+});
+
 test("static export (out/) has HTML for each route and no dangling local assets", skipWithoutOut, () => {
   const out = resolve(root, "out");
   for (const route of routes) {

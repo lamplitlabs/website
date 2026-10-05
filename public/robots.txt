@@ -1,5 +1,0 @@
-# robots.txt for lamplitlabs.com
-User-agent: *
-Allow: /
-
-Sitemap: https://www.lamplitlabs.com/sitemap.xml

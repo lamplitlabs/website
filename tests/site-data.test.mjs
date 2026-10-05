@@ -228,9 +228,17 @@ test("every In development product links a real trackingDoc", () => {
 // `trackingDoc` is test-only data until an ADR covers rendering it in the UI
 // (ripple-5, nimbus-6, harbor-9; folded into one guard by juniper-5). Rendering
 // it on a page (a "why not yet live" note, a progress link) is a product-surface
-// decision, so any UI file that reads it must cite an ADR in docs/decisions/
-// that mentions trackingDoc. Scan every components/**/*.tsx and app/**/page.tsx
-// via readdir so a new section or route is covered without editing this list.
+// decision the owner makes in docs/decisions/ (agents may not write there), so
+// any UI file that reads it must be covered by an ADR. The guard names the ADR
+// it expects (TRACKING_DOC_ADR) so a card proposing to render trackingDoc can be
+// filtered at planning time ("does that file exist on main?") instead of a
+// worker discovering the hard stop mid-run (iris, job 20261005T045531Z). Any
+// other ADR in docs/decisions/ that mentions trackingDoc also satisfies the
+// guard, so the owner is free to pick a different file name. Scan every
+// components/**/*.tsx and app/**/page.tsx via readdir so a new section or route
+// is covered without editing this list.
+const TRACKING_DOC_ADR = "docs/decisions/render-tracking-doc-in-ui.md";
+
 test("no UI file (components/**/*.tsx, app/**/page.tsx) renders trackingDoc unless an ADR in docs/decisions/ covers it", () => {
   const uiFiles = [
     ...readdirSync(resolve(root, "components"), { recursive: true })
@@ -246,12 +254,14 @@ test("no UI file (components/**/*.tsx, app/**/page.tsx) renders trackingDoc unle
   const adrs = readdirSync(resolve(root, "docs/decisions"))
     .filter((f) => f.endsWith(".md") && !f.startsWith("_"))
     .filter((f) => /trackingDoc/.test(readFileSync(resolve(root, "docs/decisions", f), "utf8")));
+  const covered = existsSync(resolve(root, TRACKING_DOC_ADR)) || adrs.length > 0;
   for (const file of uiFiles) {
     const src = readFileSync(resolve(root, file), "utf8");
     if (!/\btrackingDoc\b/.test(src)) continue;
     assert.ok(
-      adrs.length > 0,
-      `${file} renders trackingDoc but no ADR in docs/decisions/ mentions trackingDoc; add one before using it in the UI`,
+      covered,
+      `${file} renders trackingDoc but ${TRACKING_DOC_ADR} does not exist and no ADR in docs/decisions/ mentions trackingDoc. ` +
+        "Rendering trackingDoc is an owner decision (Tier 2): do not plan or run a job for it until that ADR is on main.",
     );
   }
 });

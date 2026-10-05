@@ -369,3 +369,17 @@ test("every product's cover file exists in public/", () => {
     assert.ok(existsSync(file), `${product.slug}: cover "${product.cover}" not found at public/${product.cover.replace(/^\/+/, "")}`);
   }
 });
+
+// Every product `url` is the external CTA target ("Visit <product>"). A typo'd
+// or http:// value would send a real visitor to a broken or insecure
+// destination, so each must parse as a URL with protocol exactly "https:".
+test("every product url is a well-formed https URL", () => {
+  for (const product of products) {
+    assert.equal(typeof product.url, "string", `${product.slug}: url must be a string`);
+    let parsed;
+    assert.doesNotThrow(() => {
+      parsed = new URL(product.url);
+    }, `${product.slug}: url "${product.url}" does not parse as a URL`);
+    assert.equal(parsed.protocol, "https:", `${product.slug}: url "${product.url}" must use https://`);
+  }
+});

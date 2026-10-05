@@ -4,7 +4,7 @@
 
 - **Node.js:** 24.x only (`engines` in `package.json` is `24.x` (Vercel requires Node 24; 20.x is discontinued there), `.nvmrc` names the same major (`24`)). The Pulse CTX-environment recipe still pins `node@v20.20.2` (owner-set, ADR-026); until it moves to a 24.x release, `npm ci` in agent clones emits an EBADENGINE warning (non-fatal). Tooling note: local contributors may use nvm with `.nvmrc` (`nvm use`), while Pulse agent clones provision Node via mise per the CTX-environment recipe (ADR-026); neither tool is mandatory, but both should resolve to Node 24.
 - **Runtime:** Next.js 15.5.25 with static export (`output: "export"` in `next.config.js`)
-- **Language:** TypeScript 5.6.3 (strict mode)
+- **Language:** TypeScript ^5.6.3 (strict mode; resolves to 5.9.3 at time of writing)
 - **Package Manager:** npm (lock file tracked)
 
 ## Frontend Stack
@@ -17,13 +17,13 @@
 - **Icons:** lucide-react 0.469.0
 
 ### Features & Utilities
-- **Dark Mode:** next-themes 0.4.4
+- **Dark Mode:** next-themes ^0.4.4 (resolves to 0.4.6 at time of writing)
 - **Styling Utilities:** `clsx` (class concatenation), `class-variance-authority` (component variants), `tailwind-merge` (Tailwind merging)
 
 ## Development Tools
 
 ### Type Checking
-- **TypeScript:** 5.6.3
+- **TypeScript:** ^5.6.3 (resolves to 5.9.3)
 - **ESLint:** 8.57.0 with `eslint-config-next`
 - **Command:** `npm run typecheck` for type checking without emit
 
@@ -102,11 +102,11 @@ See `.github/workflows/ci.yml` and `.github/workflows/deploy-web-vercel.yml` for
 |---------|---------|---------|-------|
 | next | 15.5.25 | Web framework | Static export with App Router |
 | react | 19.2.8 | UI library | Server & client components |
-| typescript | 5.6.3 | Type safety | Strict mode |
-| tailwindcss | 3.4.17 | Styling | Utility-first CSS |
+| typescript | ^5.6.3 | Type safety | Strict mode (resolves to 5.9.3) |
+| tailwindcss | ^3.4.17 | Styling | Utility-first CSS (resolves to 3.4.19) |
 | @radix-ui/react-slot | 1.1.1 | UI primitives | Composition pattern |
 | class-variance-authority | 0.7.1 | Component variants | Type-safe CSS classes |
-| next-themes | 0.4.4 | Dark mode | Light/dark theme toggle |
+| next-themes | ^0.4.4 | Dark mode | Light/dark theme toggle (resolves to 0.4.6) |
 | lucide-react | 0.469.0 | Icon library | Consistent icon set |
 | vercel (`tools/vercel-cli`) | 59.11.7 | Deploy CLI used by the deploy workflow | Exact pin; not a site dependency |
 

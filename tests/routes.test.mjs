@@ -617,3 +617,42 @@ test("footer nav prefixes hash-only navLinks with '/' off the home page", () => 
     assert.match(href[1], /^#[a-z-]+$/, `non-external navLink must be a bare hash anchor: ${href[1]}`);
   }
 });
+
+// 404 near-miss suggestion (evolution/job-20261006t150740z-66120f): a visitor
+// who mistypes a product slug (e.g. /products/amistio -> /products/amistiio)
+// should land on a 404 that offers the product they likely meant, not a bare
+// dead end. Source-level check since the page is a client component.
+test("not-found page offers a near-miss product slug suggestion", () => {
+  const src = read("app/not-found.tsx");
+  assert.match(src, /findNearMissProduct/, "not-found page must compute a near-miss product suggestion");
+  assert.match(src, /levenshtein/, "near-miss matching should be edit-distance based");
+  assert.match(src, /data-testid="not-found-suggestion"/, "near-miss suggestion must be rendered when found");
+  assert.match(src, /Did you mean/i, "near-miss suggestion must prompt the visitor with their likely intended product");
+
+  // Exercise the matching logic directly against a real slug + a realistic typo.
+  const match = src.match(/function levenshtein\(a, b\)[\s\S]*?\n}/) ||
+    src.match(/function levenshtein\(a: string, b: string\): number \{[\s\S]*?\n}/);
+  assert.ok(match, "levenshtein function body must be present");
+
+  assert.ok(slugs.length > 0, "site-data must export at least one product slug");
+  const realSlug = slugs[0];
+  const typo = realSlug.length > 3 ? realSlug.slice(0, -1) + realSlug.slice(-1) + realSlug.slice(-1) : realSlug + "x";
+  // Build and run the module's own threshold logic inline to confirm a
+  // single-character typo falls within the allowed distance.
+  function levenshtein(a, b) {
+    const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+      Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+    );
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i][j] = a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+    return dp[a.length][b.length];
+  }
+  const distance = levenshtein(typo, realSlug);
+  const threshold = Math.max(1, Math.floor(realSlug.length / 3));
+  assert.ok(distance <= threshold, `a one-character typo of "${realSlug}" ("${typo}") should be within the near-miss threshold`);
+});

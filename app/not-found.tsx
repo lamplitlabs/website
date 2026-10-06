@@ -67,7 +67,7 @@ export default function NotFound() {
         </ul>
       </SiteNav>
 
-      <main className="mx-auto flex min-h-[70vh] max-w-5xl flex-col items-center justify-center px-4 py-20 text-center">
+      <main id="main-content" className="mx-auto flex min-h-[70vh] max-w-5xl flex-col items-center justify-center px-4 py-20 text-center">
         <Logo className="mb-6 h-16 w-16" />
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">
           404

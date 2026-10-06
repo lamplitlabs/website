@@ -4,6 +4,7 @@ import Script from "next/script";
 import { CookieConsent } from "@/components/cookie-consent";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import {
+  contactEmail,
   isProductInDevelopment,
   productCreativeWorkStatus,
   products,
@@ -133,7 +134,7 @@ const organizationJsonLd = {
   sameAs: Object.values(socialLinks),
   contactPoint: {
     "@type": "ContactPoint",
-    email: "hello@lamplitlabs.com",
+    email: contactEmail,
     contactType: "customer support",
   },
 };

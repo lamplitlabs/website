@@ -1,3 +1,6 @@
+/** Single source of truth for the public contact address (contact section, privacy page, Organization JSON-LD, PDP notify-me). */
+export const contactEmail = "hello@lamplitlabs.com";
+
 export interface ProductHighlight {
   title: string;
   description: string;

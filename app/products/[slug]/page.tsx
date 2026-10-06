@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
 import {
+  contactEmail,
   getProductBySlug,
   isProductInDevelopment,
   productCreativeWorkStatus,
@@ -325,7 +326,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     Want to know when it ships?{" "}
                     <a
                       data-testid="product-notify-me"
-                      href={`mailto:hello@lamplitlabs.com?subject=${encodeURIComponent(`Notify me: ${product.name}`)}`}
+                      href={`mailto:${contactEmail}?subject=${encodeURIComponent(`Notify me: ${product.name}`)}`}
                       className="font-medium underline underline-offset-4 transition-colors hover:text-foreground"
                     >
                       Email us to be notified

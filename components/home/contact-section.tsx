@@ -3,7 +3,7 @@ import { OutboundLink } from "@/components/outbound-link";
 import { socialPlatforms } from "@/components/social-platforms";
 import { Button } from "@/components/ui/button";
 import { RevealSection } from "@/components/home/reveal-section";
-import { socialLinks } from "@/lib/site-data";
+import { contactEmail, socialLinks } from "@/lib/site-data";
 
 export function ContactSection() {
   return (
@@ -23,14 +23,14 @@ export function ContactSection() {
           <div className="mt-8">
             <Button size="lg" asChild>
               <OutboundLink
-                href="mailto:hello@lamplitlabs.com"
+                href={`mailto:${contactEmail}`}
                 className="transition-transform hover:scale-105"
-                trackingTarget="hello@lamplitlabs.com"
+                trackingTarget={contactEmail}
                 trackingContext="contact_email"
-                trackingUrl="mailto:hello@lamplitlabs.com"
+                trackingUrl={`mailto:${contactEmail}`}
               >
                 <Mail className="mr-2 h-5 w-5" />
-                hello@lamplitlabs.com
+                {contactEmail}
               </OutboundLink>
             </Button>
             <p

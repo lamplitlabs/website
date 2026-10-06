@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/home/footer";
-import { navLinks } from "@/lib/site-data";
+import { contactEmail, navLinks } from "@/lib/site-data";
 import { CONSENT_KEY } from "@/lib/consent-storage";
 
 export const metadata: Metadata = {
@@ -116,10 +116,10 @@ export default function PrivacyPage() {
             <p className="text-muted-foreground">
               Ask us at{" "}
               <a
-                href="mailto:hello@lamplitlabs.com"
+                href={`mailto:${contactEmail}`}
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                hello@lamplitlabs.com
+                {contactEmail}
               </a>
               .
             </p>

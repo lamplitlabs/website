@@ -66,6 +66,12 @@ npm run check        # Full verification: lint → typecheck → test (test buil
 - Do not modify product code before the feature or ADR is documented.
 - Keep prompts and plans model-agnostic.
 - When changes touch files, dependencies, or deployment, define a rollback plan first.
+- Pre-check before proposing or starting an improve job: 123 of 283 improve jobs here ended
+  "no commit: already done". Before writing a card or editing, grep the target file and variable
+  against the last two weeks of results (`pulse jobs --project lamplitlabs --all --json`, filter
+  `result` for the file/variable and `git log -S'<variable>' --since='2 weeks ago' -- <file>`). If a
+  landed commit or a finished job already covers it, name that commit in SUMMARY: and stop, or
+  vote on the existing card instead of reposting it.
 - One status-fill job per data file at a time (e.g. `lib/site-data.ts`): parallel edits to the same
   object have shipped duplicate keys (TS1117). Before landing, rebase on fresh `main` and verify
   `npm run typecheck` passes on the rebased branch.

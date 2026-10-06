@@ -423,3 +423,16 @@ test("AI section renders buildSteps through one shared helper in both places", (
   const stages = (block[1].match(/^\s*index: "\d\d",/gm) ?? []).length;
   assert.equal(stages, 5, "rail markers are placed at 10 + index*20 %, which assumes 5 stages");
 });
+
+test("every product carries a statusSince month and the detail page surfaces it", () => {
+  const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
+  for (const product of products) {
+    assert.match(
+      product.statusSince ?? "",
+      monthPattern,
+      `${product.slug}: statusSince must be YYYY-MM so visitors see when "${product.status}" took effect`,
+    );
+  }
+  const page = readFileSync(new URL("../app/products/[slug]/page.tsx", import.meta.url), "utf8");
+  assert.ok(page.includes("product.statusSince"), "product detail page must render statusSince next to the status label");
+});

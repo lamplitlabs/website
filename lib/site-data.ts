@@ -43,6 +43,12 @@ export interface Product {
   featured?: boolean;
   status: ProductStatus;
   /**
+   * Month (YYYY-MM) the current `status` label took effect, so visitors see a
+   * status history ("Live since 2026-03") instead of only the label. Update it
+   * whenever `status` changes.
+   */
+  statusSince: string;
+  /**
    * Where a visitor can follow real progress on an unreleased product: an
    * https URL or a repository-relative doc path. tests/site-data.test.mjs
    * requires it for every product whose status is "In development", so a
@@ -143,6 +149,7 @@ export const products: Product[] = [
     ],
     featured: true,
     status: "Live",
+    statusSince: "2026-03",
     metaTitle: "Amistio - Visual AI Agent Builder",
     metaDescription:
       "Build visual AI agents with app connectors, immutable versions, approval gates, shareable run pages, and inspectable execution history.",
@@ -202,6 +209,7 @@ export const products: Product[] = [
     ],
     featured: true,
     status: "In development",
+    statusSince: "2026-09",
     trackingDoc: "https://huggingface.co/lamplitlabs",
     metaTitle: "Lamplit Light - Small AI Models You Host Yourself",
     metaDescription:
@@ -224,6 +232,7 @@ export const products: Product[] = [
   {
     slug: "kenntnistrainer",
     status: "Live",
+    statusSince: "2026-04",
     name: "Kenntnistrainer",
     title: "AI-powered Kenntnisprufung simulation and training",
     description:
@@ -247,6 +256,7 @@ export const products: Product[] = [
   {
     slug: "fachsprachprufung",
     status: "Live",
+    statusSince: "2026-04",
     name: "Fachsprachprüfung",
     title: "AI-powered FSP simulation and training",
     description:
@@ -270,6 +280,7 @@ export const products: Product[] = [
   {
     slug: "leben-in-deutschland",
     status: "Live",
+    statusSince: "2026-03",
     name: "Leben in Deutschland",
     title: "Citizenship test prep for Germany",
     description:
@@ -293,6 +304,7 @@ export const products: Product[] = [
   {
     slug: "developer-tools",
     status: "Live",
+    statusSince: "2026-03",
     name: "Developer Tools",
     title: "Everyday utilities for developers",
     description:
@@ -316,6 +328,7 @@ export const products: Product[] = [
   {
     slug: "resume-builder",
     status: "Live",
+    statusSince: "2024-10",
     name: "Resume Builder",
     title: "Create an ATS-optimized resume",
     description:
@@ -338,6 +351,7 @@ export const products: Product[] = [
   {
     slug: "edmx-tools",
     status: "Live",
+    statusSince: "2026-03",
     name: "EDMX Tools",
     title: "Tools for EDMX and OData metadata",
     description:
@@ -360,6 +374,7 @@ export const products: Product[] = [
   {
     slug: "azure-drawio-assets",
     status: "Live",
+    statusSince: "2026-04",
     name: "Azure Draw.io Assets",
     title: "Azure icons for architecture diagrams",
     description:
@@ -382,6 +397,7 @@ export const products: Product[] = [
   {
     slug: "azure-compliance-matrix",
     status: "Live",
+    statusSince: "2026-04",
     name: "Azure Compliance Matrix",
     title: "Azure services compliance coverage",
     description:

@@ -174,6 +174,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {product.status && (
                 <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
                   Status: {product.status}
+                  {product.statusSince && (
+                    <span className="normal-case tracking-normal text-primary/80">
+                      {" "}
+                      since {product.statusSince}
+                    </span>
+                  )}
                 </span>
               )}
               {product.tags.map((tag) => (

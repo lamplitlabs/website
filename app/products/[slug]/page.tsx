@@ -158,7 +158,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </OutboundLink>
       </SiteNav>
 
-      <main>
+      <main id="main-content">
         {/* ── Hero section with cover ──────────────────────── */}
         <section className="relative overflow-hidden">
           {/* Cover background */}

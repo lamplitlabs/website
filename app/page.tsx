@@ -95,7 +95,7 @@ export default function Home() {
         theme={theme}
         setTheme={setTheme}
       />
-      <main>
+      <main id="main-content">
         <HeroSection />
         <WhyLamplitSection />
         <AiSection />

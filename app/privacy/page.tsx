@@ -36,7 +36,7 @@ export default function PrivacyPage() {
         </ul>
       </SiteNav>
 
-      <main className="mx-auto max-w-3xl px-4 py-16">
+      <main id="main-content" className="mx-auto max-w-3xl px-4 py-16">
         <Link
           href="/"
           className="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"

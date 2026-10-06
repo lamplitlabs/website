@@ -525,8 +525,12 @@ test("static export (out/) /products/light page offers a 'Notify me' mailto whil
   const links = html.match(/data-testid="product-notify-me"[^>]*href="mailto:hello@lamplitlabs\.com\?subject=Notify%20me%3A%20[^"]+"/g) ?? [];
   if (light === "In development") {
     assert.equal(links.length, 1, "in-development product page should render exactly one Notify-me mailto link");
+    // Plain-text fallback: users without a configured mail client must still be able to read/copy the address.
+    const plain = html.match(/data-testid="product-notify-me-email"[^>]*>\(hello@lamplitlabs\.com\)<\/span>/g) ?? [];
+    assert.equal(plain.length, 1, "in-development product page should render the contact email as visible plain text next to the Notify-me link");
   } else {
     assert.equal(links.length, 0, "live product page should not offer a Notify-me link");
+    assert.doesNotMatch(html, /data-testid="product-notify-me-email"/, "live product page should not render the Notify-me email fallback");
   }
 });
 

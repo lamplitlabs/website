@@ -330,7 +330,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       className="font-medium underline underline-offset-4 transition-colors hover:text-foreground"
                     >
                       Email us to be notified
-                    </a>
+                    </a>{" "}
+                    <span data-testid="product-notify-me-email">
+                      {`(${contactEmail})`}
+                    </span>
                   </p>
                 )}
               </div>

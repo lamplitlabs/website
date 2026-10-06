@@ -41,14 +41,22 @@ export function readConsent(storage: Storage): ConsentValue {
   return legacy;
 }
 
-export function writeConsent(storage: Storage, value: "accepted" | "declined") {
+// Returns true when the choice was persisted, false when storage refused the
+// write so the caller can tell the visitor the banner may reappear.
+export function writeConsent(storage: Storage, value: "accepted" | "declined"): boolean {
   try {
     storage.setItem(CONSENT_KEY, value);
-    storage.removeItem(LEGACY_CONSENT_KEY);
   } catch {
     // Storage is unavailable (e.g. private mode); the choice still applies
     // for this page view even though it will not persist.
+    return false;
   }
+  try {
+    storage.removeItem(LEGACY_CONSENT_KEY);
+  } catch {
+    // The new key was written; failing to drop the legacy key is harmless.
+  }
+  return true;
 }
 
 // Forget the stored choice so the banner asks again. Used by the footer's

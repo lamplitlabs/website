@@ -13,10 +13,15 @@ export function getConsent(): ConsentValue {
   return readConsent(localStorage);
 }
 
-function setConsent(value: "accepted" | "declined") {
-  writeConsent(localStorage, value);
+/** Persist the choice; returns false when storage refused the write. */
+function setConsent(value: "accepted" | "declined"): boolean {
+  const saved = writeConsent(localStorage, value);
   window.dispatchEvent(new Event("consent-change"));
+  return saved;
 }
+
+export const CONSENT_SAVE_FAILED_NOTICE =
+  "Your choice could not be saved this session \u2014 you may see this banner again.";
 
 /** Forget the stored choice; the banner listens for the event and reappears. */
 export function resetConsent() {
@@ -43,6 +48,10 @@ export function CookieSettingsButton({ className }: { className?: string }) {
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  // Set once when storage (e.g. private browsing) refused to persist the
+  // choice, so the visitor learns why the banner may come back instead of it
+  // silently reappearing. Cleared when the visitor dismisses the notice.
+  const [saveFailed, setSaveFailed] = useState(false);
   const acceptRef = useRef<HTMLButtonElement>(null);
   // True only when the banner reappears after a reset, so initial page load
   // never steals focus but a "Cookie settings" click moves keyboard and
@@ -69,17 +78,36 @@ export function CookieConsent() {
     }
   }, [visible]);
 
-  function handleAccept() {
-    setConsent("accepted");
+  function choose(value: "accepted" | "declined") {
+    if (!setConsent(value)) setSaveFailed(true);
     setVisible(false);
+  }
+
+  function handleAccept() {
+    choose("accepted");
   }
 
   function handleDecline() {
-    setConsent("declined");
-    setVisible(false);
+    choose("declined");
   }
 
-  if (!visible) return null;
+  if (!visible) {
+    if (!saveFailed) return null;
+    return (
+      <div
+        role="status"
+        data-testid="cookie-consent-save-failed"
+        className="fixed bottom-0 left-0 right-0 z-[60] border-t bg-background/95 backdrop-blur-xl"
+      >
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+          <p className="text-sm text-muted-foreground">{CONSENT_SAVE_FAILED_NOTICE}</p>
+          <Button variant="outline" size="sm" onClick={() => setSaveFailed(false)}>
+            Dismiss
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

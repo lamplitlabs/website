@@ -108,3 +108,30 @@ test("a storage that throws on every call degrades to no stored choice, not a cr
   assert.doesNotThrow(() => writeConsent(throwingStorage, "accepted"));
   assert.doesNotThrow(() => clearConsent(throwingStorage));
 });
+
+// Fallback notice (ripple): when storage refuses the write, writeConsent reports
+// it so components/cookie-consent.tsx can show the visitor an inline notice
+// instead of the banner silently reappearing on the next page view.
+test("writeConsent reports whether the choice was persisted", () => {
+  assert.equal(writeConsent(memoryStorage(), "accepted"), true, "persisted write returns true");
+  const throwingStorage = {
+    getItem: () => null,
+    setItem: () => {
+      throw new Error("QuotaExceededError");
+    },
+    removeItem: () => {},
+  };
+  assert.equal(writeConsent(throwingStorage, "declined"), false, "failed write returns false");
+});
+
+test("cookie banner renders a one-time notice when the consent write fails", () => {
+  const component = readFileSync(resolve(root, "components/cookie-consent.tsx"), "utf8");
+  assert.match(
+    component,
+    /CONSENT_SAVE_FAILED_NOTICE =\s*"Your choice could not be saved this session/,
+    "notice copy explains the banner may come back",
+  );
+  assert.match(component, /if \(!setConsent\(value\)\) setSaveFailed\(true\)/, "state set on failed write");
+  assert.match(component, /data-testid="cookie-consent-save-failed"/, "notice rendered inline");
+  assert.match(component, /role="status"/, "notice announced to assistive tech");
+});

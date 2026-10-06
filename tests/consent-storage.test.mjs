@@ -88,3 +88,23 @@ test("dialog is described by its explanatory paragraph so screen readers hear wh
   assert.match(banner, /aria-describedby="cookie-consent-description"/, "dialog must point at its description");
   assert.match(banner, /<p id="cookie-consent-description"/, "explanatory paragraph must carry the matching id");
 });
+
+// Private-mode Safari and storage-disabled browsers can throw on getItem/
+// setItem/removeItem instead of failing quietly; the banner must not crash.
+test("a storage that throws on every call degrades to no stored choice, not a crash", () => {
+  const throwingStorage = {
+    getItem: () => {
+      throw new Error("SecurityError: storage disabled");
+    },
+    setItem: () => {
+      throw new Error("SecurityError: storage disabled");
+    },
+    removeItem: () => {
+      throw new Error("SecurityError: storage disabled");
+    },
+  };
+  assert.doesNotThrow(() => readConsent(throwingStorage));
+  assert.equal(readConsent(throwingStorage), null);
+  assert.doesNotThrow(() => writeConsent(throwingStorage, "accepted"));
+  assert.doesNotThrow(() => clearConsent(throwingStorage));
+});

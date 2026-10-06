@@ -10,27 +10,55 @@ function parse(value: string | null): ConsentValue {
   return value === "accepted" || value === "declined" ? value : null;
 }
 
+// Some browsers (Safari private mode, cookies disabled, storage quota
+// exceeded) throw on getItem/setItem/removeItem instead of failing quietly.
+// A thrown error here must not crash the banner or the rest of the page, so
+// every storage call is guarded; a failure is treated as "no stored choice".
 export function readConsent(storage: Storage): ConsentValue {
-  const current = parse(storage.getItem(CONSENT_KEY));
+  let current: ConsentValue = null;
+  try {
+    current = parse(storage.getItem(CONSENT_KEY));
+  } catch {
+    return null;
+  }
   if (current) return current;
-  const legacy = parse(storage.getItem(LEGACY_CONSENT_KEY));
+
+  let legacy: ConsentValue = null;
+  try {
+    legacy = parse(storage.getItem(LEGACY_CONSENT_KEY));
+  } catch {
+    return null;
+  }
   if (legacy) {
     // One-time migration: copy forward and drop the old key.
-    storage.setItem(CONSENT_KEY, legacy);
-    storage.removeItem(LEGACY_CONSENT_KEY);
+    try {
+      storage.setItem(CONSENT_KEY, legacy);
+      storage.removeItem(LEGACY_CONSENT_KEY);
+    } catch {
+      // Migration is best-effort; the legacy value still applies this visit.
+    }
   }
   return legacy;
 }
 
 export function writeConsent(storage: Storage, value: "accepted" | "declined") {
-  storage.setItem(CONSENT_KEY, value);
-  storage.removeItem(LEGACY_CONSENT_KEY);
+  try {
+    storage.setItem(CONSENT_KEY, value);
+    storage.removeItem(LEGACY_CONSENT_KEY);
+  } catch {
+    // Storage is unavailable (e.g. private mode); the choice still applies
+    // for this page view even though it will not persist.
+  }
 }
 
 // Forget the stored choice so the banner asks again. Used by the footer's
 // "Cookie settings" control so a visitor can change their mind on the site
 // itself instead of clearing site data in browser settings.
 export function clearConsent(storage: Storage) {
-  storage.removeItem(CONSENT_KEY);
-  storage.removeItem(LEGACY_CONSENT_KEY);
+  try {
+    storage.removeItem(CONSENT_KEY);
+    storage.removeItem(LEGACY_CONSENT_KEY);
+  } catch {
+    // Nothing to do if storage itself refuses the call.
+  }
 }

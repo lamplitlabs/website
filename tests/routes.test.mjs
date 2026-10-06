@@ -129,10 +129,15 @@ test("static export (out/) has HTML for each route and no dangling local assets"
 // anchor (first focusable element) that targets <main id="main-content">.
 test("static export (out/) every route has a skip link targeting main#main-content", skipWithoutOut, () => {
   const out = resolve(root, "out");
-  for (const route of routes) {
+  // The 404 page (out/404.html) is served for every unknown URL and must not
+  // leave the skip link as a dead anchor, so it is checked alongside the routes.
+  const pages = [...routes.map((route) => {
     const html = route === "/" ? "index.html" : `${route.slice(1)}.html`;
     const alt = route === "/" ? null : `${route.slice(1)}/index.html`;
-    const page = readFileSync(existsSync(join(out, html)) ? join(out, html) : join(out, alt), "utf8");
+    return [route, existsSync(join(out, html)) ? join(out, html) : join(out, alt)];
+  }), ["/404 (out/404.html)", join(out, "404.html")]];
+  for (const [route, file] of pages) {
+    const page = readFileSync(file, "utf8");
     assert.match(page, /<a href="#main-content"[^>]*>Skip to content<\/a>/, `${route} must render a skip link`);
     assert.match(page, /<main[^>]*\bid="main-content"/, `${route} must have <main id="main-content">`);
     const skipIdx = page.search(/<a href="#main-content"/);

@@ -57,7 +57,7 @@ git status --short
 
 # Restore specific files (example)
 git checkout app/page.tsx
-git checkout components/Hero.tsx
+git checkout components/home/hero-section.tsx
 
 # Or restore directory
 git checkout app/

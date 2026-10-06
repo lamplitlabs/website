@@ -592,3 +592,28 @@ test("static export (out/) every product page CTA icon matches its href kind (#a
     }
   }
 });
+
+// Source-level gate: the footer nav prefixes hash-only navLinks with "/" when
+// not on the home page, so Products/AI/About/Contact from /privacy or
+// /products/<slug> navigate home instead of being a dead "#products" scroll.
+// Every non-external navLinks entry must be a bare "#anchor" so that branch is
+// reachable and never double-prefixes an already-absolute path.
+test("footer nav prefixes hash-only navLinks with '/' off the home page", () => {
+  const src = read("components/home/footer-nav-links.tsx");
+  assert.match(src, /usePathname\(\)/, "footer nav must read the current pathname");
+  assert.match(src, /const onHome = pathname === "\/"/, "footer nav must define an onHome guard");
+  assert.match(src, /!onHome/, "hash prefixing must be guarded by !onHome");
+  assert.match(src, /link\.href\.startsWith\("#"\)/, "only hash-only hrefs may be prefixed");
+  assert.match(src, /`\/\$\{link\.href\}`/, "off-home hash hrefs must be prefixed with '/'");
+
+  const block = siteData.match(/export const navLinks: NavLink\[\] = \[([\s\S]*?)\];/);
+  assert.ok(block, "lib/site-data.ts must export navLinks");
+  const entries = [...block[1].matchAll(/\{[^}]*\}/g)].map((m) => m[0]);
+  assert.ok(entries.length >= 4, "navLinks should list the home section anchors");
+  for (const entry of entries) {
+    if (/external:\s*true/.test(entry)) continue;
+    const href = entry.match(/href:\s*"([^"]+)"/);
+    assert.ok(href, `navLink entry has a string href: ${entry}`);
+    assert.match(href[1], /^#[a-z-]+$/, `non-external navLink must be a bare hash anchor: ${href[1]}`);
+  }
+});

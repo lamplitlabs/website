@@ -19,6 +19,7 @@ workflows/       Repeatable engineering procedures
 
 - **New to the project?** Start with [`context/product.md`](context/product.md) and [`context/stack.md`](context/stack.md).
 - **Blocked on an owner decision?** Check [`context/open-questions.md`](context/open-questions.md) before writing an ADR or plan.
+- **Planning or voting on a card?** Check [`context/queue-rules.md`](context/queue-rules.md): gates marked `needs-owner-ADR` suppress cards until the owner's ADR lands.
 - **Making architectural decisions?** Read existing [`decisions/`](decisions/) and create a new ADR.
 - **Planning work?** Use [`plans/_template.md`](plans/_template.md) for verification-first planning.
 - **Implementing a feature?** Check [`features/`](features/) for spec and existing [`memory/`](memory/) for conventions.

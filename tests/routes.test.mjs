@@ -537,6 +537,24 @@ test("static export (out/) contact section shows a response-time note near the m
   assert.match(contact, /usually reply within a few business days/, "contact section must tell visitors when to expect a reply");
 });
 
+// Contact section (tundra-2): visitors on devices without a configured mail
+// client get nothing from a mailto: click, so the exported home page must offer
+// a copy-to-clipboard affordance alongside the mailto link.
+test("static export (out/) contact section offers a copy-to-clipboard button next to the mailto link", skipWithoutOut, () => {
+  const html = readFileSync(resolve(root, "out", "index.html"), "utf8");
+  const start = html.indexOf('<section id="contact"');
+  assert.ok(start >= 0, "expected a <section id=\"contact\"> block in out/index.html");
+  const contact = html.slice(start, html.indexOf("</section>", start));
+  const mailtoAt = contact.indexOf("mailto:hello@lamplitlabs.com");
+  assert.ok(mailtoAt >= 0, "contact section must link to hello@lamplitlabs.com");
+  const copyAt = contact.indexOf('data-testid="contact-copy-email"');
+  assert.ok(copyAt >= 0, "contact section must render a copy-email button");
+  const button = contact.slice(copyAt - 200, copyAt + 400);
+  assert.match(button, /<button[^>]*type="button"/, "copy affordance must be a real <button>");
+  assert.match(button, /aria-label="Copy hello@lamplitlabs\.com to clipboard"/, "copy button must name the address it copies");
+  assert.ok(Math.abs(copyAt - mailtoAt) < 1500, "copy button must sit alongside the mailto link");
+});
+
 // Notify-me (cinder-2): while a product is In development its page offers a
 // mailto link so visitors can ask to be told when it ships instead of hitting
 // a dead end. Once Live the link must disappear.

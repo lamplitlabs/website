@@ -2,6 +2,7 @@ import { Github, Mail } from "lucide-react";
 import { OutboundLink } from "@/components/outbound-link";
 import { socialPlatforms } from "@/components/social-platforms";
 import { Button } from "@/components/ui/button";
+import { CopyEmailButton } from "@/components/home/copy-email-button";
 import { RevealSection } from "@/components/home/reveal-section";
 import { contactEmail, socialLinks } from "@/lib/site-data";
 
@@ -14,30 +15,34 @@ export function ContactSection() {
             Get in Touch
           </h2>
           <p className="mx-auto mt-6 max-w-lg text-lg text-muted-foreground">
-            Have a question, suggestion, or want to collaborate? We&apos;d love to
-            hear from you.
+            Have a question, suggestion, or want to collaborate? We&apos;d love
+            to hear from you.
           </p>
           <p className="mono-label mx-auto mt-4 max-w-lg text-muted-foreground/70">
             for products, partnerships and Lamplit Light pilots
           </p>
           <div className="mt-8">
-            <Button size="lg" asChild>
-              <OutboundLink
-                href={`mailto:${contactEmail}`}
-                className="transition-transform hover:scale-105"
-                trackingTarget={contactEmail}
-                trackingContext="contact_email"
-                trackingUrl={`mailto:${contactEmail}`}
-              >
-                <Mail className="mr-2 h-5 w-5" />
-                {contactEmail}
-              </OutboundLink>
-            </Button>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Button size="lg" asChild>
+                <OutboundLink
+                  href={`mailto:${contactEmail}`}
+                  className="transition-transform hover:scale-105"
+                  trackingTarget={contactEmail}
+                  trackingContext="contact_email"
+                  trackingUrl={`mailto:${contactEmail}`}
+                >
+                  <Mail className="mr-2 h-5 w-5" />
+                  {contactEmail}
+                </OutboundLink>
+              </Button>
+              <CopyEmailButton email={contactEmail} />
+            </div>
             <p
               data-testid="contact-response-note"
               className="mt-4 text-sm text-muted-foreground"
             >
-              We read every message and usually reply within a few business days.
+              We read every message and usually reply within a few business
+              days.
             </p>
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">

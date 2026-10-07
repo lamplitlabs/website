@@ -696,3 +696,42 @@ test("not-found page offers a near-miss product slug suggestion", () => {
   const threshold = Math.max(1, Math.floor(realSlug.length / 3));
   assert.ok(distance <= threshold, `a one-character typo of "${realSlug}" ("${typo}") should be within the near-miss threshold`);
 });
+
+// Nav-markup drift: components/site-nav.tsx is the single source for the
+// sticky nav on the 404 page and every /products/<slug> page. The pages pass
+// different right-hand children (CTA vs. "Back home"), so the comparison
+// covers the SiteNav *shell*: the <nav>/<div> wrappers and the branded
+// back-home <a> link, with React's per-render SVG gradient id normalised.
+// How it fails: if a page stopped using <SiteNav> and inlined its own <nav>
+// (or SiteNav grew a prop that changes a class/aria-label on one page only),
+// the extracted shell for that page would differ from 404.html's and the
+// deepEqual below reports the first differing page by path.
+test("static export (out/) 404 and product pages render an identical SiteNav shell", skipWithoutOut, () => {
+  const out = resolve(root, "out");
+  const productPages = slugs.map((s) =>
+    existsSync(join(out, "products", `${s}.html`)) ? join(out, "products", `${s}.html`) : join(out, "products", s, "index.html"),
+  );
+  assert.ok(productPages.length >= 2, "need at least two product pages to compare");
+  const pages = [join(out, "404.html"), ...productPages];
+
+  const shellOf = (file) => {
+    const html = readFileSync(file, "utf8");
+    const nav = html.match(/<nav\b[^>]*>[\s\S]*?<\/nav>/);
+    assert.ok(nav, `${file} has no <nav> element`);
+    // Shell = everything up to and including the first back-home link; the
+    // rest of the <div> is the page-specific children slot.
+    const shell = nav[0].match(/^<nav\b[^>]*><div\b[^>]*><a\b[^>]*>[\s\S]*?<\/a>/);
+    assert.ok(shell, `${file} nav does not open with the SiteNav wrapper + back-home link`);
+    assert.ok(nav[0].endsWith("</div></nav>"), `${file} nav does not close the SiteNav wrapper`);
+    return shell[0]
+      .replace(/logo-glow-[^"()]+/g, "logo-glow-ID") // React useId differs per page
+      .replace(/\s+/g, " ");
+  };
+
+  const reference = shellOf(pages[0]);
+  assert.match(reference, /aria-label="Back to Lamplit Labs home"/);
+  assert.match(reference, /class="sticky top-0 z-40 /);
+  for (const page of pages.slice(1)) {
+    assert.equal(shellOf(page), reference, `SiteNav shell in ${page} diverged from 404.html`);
+  }
+});

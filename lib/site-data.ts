@@ -83,6 +83,19 @@ export function productCreativeWorkStatus(
   return isProductLive(product) ? "Published" : "In development";
 }
 
+/**
+ * `href` for the "Notify me" link on in-development product pages. The
+ * subject is percent-encoded so product names containing `&`, `?`, `#`, `+`
+ * or non-ASCII characters survive the mailto URL instead of being cut off
+ * or read as extra query parameters by the mail client.
+ */
+export function productNotifyMeHref(
+  product: Pick<Product, "name">,
+  email: string = contactEmail,
+): string {
+  return `mailto:${email}?subject=${encodeURIComponent(`Notify me: ${product.name}`)}`;
+}
+
 export interface NavLink {
   label: string;
   href: string;

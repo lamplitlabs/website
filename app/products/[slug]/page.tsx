@@ -12,6 +12,7 @@ import {
   getProductBySlug,
   isProductInDevelopment,
   productCreativeWorkStatus,
+  productNotifyMeHref,
   products,
 } from "@/lib/site-data";
 
@@ -332,7 +333,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     Want to know when it ships?{" "}
                     <a
                       data-testid="product-notify-me"
-                      href={`mailto:${contactEmail}?subject=${encodeURIComponent(`Notify me: ${product.name}`)}`}
+                      href={productNotifyMeHref(product)}
                       className="font-medium underline underline-offset-4 transition-colors hover:text-foreground"
                     >
                       Email us to be notified

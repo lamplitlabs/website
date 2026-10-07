@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Lamplit Labs",
   },
   description:
-    "Lamplit Labs builds practical tools that solve real problems, including the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Resume Builder, Developer Tools, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
+    "Lamplit Labs builds practical tools that solve real problems, including the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Developer Tools, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
   metadataBase: new URL("https://www.lamplitlabs.com"),
   keywords: [
     "Lamplit Labs",
@@ -50,8 +50,6 @@ export const metadata: Metadata = {
     "Leben in Deutschland",
     "Einburgerungstest",
     "German citizenship test",
-    "Resume Builder",
-    "ATS resume",
     "Developer Tools",
     "JSON formatter",
     "Base64 encoder",

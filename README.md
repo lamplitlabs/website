@@ -15,7 +15,6 @@ From visual AI agents with Amistio and sovereign small-model AI with Lamplit Lig
 | **Kenntnistrainer** | KI-gestützte Kenntnisprüfung simulation & training for foreign doctors in Germany — **Live** | [kenntnistrainer.de](https://www.kenntnistrainer.de) |
 | **Fachsprachprüfung** | KI-gestützte FSP simulation & training for foreign doctors in Germany — **Live** | [fachsprachtrainer.de](https://www.fachsprachtrainer.de) |
 | **Leben in Deutschland** | German citizenship test (Einbürgerungstest) prep with 310 questions — **Live** | [lebenindeutschland.org](https://www.lebenindeutschland.org) |
-| **Resume Builder** | ATS-optimized resume builder — **Live** | [resume.lamplitlabs.com](https://resume.lamplitlabs.com) |
 | **Developer Tools** | Everyday developer utilities — JSON formatter, Base64, UUID, and more — **Live** | [tools.lamplitlabs.com](https://tools.lamplitlabs.com) |
 | **EDMX Tools** | Tools for EDMX/OData metadata files — **Live** | [edmx.lamplitlabs.com](https://edmx.lamplitlabs.com) |
 | **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams — **Live** | [azure-assets.lamplitlabs.com](https://azure-assets.lamplitlabs.com) |

@@ -326,29 +326,6 @@ export const products: Product[] = [
       "Free browser-based developer utilities from Lamplit Labs: JSON formatter, Base64 encoder/decoder, UUID generator and more. Nothing leaves your browser.",
   },
   {
-    slug: "resume-builder",
-    status: "Live",
-    statusSince: "2024-10",
-    name: "Resume Builder",
-    title: "Create an ATS-optimized resume",
-    description:
-      "Build professional, ATS-friendly resumes in minutes with clear structure and practical guidance.",
-    longDescription:
-      "Resume Builder helps job seekers create resumes that read well for both recruiters and applicant tracking systems, improving clarity and discoverability.",
-    url: "https://resume.lamplitlabs.com",
-    cover: "/covers/resume.svg",
-    tags: ["Productivity", "Career"],
-    category: "Career",
-    highlights: [
-      { title: "ATS-Optimized", description: "Structured output that applicant tracking systems can parse correctly." },
-      { title: "Professional Templates", description: "Clean, recruiter-friendly layouts you can customize." },
-      { title: "Quick Setup", description: "Fill in your details and get a polished resume in minutes." },
-      { title: "Export Ready", description: "Download your resume as PDF, ready to submit." },
-    ],
-    metaDescription:
-      "Build an ATS-friendly, recruiter-ready resume in minutes with professional templates, structured guidance and PDF export.",
-  },
-  {
     slug: "edmx-tools",
     status: "Live",
     statusSince: "2026-03",

@@ -19,7 +19,6 @@ Lamplit Labs now presents two connected pillars: practical products and the Lamp
 | **Kenntnistrainer** | KI-gestützte medical exam prep (Germany) | Next.js | Live |
 | **Fachsprachprüfung** | FSP simulation & training (Germany) | Next.js | Live |
 | **Leben in Deutschland** | German citizenship test prep (310 questions) | Next.js | Live |
-| **Resume Builder** | ATS-optimized resume creation | Next.js | Live |
 | **Developer Tools** | JSON formatter, Base64, UUID, etc. | Next.js | Live |
 | **EDMX Tools** | Tools for EDMX/OData metadata files | Next.js | Live |
 | **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams | Not recorded | Live |

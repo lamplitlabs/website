@@ -12,15 +12,13 @@ export type ProductCategory =
   | "AI"
   | "Education"
   | "Developer Tools"
-  | "Azure"
-  | "Career";
+  | "Azure";
 
 export const productCategories: ProductCategory[] = [
   "AI",
   "Education",
   "Developer Tools",
   "Azure",
-  "Career",
 ];
 
 export interface ProductSchema {

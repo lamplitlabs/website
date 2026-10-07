@@ -19,7 +19,6 @@ import { getProductBySlug, isProductLive, socialLinks } from "@/lib/site-data";
 import styles from "./ai-section.module.css";
 
 const lightProduct = getProductBySlug("light");
-const lightStatus = lightProduct?.status ?? "In development";
 // Single source of truth for the Light domain: lib/site-data.ts `url`, the
 // same field app/layout.tsx feeds into the JSON-LD schema, so the domain
 // string is written once and the status copy can never drift from it.
@@ -28,14 +27,13 @@ const lightHomeUrl = lightProduct?.url ?? "/products/light";
 // shown in copy, so an absent product yields the current origin, not a
 // hard-coded external domain.
 const lightDomain = new URL(lightHomeUrl, "https://lamplitlabs.com").hostname;
-const lightStatusLabel =
-  lightStatus === "Live"
-    ? `Live \u00b7 public site at ${lightDomain}`
-    : `In development \u00b7 public site coming to ${lightDomain}`;
-const lightTryUrl = `${lightHomeUrl}/try`;
 // The /try playground only exists once the product is Live; while it is In
 // development the CTA would be a dead-end click, so it is gated on status.
 const lightIsLive = lightProduct ? isProductLive(lightProduct) : false;
+const lightStatusLabel = lightIsLive
+  ? `Live \u00b7 public site at ${lightDomain}`
+  : `In development \u00b7 public site coming to ${lightDomain}`;
+const lightTryUrl = `${lightHomeUrl}/try`;
 const primaryCtaClassName =
   "inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 

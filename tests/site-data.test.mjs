@@ -436,3 +436,14 @@ test("every product carries a statusSince month and the detail page surfaces it"
   const page = readFileSync(new URL("../app/products/[slug]/page.tsx", import.meta.url), "utf8");
   assert.ok(page.includes("product.statusSince"), "product detail page must render statusSince next to the status label");
 });
+
+test("every in-development product carries a roadmapNote and the detail page surfaces it", () => {
+  for (const product of products.filter((p) => p.status === "In development")) {
+    assert.ok(
+      typeof product.roadmapNote === "string" && product.roadmapNote.trim().length >= 20,
+      `${product.slug}: in-development products need a one-line roadmapNote so visitors see a reason/plan, not only a date`,
+    );
+  }
+  const page = readFileSync(new URL("../app/products/[slug]/page.tsx", import.meta.url), "utf8");
+  assert.ok(page.includes("product.roadmapNote"), "product detail page must render roadmapNote next to the in-development status badge");
+});

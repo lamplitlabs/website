@@ -193,6 +193,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
               ))}
             </div>
 
+            {isInDevelopment && product.roadmapNote && (
+              <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
+                {product.roadmapNote}
+              </p>
+            )}
+
             {isInDevelopment ? (
               <>
                 <p className="font-display text-xl font-semibold tracking-tight text-muted-foreground">

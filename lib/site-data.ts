@@ -55,6 +55,13 @@ export interface Product {
    * stale status label can never ship without a live place to track it.
    */
   trackingDoc?: string;
+  /**
+   * One sentence for visitors of an in-development product: what is being
+   * built right now and what unblocks release, so the status badge is more
+   * than a label plus a date. Rendered next to the status badge on the
+   * detail page when `status` is "In development".
+   */
+  roadmapNote?: string;
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
@@ -224,6 +231,8 @@ export const products: Product[] = [
     status: "In development",
     statusSince: "2026-09",
     trackingDoc: "https://huggingface.co/lamplitlabs",
+    roadmapNote:
+      "The first light-<purpose> models are being trained and run through the offline gates and judge panel; a model is listed here only once it passes and its weights are published.",
     metaTitle: "Lamplit Light - Small AI Models You Host Yourself",
     metaDescription:
       "Small, specialised AI models you host in browsers, apps, private clouds, laptops, on-prem, or at the edge. Your data never leaves.",

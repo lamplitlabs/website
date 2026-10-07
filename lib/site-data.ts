@@ -247,17 +247,17 @@ export const products: Product[] = [
     status: "Live",
     statusSince: "2026-04",
     name: "Kenntnistrainer",
-    title: "AI-powered Kenntnisprufung simulation and training",
+    title: "AI-powered Kenntnisprüfung simulation and training",
     description:
-      "Kenntnisprufung preparation with AI simulation: a structured 7-step case flow, AI feedback, spaced repetition, and medical communication in German.",
+      "Kenntnisprüfung preparation with AI simulation: a structured 7-step case flow, AI feedback, spaced repetition, and medical communication in German.",
     longDescription:
-      "Kenntnistrainer helps foreign doctors in Germany prepare for the Kenntnisprufung with guided case-based training. It combines exam-style simulation, feedback loops, and focused medical language practice.",
+      "Kenntnistrainer helps foreign doctors in Germany prepare for the Kenntnisprüfung with guided case-based training. It combines exam-style simulation, feedback loops, and focused medical language practice.",
     url: "https://www.kenntnistrainer.de",
     cover: "/covers/kenntnistrainer.svg",
     tags: ["AI", "Medical", "Training"],
     category: "Education",
     highlights: [
-      { title: "7-Step Case Flow", description: "Structured exam simulation following the official Kenntnisprufung format step by step." },
+      { title: "7-Step Case Flow", description: "Structured exam simulation following the official Kenntnisprüfung format step by step." },
       { title: "AI Feedback", description: "Get instant, detailed feedback on your responses powered by AI evaluation." },
       { title: "Spaced Repetition", description: "Smart review scheduling so you retain medical knowledge efficiently." },
       { title: "German Medical Language", description: "Practice medical communication in German with realistic scenarios." },
@@ -299,7 +299,7 @@ export const products: Product[] = [
     description:
       "Prepare for the German citizenship test with a free platform and comprehensive resources.",
     longDescription:
-      "Leben in Deutschland offers focused preparation for the Einburgerungstest with complete question coverage, region-specific content, and a simple practice flow.",
+      "Leben in Deutschland offers focused preparation for the Einbürgerungstest with complete question coverage, region-specific content, and a simple practice flow.",
     url: "https://www.lebenindeutschland.org",
     cover: "/covers/leben.svg",
     tags: ["Education", "Germany", "Integration"],

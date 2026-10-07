@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { copyText } from "@/lib/copy-text";
 
 /**
  * Copy-to-clipboard fallback next to the mailto contact link, for visitors
  * whose device has no configured mail client (a mailto: click would do
- * nothing or open an unwanted app). Falls back to selecting nothing and
- * leaving the address visible if the Clipboard API is unavailable.
+ * nothing or open an unwanted app). Uses the Clipboard API when present and
+ * falls back to a hidden textarea + execCommand("copy") where it is not
+ * (non-secure contexts, older WebViews), so more devices copy instead of
+ * seeing the failure message.
  */
 export function CopyEmailButton({ email }: { email: string }) {
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
@@ -20,12 +23,8 @@ export function CopyEmailButton({ email }: { email: string }) {
   }, []);
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(email);
-      setState("copied");
-    } catch {
-      setState("failed");
-    }
+    const ok = await copyText(email);
+    setState(ok ? "copied" : "failed");
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setState("idle"), 2000);
   };

@@ -16,6 +16,8 @@ import {
 import styles from "./product-grid.module.css";
 
 const CATEGORY_QUERY_PARAM = "category";
+// The grid lives inside <section id="products"> (components/home/products-section.tsx).
+const PRODUCTS_SECTION_ID = "products";
 
 function ProductCard({
   product,
@@ -155,6 +157,14 @@ export function ProductGrid({ products }: { products: Product[] }) {
     );
     if (param && (productCategories as string[]).includes(param)) {
       setActiveCategoryState(param as ProductCategory);
+      // A shared /?category=AI link should land on the filtered cards, not the
+      // hero. Skip when the URL already carries a hash (e.g. #contact) so we
+      // never override an explicit anchor.
+      if (!window.location.hash) {
+        document
+          .getElementById(PRODUCTS_SECTION_ID)
+          ?.scrollIntoView({ behavior: "auto", block: "start" });
+      }
     }
   }, []);
   const setActiveCategory = (category: ProductCategory | "All") => {

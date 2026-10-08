@@ -493,6 +493,17 @@ test("product grid syncs the active category filter with the ?category= URL quer
     "selecting All must drop the param so the default view has a clean URL",
   );
   assert.match(grid, /window\.history\.replaceState\(/, "must not push history entries per click");
+  // A shared filter link must show the filtered grid immediately: on mount with a
+  // valid ?category=, scroll to the #products section instead of leaving the hero.
+  assert.match(grid, /const PRODUCTS_SECTION_ID = "products";/, "must target the #products section");
+  assert.match(
+    grid,
+    /getElementById\(PRODUCTS_SECTION_ID\)\s*\?\.scrollIntoView\(/,
+    "must scroll to #products when the page loads with a valid ?category= param",
+  );
+  assert.match(grid, /if \(!window\.location\.hash\)/, "an explicit #anchor in the URL must win over the auto-scroll");
+  const section = readFileSync(resolve(root, "components/home/products-section.tsx"), "utf8");
+  assert.match(section, /id="products"/, "the products section must keep id=\"products\" for the scroll target");
   // AI is a real ProductCategory, so /?category=AI resolves to a pre-selected filter.
   const siteData = readFileSync(resolve(root, "lib/site-data.ts"), "utf8");
   const cats = siteData.match(/export const productCategories: ProductCategory\[\] = \[([\s\S]*?)\];/)?.[1] ?? "";

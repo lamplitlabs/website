@@ -189,7 +189,7 @@ All steps run in CI/CD on every push to `main`.
 - [ ] Should we add internationalization (i18n) for multilingual content?
 - [ ] Do we need client-side routing animations or transitions?
 - [ ] Should dynamic product details load from a headless CMS?
-- [ ] Performance monitoring or analytics integration?
+- [x] Performance monitoring or analytics integration? — Implemented: Plausible + Google Analytics 4, gated by cookie consent (see [`components/cookie-consent.tsx`](../../components/cookie-consent.tsx), [`components/google-analytics.tsx`](../../components/google-analytics.tsx)).
 - [ ] Automated screenshot/preview generation for product cards?
 
 ## Related Documents

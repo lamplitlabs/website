@@ -138,6 +138,23 @@ test("every product status is one of the ProductStatus union values", () => {
   }
 });
 
+// Runtime guard independent of TypeScript and of the source-regex union read
+// above: the two ProductStatus members are hard-coded here, so a value that
+// reaches the runtime catalog via a non-literal assignment, JSON import, or a
+// widened type still fails `npm test` instead of silently matching neither
+// isProductLive() nor isProductInDevelopment(). `status` is required on
+// Product, so a missing value fails too (unlike the smoke test's optional skip).
+test("every product.status is exactly 'Live' or 'In development' (hard-coded ProductStatus literals)", () => {
+  const known = ["Live", "In development"];
+  assert.ok(products.length > 0, "expected at least one product in the catalog");
+  for (const product of products) {
+    assert.ok(
+      known.includes(product.status),
+      `${product.slug}: status ${JSON.stringify(product.status)} is not one of ${known.map((k) => `'${k}'`).join(" or ")}`,
+    );
+  }
+});
+
 // Strict drift guard: every
 // README product row must carry exactly one `**<ProductStatus>**` marker and it
 // must equal the product's status in lib/site-data.ts, so no row can imply a

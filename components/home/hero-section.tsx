@@ -36,8 +36,8 @@ export function HeroSection() {
 
           <p className="hero-entrance hero-entrance-3 mx-auto mt-6 max-w-xl text-balance text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8 lg:mx-0 lg:text-[1.0625rem] lg:leading-7">
             From the visual AI agent builder Amistio and our AI lab Lamplit Light
-            to medical exam prep, citizenship tools, career resources, developer
-            utilities, and compliance &mdash; we build practical software that
+            to medical exam prep, citizenship tools, Azure and compliance
+            references, and developer utilities &mdash; we build practical software that
             makes a real difference.
           </p>
 

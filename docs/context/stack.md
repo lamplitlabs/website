@@ -133,4 +133,4 @@ Both `package.json` and `tools/vercel-cli/package.json` carry an npm `overrides`
 
 ## Open Questions
 
-Tracked centrally in [`open-questions.md`](open-questions.md) (performance budgets: #2, image optimization: #4, analytics/monitoring integrations: #5).
+Tracked centrally in [`open-questions.md`](open-questions.md) (performance budgets: #2, image optimization: #4). Analytics is no longer an open question — #5 is resolved: Plausible and Google Analytics 4 ship in [`app/layout.tsx`](../../app/layout.tsx) and [`components/google-analytics.tsx`](../../components/google-analytics.tsx), gated by [`components/cookie-consent.tsx`](../../components/cookie-consent.tsx).

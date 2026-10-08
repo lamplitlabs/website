@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react";
 import { useReveal } from "@/hooks/use-reveal";
 import { OutboundLink } from "@/components/outbound-link";
@@ -14,6 +14,8 @@ import {
   type ProductCategory,
 } from "@/lib/site-data";
 import styles from "./product-grid.module.css";
+
+const CATEGORY_QUERY_PARAM = "category";
 
 function ProductCard({
   product,
@@ -141,9 +143,30 @@ function ProductCard({
 
 export function ProductGrid({ products }: { products: Product[] }) {
   const { ref, visible } = useReveal(0.1);
-  const [activeCategory, setActiveCategory] = useState<
+  const [activeCategory, setActiveCategoryState] = useState<
     ProductCategory | "All"
   >("All");
+  // Keep the active filter in the URL (`?category=AI`) so a filtered view can
+  // be reloaded, bookmarked or shared. Read on mount (after hydration, so the
+  // static export still matches) and write back with replaceState on click.
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get(
+      CATEGORY_QUERY_PARAM
+    );
+    if (param && (productCategories as string[]).includes(param)) {
+      setActiveCategoryState(param as ProductCategory);
+    }
+  }, []);
+  const setActiveCategory = (category: ProductCategory | "All") => {
+    setActiveCategoryState(category);
+    const url = new URL(window.location.href);
+    if (category === "All") {
+      url.searchParams.delete(CATEGORY_QUERY_PARAM);
+    } else {
+      url.searchParams.set(CATEGORY_QUERY_PARAM, category);
+    }
+    window.history.replaceState(window.history.state, "", url);
+  };
   const categoryCounts = useMemo(() => {
     return products.reduce<Partial<Record<ProductCategory, number>>>(
       (counts, product) => {

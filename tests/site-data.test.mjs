@@ -464,3 +464,37 @@ test("every in-development product carries a roadmapNote and the detail page sur
   const page = readFileSync(new URL("../app/products/[slug]/page.tsx", import.meta.url), "utf8");
   assert.ok(page.includes("product.roadmapNote"), "product detail page must render roadmapNote next to the in-development status badge");
 });
+
+// Product grid filter is shareable: the active category is read from
+// `?category=<ProductCategory>` on mount and written back on click, so a user
+// who filters to e.g. /?category=AI can reload, bookmark or share that view
+// instead of landing on "All" again (meridian, 20261008T075427Z-meridian-2).
+test("product grid syncs the active category filter with the ?category= URL query param", () => {
+  const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
+  assert.match(grid, /const CATEGORY_QUERY_PARAM = "category";/, "query param must be named `category`");
+  assert.match(
+    grid,
+    /new URLSearchParams\(window\.location\.search\)\.get\(\s*CATEGORY_QUERY_PARAM\s*\)/,
+    "must read ?category= from the URL on mount",
+  );
+  assert.match(
+    grid,
+    /\(productCategories as string\[\]\)\.includes\(param\)/,
+    "an unknown ?category= value must be ignored, not applied",
+  );
+  assert.match(
+    grid,
+    /url\.searchParams\.set\(CATEGORY_QUERY_PARAM, category\)/,
+    "clicking a filter must write ?category= back to the URL",
+  );
+  assert.match(
+    grid,
+    /url\.searchParams\.delete\(CATEGORY_QUERY_PARAM\)/,
+    "selecting All must drop the param so the default view has a clean URL",
+  );
+  assert.match(grid, /window\.history\.replaceState\(/, "must not push history entries per click");
+  // AI is a real ProductCategory, so /?category=AI resolves to a pre-selected filter.
+  const siteData = readFileSync(resolve(root, "lib/site-data.ts"), "utf8");
+  const cats = siteData.match(/export const productCategories: ProductCategory\[\] = \[([\s\S]*?)\];/)?.[1] ?? "";
+  assert.ok(/"AI"/.test(cats), "AI must be a productCategories entry for /?category=AI to pre-select it");
+});

@@ -5,6 +5,8 @@
 **Owner:** Lamplit Labs  
 **Tier:** 2 - new homepage behavior: dedicated AI section, catalog entry, navigation link, and category filtering
 
+> **Addendum (2026-10-08):** The `Career` category described below was later removed. Resume Builder was discontinued and dropped from the catalog, and commit `249bfd0` removed the now-empty `Career` entry from `productCategories`/`ProductCategory` in [`lib/site-data.ts`](../../lib/site-data.ts). The homepage filter chips today are `AI`, `Education`, `Developer Tools`, and `Azure`; references to `Career` and Resume Builder in the requirements below are historical.
+
 ## Overview
 
 Add Lamplit Light to the Lamplit Labs website as the company's AI lab and product line for compact, sovereign models. The homepage gains a dedicated AI section, an AI navigation target, a Lamplit Light catalog entry, product category filtering, and refreshed copy that makes the company's AI side visible without changing deployment, analytics, consent, or dependencies.

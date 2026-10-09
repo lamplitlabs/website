@@ -509,3 +509,28 @@ test("product grid syncs the active category filter with the ?category= URL quer
   const cats = siteData.match(/export const productCategories: ProductCategory\[\] = \[([\s\S]*?)\];/)?.[1] ?? "";
   assert.ok(/"AI"/.test(cats), "AI must be a productCategories entry for /?category=AI to pre-select it");
 });
+
+// statusSince is shown to visitors as "Live since YYYY-MM" / "In development
+// since YYYY-MM", so a wrong or forgotten month is a user-facing accuracy bug.
+// Two time-based guards: the month can never be in the future (a typo or a
+// pre-dated edit), and an "In development" label older than 12 months is
+// treated as forgotten — the status (or the month, with a fresh roadmapNote)
+// must be revisited rather than silently advertising a stale promise.
+test("statusSince is not in the future and in-development labels are not >12 months stale", () => {
+  const now = new Date();
+  const currentMonths = now.getUTCFullYear() * 12 + now.getUTCMonth();
+  for (const product of products) {
+    const [year, month] = (product.statusSince ?? "").split("-").map(Number);
+    const sinceMonths = year * 12 + (month - 1);
+    assert.ok(
+      sinceMonths <= currentMonths,
+      `${product.slug}: statusSince ${product.statusSince} is in the future; the "${product.status}" label cannot have taken effect yet`,
+    );
+    if (product.status === "In development") {
+      assert.ok(
+        currentMonths - sinceMonths <= 12,
+        `${product.slug}: "In development since ${product.statusSince}" is more than 12 months old; update status, or refresh statusSince and roadmapNote so visitors see current progress`,
+      );
+    }
+  }
+});

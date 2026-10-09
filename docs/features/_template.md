@@ -40,6 +40,10 @@ One-paragraph summary of what this feature is and why it matters.
 - Related components to modify
 - Dependencies or blockers
 - Testing strategy
+- Counts drift: state any suite size, pass count, page count, or assertion
+  total as "N as of YYYY-MM-DD" (for example, "`npm test` passed 96/96 as of
+  2026-10-09"). The suite grows; a bare "passed 89/89" reads as the current
+  total once it is stale.
 
 ## Mockups / Wireframes
 

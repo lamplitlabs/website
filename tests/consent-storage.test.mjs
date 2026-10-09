@@ -146,3 +146,17 @@ test("a write that failed can be retried once storage recovers", () => {
   assert.equal(writeConsent(flaky, "declined"), true, "retry succeeds");
   assert.equal(readConsent(flaky), "declined", "retried choice persists");
 });
+
+// Self-clearing notice (pallas-2): the "could not be saved" notice must not
+// stay stale once storage recovers; the banner re-probes storage on the
+// notice's mount and when the visitor returns to the tab, with no click.
+test("save-failed notice re-probes storage automatically so it self-clears when storage recovers", () => {
+  const component = readFileSync(resolve(root, "components/cookie-consent.tsx"), "utf8");
+  const effect = component.match(/useEffect\(\(\) => \{\s*if \(!saveFailed\) return;[\s\S]*?\}, \[saveFailed, failedChoice\]\);/);
+  assert.ok(effect, "an effect keyed on saveFailed must re-probe storage");
+  assert.match(effect[0], /writeConsent\(localStorage, failedChoice\)/, "re-probe retries the same choice");
+  assert.match(effect[0], /setSaveFailed\(false\)/, "notice clears itself on success");
+  assert.match(effect[0], /reprobe\(\);\s*window\.addEventListener\("focus", reprobe\)/, "probes once on mount and again on focus");
+  assert.match(effect[0], /addEventListener\("visibilitychange", reprobe\)/, "probes when the tab becomes visible again");
+  assert.match(effect[0], /removeEventListener\("focus", reprobe\)/, "listeners are removed on cleanup");
+});

@@ -81,6 +81,28 @@ export function CookieConsent() {
     }
   }, [visible]);
 
+  // While the notice is up, re-probe storage without a click: once when the
+  // notice mounts and again whenever the visitor returns to the tab (focus or
+  // visibility), since that is when storage most often recovers (private
+  // window closed, quota freed). On success the notice clears itself.
+  useEffect(() => {
+    if (!saveFailed) return;
+    function reprobe() {
+      if (document.visibilityState === "hidden") return;
+      if (writeConsent(localStorage, failedChoice)) {
+        setSaveFailed(false);
+        window.dispatchEvent(new Event("consent-change"));
+      }
+    }
+    reprobe();
+    window.addEventListener("focus", reprobe);
+    document.addEventListener("visibilitychange", reprobe);
+    return () => {
+      window.removeEventListener("focus", reprobe);
+      document.removeEventListener("visibilitychange", reprobe);
+    };
+  }, [saveFailed, failedChoice]);
+
   function choose(value: "accepted" | "declined") {
     if (setConsent(value)) {
       setSaveFailed(false);

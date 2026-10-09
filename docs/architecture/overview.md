@@ -39,7 +39,7 @@ A static, fast-loading corporate website showcasing Lamplit Labs and its product
 ### 1. Pages & Routing (app/)
 
 - **app/layout.tsx** — Root layout with theme provider, fonts, metadata, and global scripts (Header/Footer are rendered per-page, e.g. in `app/page.tsx`, not in the root layout)
-- **app/page.tsx** — Home page with all sections (hero, why Lamplit, AI, products, about, journey, contact) and the shared `Header`/`Footer`
+- **app/page.tsx** — Home page with all sections (hero, why Lamplit, AI, products, journey, about, contact) and the shared `Header`/`Footer`
 - **app/products/[slug]/page.tsx** — Statically generated product detail pages; `generateStaticParams` maps each product in [`lib/site-data.ts`](../../lib/site-data.ts) to its route.
 
 Features:
@@ -61,8 +61,8 @@ Reusable UI building blocks organized by concern:
 - **WhyLamplitSection** — Key differentiators
 - **AiSection** — Lamplit Light AI lab story (`components/home/ai-section.tsx`, `id="ai"`)
 - **ProductsSection** — Grid of products with category filter chips and links
-- **AboutSection** — Company story and mission
 - **JourneySection** — Timeline or history
+- **AboutSection** — Company story and mission
 - **ContactSection** — Contact information and outbound links (mailto/social; no on-page form, see "Known Constraints & Limitations")
 - **EasterEggs** — Interactive elements
 
@@ -105,8 +105,8 @@ Reusable UI building blocks organized by concern:
 │      ├─ WhyLamplitSection
 │      ├─ AiSection (`id="ai"`)
 │      ├─ ProductsSection (maps products array; filters by Product.category)
-│      ├─ AboutSection
 │      ├─ JourneySection
+│      ├─ AboutSection
 │      └─ ContactSection
 │
 └─ Static Output → ./out/ → Vercel CDN → Browser
@@ -132,8 +132,8 @@ Layout
 │  ├─ AiSection
 │  ├─ ProductsSection
 │  │  └─ ProductCard (repeated)
-│  ├─ AboutSection
 │  ├─ JourneySection
+│  ├─ AboutSection
 │  ├─ ContactSection
 │  └─ EasterEggs
 └─ Footer

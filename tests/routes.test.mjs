@@ -697,6 +697,72 @@ test("not-found page offers a near-miss product slug suggestion", () => {
   assert.ok(distance <= threshold, `a one-character typo of "${realSlug}" ("${typo}") should be within the near-miss threshold`);
 });
 
+// Near-miss false positives (commit 8a48c45, boundary-char guard at
+// app/not-found.tsx ~45-48): the suggestion must only fire for genuine typos.
+// The matcher below mirrors the module's own logic (threshold =
+// max(1, floor(slug.length / 3)); attempted slug must share first and last
+// character with the real slug) and runs it against the real product slugs.
+// How it fails: if the guard or threshold in app/not-found.tsx were loosened,
+// the source assertions below report the missing guard, and the behavioural
+// cases report which unrelated slug would have been suggested.
+test("not-found near-miss matcher: two-character typo and unrelated short slug", () => {
+  const src = read("app/not-found.tsx");
+  assert.match(src, /Math\.max\(1, Math\.floor\(product\.slug\.length \/ 3\)\)/, "threshold must stay relative to slug length");
+  assert.match(src, /attempted\[0\] === product\.slug\[0\]/, "guard must require a shared first character");
+  assert.match(src, /attempted\[attempted\.length - 1\] === product\.slug\[product\.slug\.length - 1\]/, "guard must require a shared last character");
+  assert.match(src, /distance <= threshold && sharesBoundaries/, "match must require both the threshold and the boundary guard");
+
+  function levenshtein(a, b) {
+    const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+      Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+    );
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i][j] = a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+    return dp[a.length][b.length];
+  }
+  function findNearMiss(attempted) {
+    let best;
+    for (const slug of slugs) {
+      const distance = levenshtein(attempted, slug);
+      if (distance === 0) continue;
+      const threshold = Math.max(1, Math.floor(slug.length / 3));
+      const sharesBoundaries =
+        attempted.length > 0 && attempted[0] === slug[0] && attempted[attempted.length - 1] === slug[slug.length - 1];
+      if (distance <= threshold && sharesBoundaries && (!best || distance < best.distance)) {
+        best = { slug, distance };
+      }
+    }
+    return best;
+  }
+
+  // (1) Two-character typos: swap two interior characters (distance 2), keeping
+  // the boundary characters intact. A long slug (threshold >= 2) must still be
+  // corrected; a short slug (threshold 1) must NOT be, by design.
+  const long = slugs.find((s) => Math.floor(s.length / 3) >= 2 && !s.includes("-"));
+  assert.ok(long, "need a product slug long enough for a threshold of 2 or more");
+  const longTypo = long[0] + long.slice(1, -1).replace(/^(.)(.)/, "$2$1") + long[long.length - 1];
+  assert.notEqual(longTypo, long);
+  assert.equal(levenshtein(longTypo, long), 2, `swap typo "${longTypo}" of "${long}" should be two edits away`);
+  assert.equal(findNearMiss(longTypo)?.slug, long, `two-character typo "${longTypo}" should still suggest "${long}"`);
+
+  const short = slugs.find((s) => Math.floor(s.length / 3) <= 1 && s.length >= 4);
+  assert.ok(short, "need a short product slug with a threshold of 1");
+  const shortTypo = short[0] + short.slice(1, -1).replace(/^(.)(.)/, "$2$1") + short[short.length - 1];
+  assert.equal(levenshtein(shortTypo, short), 2);
+  assert.equal(findNearMiss(shortTypo), undefined, `two-character typo "${shortTypo}" of short slug "${short}" is outside its threshold of 1 and must not be suggested`);
+
+  // (2) Unrelated short slugs must never produce a suggestion.
+  for (const junk of ["abc", "a", "xyz", "night", "sight", "eight", "flight", "lights", "amistios"]) {
+    const hit = findNearMiss(junk);
+    assert.equal(hit, undefined, `unrelated slug "${junk}" must not suggest a product (got ${hit?.slug})`);
+  }
+});
+
 // Nav-markup drift: components/site-nav.tsx is the single source for the
 // sticky nav on the 404 page and every /products/<slug> page. The pages pass
 // different right-hand children (CTA vs. "Back home"), so the comparison

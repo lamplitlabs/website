@@ -38,8 +38,8 @@ A static, fast-loading corporate website showcasing Lamplit Labs and its product
 
 ### 1. Pages & Routing (app/)
 
-- **app/layout.tsx** — Root layout with theme provider, header, footer
-- **app/page.tsx** — Home page with all sections (hero, why Lamplit, AI, products, about, journey, contact)
+- **app/layout.tsx** — Root layout with theme provider, fonts, metadata, and global scripts (Header/Footer are rendered per-page, e.g. in `app/page.tsx`, not in the root layout)
+- **app/page.tsx** — Home page with all sections (hero, why Lamplit, AI, products, about, journey, contact) and the shared `Header`/`Footer`
 - **app/products/[slug]/page.tsx** — Statically generated product detail pages; `generateStaticParams` maps each product in [`lib/site-data.ts`](../../lib/site-data.ts) to its route.
 
 Features:

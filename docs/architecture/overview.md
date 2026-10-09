@@ -73,18 +73,15 @@ Reusable UI building blocks organized by concern:
 
 ### 3. Hooks (hooks/)
 
-Custom React hooks for common patterns:
-- State management for UI interactions
-- Theme detection and persistence
-- Scroll behavior and event handling
+- **useReveal** (`hooks/use-reveal.ts`) — IntersectionObserver-backed reveal-on-scroll hook used by section components
 
 ### 4. Utilities (lib/)
 
-Pure utility functions:
-- String formatting and manipulation
-- Date/time utilities
-- Type guards and validators
-- External API helpers (if any)
+- **lib/site-data.ts** — Single source of truth for product catalog, categories, contact email, and the `productNotifyMeHref` mailto builder for in-development product pages
+- **lib/analytics.ts** — `trackEvent`/`trackOutboundClick` wrappers around Plausible/GA4, gated by cookie consent
+- **lib/consent-storage.ts** — Cookie-consent read/write/clear helpers (`readConsent`, `writeConsent`, `clearConsent`) with legacy-key migration
+- **lib/copy-text.ts** — `execCommandCopy` clipboard fallback used by copy-to-clipboard UI
+- **lib/utils.ts** — `cn()` class-name merge helper (clsx + tailwind-merge)
 
 ### 5. Static Assets (public/)
 

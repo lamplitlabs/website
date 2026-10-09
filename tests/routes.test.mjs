@@ -848,3 +848,38 @@ test("static export (out/) 404 and product pages render an identical SiteNav she
     assert.equal(shellOf(page), reference, `SiteNav shell in ${page} diverged from 404.html`);
   }
 });
+
+// All-pages guard (granite): the per-page checks above cover index.html and
+// /products/light only, so a future page that renders the AI product (a blog
+// post, a comparison page, a new section) could reintroduce the premature
+// ai.lamplitlabs.com link (MEM-0474745e). Walk every exported HTML file: while
+// Lamplit Light is In development no page may carry an <a href> to the
+// not-yet-public domain, and every page that mentions Light's internal route
+// must do so via /products/light. Once Light is Live at least one page links out.
+test("static export (out/) no exported page has an ai.lamplitlabs.com href while Light is in development", skipWithoutOut, () => {
+  const light = siteData.match(/slug:\s*"light"[\s\S]*?status:\s*"([^"]+)"/)?.[1];
+  assert.ok(light, "expected a status for the light product");
+  const pages = [];
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const p = resolve(dir, name);
+      if (statSync(p).isDirectory()) walk(p);
+      else if (name.endsWith(".html")) pages.push(p);
+    }
+  };
+  walk(resolve(root, "out"));
+  assert.ok(pages.length >= 2, "expected at least the home and /products/light pages in out/");
+  const offenders = [];
+  let liveLinks = 0;
+  for (const page of pages) {
+    const html = readFileSync(page, "utf8");
+    const hrefs = html.match(/href="https:\/\/ai\.lamplitlabs\.com[^"]*"/g) ?? [];
+    liveLinks += hrefs.length;
+    if (hrefs.length > 0) offenders.push(`${page.slice(root.length + 1)} (${hrefs.length})`);
+  }
+  if (light === "In development") {
+    assert.deepEqual(offenders, [], `pages link to ai.lamplitlabs.com while Light is in development: ${offenders.join(", ")}`);
+  } else {
+    assert.ok(liveLinks >= 1, "live Light should be linked from at least one exported page");
+  }
+});

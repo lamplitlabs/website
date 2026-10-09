@@ -695,6 +695,53 @@ test("not-found page offers a near-miss product slug suggestion", () => {
   const distance = levenshtein(typo, realSlug);
   const threshold = Math.max(1, Math.floor(realSlug.length / 3));
   assert.ok(distance <= threshold, `a one-character typo of "${realSlug}" ("${typo}") should be within the near-miss threshold`);
+
+  // Mirror the page's full acceptance rule (distance threshold + shared
+  // first/last character) so the stricter cases below exercise the same
+  // decision the 404 page makes, not just the raw distance.
+  const nearMissRule = /distance <= threshold && sharesBoundaries/;
+  assert.match(src, nearMissRule, "near-miss acceptance must combine the distance threshold with a shared-boundary guard");
+  function findNearMiss(attempted) {
+    let best;
+    for (const slug of slugs) {
+      const d = levenshtein(attempted, slug);
+      if (d === 0) continue;
+      const t = Math.max(1, Math.floor(slug.length / 3));
+      const sharesBoundaries =
+        attempted.length > 0 && attempted[0] === slug[0] && attempted[attempted.length - 1] === slug[slug.length - 1];
+      if (d <= t && sharesBoundaries && (!best || d < best.distance)) best = { slug, distance: d };
+    }
+    return best;
+  }
+
+  // Two-character typo (one dropped letter + one doubled letter) on a longer
+  // slug must still be recovered: a visitor typing /products/kenntnitrainerr
+  // meant kenntnistrainer.
+  const longSlug = slugs.find((s) => s.length >= 9) ?? realSlug;
+  // Two edits: drop the middle character and double the final one, so the
+  // typo still shares the slug's first and last characters.
+  const mid = Math.floor(longSlug.length / 2);
+  const twoCharTypo = longSlug.slice(0, mid) + longSlug.slice(mid + 1) + longSlug.slice(-1);
+  assert.notEqual(twoCharTypo, longSlug);
+  assert.ok(levenshtein(twoCharTypo, longSlug) >= 2, `"${twoCharTypo}" should be at least two edits from "${longSlug}"`);
+  assert.equal(findNearMiss(twoCharTypo)?.slug, longSlug, `a two-character typo of "${longSlug}" ("${twoCharTypo}") should suggest it`);
+
+  // False-positive guard: slugs that are clearly not a typo of any product
+  // must never produce a suggestion. "amnesia" is within the loose
+  // length/3 threshold of nothing but still shares a first letter with
+  // "amistio"; "lights-out" and "settings" are plausible unrelated URLs.
+  for (const unrelated of ["settings", "pricing", "amnesia", "amigo", "lint", "lights-out", "developer", "azure"]) {
+    assert.ok(!slugs.includes(unrelated), `fixture "${unrelated}" must not be a real slug`);
+    const hit = findNearMiss(unrelated);
+    assert.equal(hit, undefined, `unrelated slug "${unrelated}" must not suggest "${hit?.slug}"`);
+  }
+  // Every real slug padded with a wholly different suffix of its own length
+  // must also fail: the edit distance equals the suffix length, far above
+  // length/3.
+  for (const slug of slugs) {
+    const unrelated = slug + "-" + "z".repeat(slug.length);
+    assert.equal(findNearMiss(unrelated), undefined, `"${unrelated}" must not suggest a product`);
+  }
 });
 
 // Near-miss false positives (commit 8a48c45, boundary-char guard at

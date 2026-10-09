@@ -28,7 +28,7 @@ Product descriptions and availability follow the website catalog in [`lib/site-d
 
 Product categories are now catalog data too. Each `Product` carries a `category` value used by the homepage product filter: `AI`, `Education`, `Developer Tools`, or `Azure`.
 
-Public channels are catalog data as well (`socialLinks` in `lib/site-data.ts`): Facebook, Instagram, the blog, X, LinkedIn, and the Lamplit Labs Hugging Face organisation at [huggingface.co/lamplitlabs](https://huggingface.co/lamplitlabs) (the public home for Lamplit Light model releases; no public models yet).
+Public channels are catalog data as well (`socialLinks` in `lib/site-data.ts`): Facebook, Instagram, the blog, X, LinkedIn, and the Lamplit Labs Hugging Face organisation at [huggingface.co/lamplitlabs](https://huggingface.co/lamplitlabs) (the public home for Lamplit Light model releases; two models are published there as of 2026-10: `licht-german-tutor` and `licht-german-tutor-medium`).
 
 ## Users & Goals
 

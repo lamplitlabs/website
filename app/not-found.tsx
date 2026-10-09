@@ -37,7 +37,16 @@ function findNearMissProduct(pathname: string) {
     const distance = levenshtein(attempted, product.slug);
     if (distance === 0) continue; // exact match would not 404
     const threshold = Math.max(1, Math.floor(product.slug.length / 3));
-    if (distance <= threshold && (!best || distance < best.distance)) {
+    // Require the attempted slug to share both the first and last character
+    // with the real slug. Without this, short slugs (e.g. "light") have a
+    // threshold of 1 and match many unrelated words that happen to be one
+    // edit away (e.g. "night", "sight", "eight", "flight"), suggesting the
+    // wrong product on a 404 page instead of a genuine typo correction.
+    const sharesBoundaries =
+      attempted.length > 0 &&
+      attempted[0] === product.slug[0] &&
+      attempted[attempted.length - 1] === product.slug[product.slug.length - 1];
+    if (distance <= threshold && sharesBoundaries && (!best || distance < best.distance)) {
       best = { slug: product.slug, name: product.name, distance };
     }
   }

@@ -32,6 +32,15 @@ test("cookie banner and footer link to an existing /privacy route", () => {
   assert.match(privacy, /Google Analytics/, "privacy page must name the consent-gated analytics");
 });
 
+// Consent save-failure notice (quartz-3): a visitor whose storage write failed
+// must get a working retry of the same choice, not only a "Dismiss" button,
+// so the banner stops coming back once storage is available again.
+test("consent save-failed notice offers a retry that re-attempts the failed write", () => {
+  const src = read("components/cookie-consent.tsx");
+  assert.match(src, /data-testid="cookie-consent-retry-save"/, "save-failed notice must have a retry control");
+  assert.match(src, /function retrySave\(\)\s*\{\s*choose\(failedChoice\);/, "retry must re-run the same failed choice");
+  assert.match(src, /if \(setConsent\(value\)\) \{\s*setSaveFailed\(false\);/, "a successful retry must clear the notice");
+});
 
 test("site data defines products with unique slugs", () => {
   assert.ok(slugs.length > 0, "expected at least one product slug");

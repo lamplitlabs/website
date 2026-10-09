@@ -52,6 +52,9 @@ export function CookieConsent() {
   // choice, so the visitor learns why the banner may come back instead of it
   // silently reappearing. Cleared when the visitor dismisses the notice.
   const [saveFailed, setSaveFailed] = useState(false);
+  // The choice whose write failed, kept so "Try again" can retry the exact
+  // same write (e.g. after the visitor frees storage or leaves private mode).
+  const [failedChoice, setFailedChoice] = useState<"accepted" | "declined">("accepted");
   const acceptRef = useRef<HTMLButtonElement>(null);
   // True only when the banner reappears after a reset, so initial page load
   // never steals focus but a "Cookie settings" click moves keyboard and
@@ -79,8 +82,18 @@ export function CookieConsent() {
   }, [visible]);
 
   function choose(value: "accepted" | "declined") {
-    if (!setConsent(value)) setSaveFailed(true);
+    if (setConsent(value)) {
+      setSaveFailed(false);
+    } else {
+      setFailedChoice(value);
+      setSaveFailed(true);
+    }
     setVisible(false);
+  }
+
+  // Retry the failed write with the same choice; on success the notice clears.
+  function retrySave() {
+    choose(failedChoice);
   }
 
   function handleAccept() {
@@ -101,9 +114,14 @@ export function CookieConsent() {
       >
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
           <p className="text-sm text-muted-foreground">{CONSENT_SAVE_FAILED_NOTICE}</p>
-          <Button variant="outline" size="sm" onClick={() => setSaveFailed(false)}>
-            Dismiss
-          </Button>
+          <div className="flex shrink-0 gap-2">
+            <Button variant="outline" size="sm" onClick={() => setSaveFailed(false)}>
+              Dismiss
+            </Button>
+            <Button size="sm" data-testid="cookie-consent-retry-save" onClick={retrySave}>
+              Try again
+            </Button>
+          </div>
         </div>
       </div>
     );

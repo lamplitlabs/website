@@ -131,7 +131,18 @@ test("cookie banner renders a one-time notice when the consent write fails", () 
     /CONSENT_SAVE_FAILED_NOTICE =\s*"Your choice could not be saved this session/,
     "notice copy explains the banner may come back",
   );
-  assert.match(component, /if \(!setConsent\(value\)\) setSaveFailed\(true\)/, "state set on failed write");
+  assert.match(component, /setFailedChoice\(value\);\s*setSaveFailed\(true\)/, "state set on failed write");
   assert.match(component, /data-testid="cookie-consent-save-failed"/, "notice rendered inline");
   assert.match(component, /role="status"/, "notice announced to assistive tech");
+});
+
+test("a write that failed can be retried once storage recovers", () => {
+  let broken = true;
+  const s = memoryStorage();
+  const flaky = { ...s, setItem: (k, v) => { if (broken) throw new Error("quota"); s.setItem(k, v); } };
+  assert.equal(writeConsent(flaky, "declined"), false, "first write refused");
+  assert.equal(readConsent(flaky), null, "nothing persisted yet");
+  broken = false;
+  assert.equal(writeConsent(flaky, "declined"), true, "retry succeeds");
+  assert.equal(readConsent(flaky), "declined", "retried choice persists");
 });

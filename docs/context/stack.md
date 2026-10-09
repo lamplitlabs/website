@@ -60,7 +60,7 @@ npm run clean
 ```
 app/              Next.js 15 app directory (pages, layout, global styles)
 components/       Reusable UI components (Sections, Cards, Hero, etc.)
-hooks/            Custom React hooks (useTheme, useScroll, etc.)
+hooks/            Custom React hooks (useReveal for scroll-triggered reveal animation)
 lib/              Utility functions and helpers
 public/           Static assets (favicons, OG images, product covers)
 .github/          CI/CD workflows and GitHub Actions

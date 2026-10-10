@@ -52,9 +52,8 @@ Features:
 Reusable UI building blocks organized by concern:
 
 #### Layout Components
-- **Header** — Navigation bar with theme toggle
-- **Footer** — Social links and copyright
-- **Layout** — Page structure and spacing
+- **Header** — Navigation bar with theme toggle (`components/home/header.tsx`)
+- **Footer** — Social links and copyright (`components/home/footer.tsx`)
 
 #### Section Components (home/)
 - **HeroSection** — Main value proposition
@@ -121,7 +120,7 @@ Reusable UI building blocks organized by concern:
 ## Component Hierarchy
 
 ```
-Layout
+RootLayout (app/layout.tsx)
 ├─ Header
 │  ├─ Logo/Brand
 │  ├─ Navigation Links

@@ -13,6 +13,7 @@ import {
   type Product,
   type ProductCategory,
 } from "@/lib/site-data";
+import { filterProductsByQuery } from "@/lib/product-search";
 import styles from "./product-grid.module.css";
 
 const CATEGORY_QUERY_PARAM = "category";
@@ -148,6 +149,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
   const [activeCategory, setActiveCategoryState] = useState<
     ProductCategory | "All"
   >("All");
+  const [query, setQuery] = useState("");
   // Keep the active filter in the URL (`?category=AI`) so a filtered view can
   // be reloaded, bookmarked or shared. Read on mount (after hydration, so the
   // static export still matches) and write back with replaceState on click.
@@ -197,10 +199,14 @@ export function ProductGrid({ products }: { products: Product[] }) {
     "All",
     ...availableCategories,
   ];
-  const filteredProducts =
+  const categoryProducts =
     activeCategory === "All"
       ? products
       : products.filter((product) => product.category === activeCategory);
+  // Free-text search narrows the active category by name/description
+  // substring so a user can type a tool name instead of clicking tabs.
+  const filteredProducts = filterProductsByQuery(categoryProducts, query);
+  const hasQuery = query.trim().length > 0;
   // In-development cards are deliberately not clickable, so give those users
   // a concrete next step: the homepage AI section (#ai) explains what is
   // coming and how to follow it. Rendered only while something is in development.
@@ -208,6 +214,21 @@ export function ProductGrid({ products }: { products: Product[] }) {
 
   return (
     <div>
+      <div className="mx-auto mb-4 max-w-md">
+        <label htmlFor="product-search" className="sr-only">
+          Search products by name or description
+        </label>
+        <input
+          id="product-search"
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search products…"
+          autoComplete="off"
+          data-testid="product-search"
+          className="glass w-full rounded-full border px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        />
+      </div>
       <div
         role="group"
         aria-label="Filter products by category"
@@ -272,10 +293,15 @@ export function ProductGrid({ products }: { products: Product[] }) {
           data-testid="product-grid-empty"
           className="py-12 text-center text-sm text-muted-foreground"
         >
-          No products in this category yet.{" "}
+          {hasQuery
+            ? `No products match “${query.trim()}”.`
+            : "No products in this category yet."}{" "}
           <button
             type="button"
-            onClick={() => setActiveCategory("All")}
+            onClick={() => {
+              setQuery("");
+              setActiveCategory("All");
+            }}
             className="text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Show all products

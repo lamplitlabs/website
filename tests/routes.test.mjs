@@ -993,3 +993,22 @@ test("static export (out/) every product page offers an on-site 'Explore our oth
     assert.deepEqual(new Set(linked), new Set(slugs.filter((s) => s !== slug)), `/products/${slug} must link exactly the other products`);
   }
 });
+
+// Hand-typed section URLs (fleet-1007): /products, /about and /contact are
+// nav anchors on the homepage, not routes, so they 404 on the static export.
+// `next.config.js` redirects are ignored with `output: "export"`, so the
+// redirects live in vercel.json next to the existing `/` rewrite and must
+// point each slug at its homepage section.
+test("vercel.json redirects hand-typed section URLs to the homepage anchors", () => {
+  const vercel = JSON.parse(read("vercel.json"));
+  const redirects = Object.fromEntries((vercel.redirects ?? []).map((r) => [r.source, r]));
+  const nav = read("lib/site-data.ts");
+  for (const slug of ["products", "about", "contact"]) {
+    assert.match(nav, new RegExp(`href:\\s*"#${slug}"`), `nav must still link to #${slug}`);
+    const r = redirects[`/${slug}`];
+    assert.ok(r, `vercel.json must redirect /${slug}`);
+    assert.equal(r.destination, `/#${slug}`);
+    assert.equal(r.permanent, true);
+    assert.ok(!existsSync(resolve(root, "app", slug, "page.tsx")), `/${slug} must not also be a real route`);
+  }
+});

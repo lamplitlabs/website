@@ -25,37 +25,83 @@ function levenshtein(a: string, b: string): number {
   return dp[a.length][b.length];
 }
 
+type NearMiss = { href: string; name: string; distance: number };
+
+// Shared acceptance rule for a mistyped slug against a real one: small edit
+// distance relative to the slug's own length, and the attempt must share the
+// real slug's first and last character. Without the boundary guard, short
+// slugs (e.g. "light") have a threshold of 1 and match many unrelated words
+// that happen to be one edit away (e.g. "night", "sight", "eight", "flight"),
+// suggesting the wrong page on a 404 instead of a genuine typo correction.
+function nearMissDistance(attempted: string, slug: string): number | undefined {
+  const distance = levenshtein(attempted, slug);
+  if (distance === 0) return undefined; // exact match would not 404
+  const threshold = Math.max(1, Math.floor(slug.length / 3));
+  const sharesBoundaries =
+    attempted.length > 0 &&
+    attempted[0] === slug[0] &&
+    attempted[attempted.length - 1] === slug[slug.length - 1];
+  return distance <= threshold && sharesBoundaries ? distance : undefined;
+}
+
 // A near-miss slug suggestion: only offered when the mistyped product path is
 // close enough to a real one that it is very likely the product the visitor
 // wanted (small edit distance relative to the slug's own length).
-function findNearMissProduct(pathname: string) {
+function findNearMissProduct(pathname: string): NearMiss | undefined {
   const match = pathname.match(/^\/products\/([^/]+)\/?$/);
   if (!match) return undefined;
   const attempted = match[1].toLowerCase();
-  let best: { slug: string; name: string; distance: number } | undefined;
+  let best: NearMiss | undefined;
   for (const product of products) {
-    const distance = levenshtein(attempted, product.slug);
-    if (distance === 0) continue; // exact match would not 404
-    const threshold = Math.max(1, Math.floor(product.slug.length / 3));
-    // Require the attempted slug to share both the first and last character
-    // with the real slug. Without this, short slugs (e.g. "light") have a
-    // threshold of 1 and match many unrelated words that happen to be one
-    // edit away (e.g. "night", "sight", "eight", "flight"), suggesting the
-    // wrong product on a 404 page instead of a genuine typo correction.
-    const sharesBoundaries =
-      attempted.length > 0 &&
-      attempted[0] === product.slug[0] &&
-      attempted[attempted.length - 1] === product.slug[product.slug.length - 1];
-    if (distance <= threshold && sharesBoundaries && (!best || distance < best.distance)) {
-      best = { slug: product.slug, name: product.name, distance };
+    const distance = nearMissDistance(attempted, product.slug);
+    if (distance !== undefined && (!best || distance < best.distance)) {
+      best = { href: `/products/${product.slug}`, name: product.name, distance };
     }
   }
   return best;
 }
 
+// Static routes a visitor may type by hand: the privacy page and the home-page
+// sections behind the nav anchors (/products, /about, /contact ...). The site
+// has no top-level /products or /about page, so these otherwise dead-end.
+const staticRoutes: { slug: string; href: string; name: string }[] = [
+  { slug: "privacy", href: "/privacy", name: "Privacy Policy" },
+  ...navLinks
+    .filter((link) => !link.external && link.href.startsWith("#"))
+    .map((link) => ({ slug: link.href.slice(1), href: `/${link.href}`, name: link.label })),
+];
+
+// Near-miss for a single-segment path (e.g. /privcy, /prducts, /about-us,
+// /privacy-policy): accepts the same typo rule as products, plus an exact
+// slug followed by a "-" qualifier, which is a common way to guess a URL.
+function findNearMissStaticRoute(pathname: string): NearMiss | undefined {
+  const match = pathname.match(/^\/([^/]+)\/?$/);
+  if (!match) return undefined;
+  const attempted = match[1].toLowerCase();
+  let best: NearMiss | undefined;
+  for (const route of staticRoutes) {
+    if (attempted === route.slug) continue; // /privacy itself would not 404
+    // Very short slugs (e.g. "ai") are one edit away from too many unrelated
+    // paths (/api, /ab), so only the "-" qualifier form counts for them.
+    const distance = attempted.startsWith(`${route.slug}-`)
+      ? 1
+      : route.slug.length >= 4
+        ? nearMissDistance(attempted, route.slug)
+        : undefined;
+    if (distance !== undefined && (!best || distance < best.distance)) {
+      best = { href: route.href, name: route.name, distance };
+    }
+  }
+  return best;
+}
+
+function findNearMiss(pathname: string): NearMiss | undefined {
+  return findNearMissProduct(pathname) ?? findNearMissStaticRoute(pathname);
+}
+
 export default function NotFound() {
   const pathname = usePathname();
-  const nearMiss = findNearMissProduct(pathname ?? "");
+  const nearMiss = findNearMiss(pathname ?? "");
 
   return (
     <>
@@ -90,7 +136,7 @@ export default function NotFound() {
           <p className="mb-8 max-w-md text-sm text-muted-foreground" data-testid="not-found-suggestion">
             Did you mean{" "}
             <Link
-              href={`/products/${nearMiss.slug}`}
+              href={nearMiss.href}
               className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
             >
               {nearMiss.name}

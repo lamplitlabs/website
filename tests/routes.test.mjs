@@ -763,9 +763,9 @@ test("not-found page offers a near-miss product slug suggestion", () => {
 // cases report which unrelated slug would have been suggested.
 test("not-found near-miss matcher: two-character typo and unrelated short slug", () => {
   const src = read("app/not-found.tsx");
-  assert.match(src, /Math\.max\(1, Math\.floor\(product\.slug\.length \/ 3\)\)/, "threshold must stay relative to slug length");
-  assert.match(src, /attempted\[0\] === product\.slug\[0\]/, "guard must require a shared first character");
-  assert.match(src, /attempted\[attempted\.length - 1\] === product\.slug\[product\.slug\.length - 1\]/, "guard must require a shared last character");
+  assert.match(src, /Math\.max\(1, Math\.floor\(slug\.length \/ 3\)\)/, "threshold must stay relative to slug length");
+  assert.match(src, /attempted\[0\] === slug\[0\]/, "guard must require a shared first character");
+  assert.match(src, /attempted\[attempted\.length - 1\] === slug\[slug\.length - 1\]/, "guard must require a shared last character");
   assert.match(src, /distance <= threshold && sharesBoundaries/, "match must require both the threshold and the boundary guard");
 
   function levenshtein(a, b) {
@@ -816,6 +816,84 @@ test("not-found near-miss matcher: two-character typo and unrelated short slug",
   for (const junk of ["abc", "a", "xyz", "night", "sight", "eight", "flight", "lights", "amistios"]) {
     const hit = findNearMiss(junk);
     assert.equal(hit, undefined, `unrelated slug "${junk}" must not suggest a product (got ${hit?.slug})`);
+  }
+});
+
+// 404 near-miss for non-product paths (evolution/job-20261010t085749z-512d5e):
+// a visitor who hand-types /privcy, /privacy-policy, /prducts or /about-us
+// should be offered the real static route (the privacy page or a home-page
+// section anchor), not a bare dead end. The matcher below mirrors
+// findNearMissStaticRoute in app/not-found.tsx and runs it against the
+// static routes the page derives from lib/site-data navLinks + /privacy.
+test("not-found page offers a near-miss static route suggestion", () => {
+  const src = read("app/not-found.tsx");
+  assert.match(src, /findNearMissStaticRoute/, "not-found page must compute a near-miss static-route suggestion");
+  assert.match(src, /findNearMissProduct\(pathname\) \?\? findNearMissStaticRoute\(pathname\)/, "product typos keep priority over static-route typos");
+  assert.match(src, /slug: "privacy", href: "\/privacy"/, "the privacy page must be a static-route candidate");
+  assert.match(src, /navLinks[\s\S]*?\.filter\(\(link\) => !link\.external && link\.href\.startsWith\("#"\)\)/, "home-page nav anchors must be static-route candidates");
+  assert.match(src, /attempted\.startsWith\(`\$\{route\.slug\}-`\)/, "an exact slug with a '-' qualifier must count as a near miss");
+  assert.match(src, /route\.slug\.length >= 4/, "very short slugs must only match via the '-' qualifier form, not edit distance");
+  assert.match(src, /href=\{nearMiss\.href\}/, "suggestion link must use the match's own href so static routes resolve");
+
+  const anchors = [...siteData.matchAll(/\{\s*label:\s*"([^"]+)",\s*href:\s*"#([a-z-]+)"\s*\}/g)]
+    .map((m) => ({ slug: m[2], href: `/#${m[2]}`, name: m[1] }));
+  assert.ok(anchors.length >= 3, "site-data must expose several home-page anchor nav links");
+  const routes = [{ slug: "privacy", href: "/privacy", name: "Privacy Policy" }, ...anchors];
+
+  function levenshtein(a, b) {
+    const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+      Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+    );
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i][j] = a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+    return dp[a.length][b.length];
+  }
+  function nearMissDistance(attempted, slug) {
+    const distance = levenshtein(attempted, slug);
+    if (distance === 0) return undefined;
+    const threshold = Math.max(1, Math.floor(slug.length / 3));
+    const sharesBoundaries =
+      attempted.length > 0 && attempted[0] === slug[0] && attempted[attempted.length - 1] === slug[slug.length - 1];
+    return distance <= threshold && sharesBoundaries ? distance : undefined;
+  }
+  function findStatic(pathname) {
+    const match = pathname.match(/^\/([^/]+)\/?$/);
+    if (!match) return undefined;
+    const attempted = match[1].toLowerCase();
+    let best;
+    for (const route of routes) {
+      if (attempted === route.slug) continue;
+      const distance = attempted.startsWith(`${route.slug}-`)
+        ? 1
+        : route.slug.length >= 4 ? nearMissDistance(attempted, route.slug) : undefined;
+      if (distance !== undefined && (!best || distance < best.distance)) best = { ...route, distance };
+    }
+    return best;
+  }
+
+  // Genuine typos and common URL guesses recover to the right page.
+  assert.equal(findStatic("/privcy")?.href, "/privacy");
+  assert.equal(findStatic("/privacy-policy")?.href, "/privacy");
+  assert.equal(findStatic("/Privcy/")?.href, "/privacy", "case and trailing slash are normalised");
+  for (const route of anchors) {
+    if (route.slug.length >= 4) {
+      const dropped = route.slug[0] + route.slug.slice(2); // drop the second character
+      assert.equal(findStatic(`/${dropped}`)?.href, route.href, `typo "/${dropped}" should suggest ${route.href}`);
+    }
+    assert.equal(findStatic(`/${route.slug}-us`)?.href, route.href, `"/${route.slug}-us" should suggest ${route.href}`);
+  }
+
+  // Never fire for the real routes themselves, deeper paths, or unrelated URLs.
+  for (const real of routes) assert.equal(findStatic(`/${real.slug}`), undefined, `/${real.slug} is a real route`);
+  assert.equal(findStatic("/products/privcy"), undefined, "nested paths are left to the product matcher");
+  for (const junk of ["/", "/admin", "/login", "/pricing", "/blog", "/api", "/wp-admin", "/index.php", "/ab"]) {
+    const hit = findStatic(junk);
+    assert.equal(hit, undefined, `unrelated path "${junk}" must not suggest ${hit?.href}`);
   }
 });
 

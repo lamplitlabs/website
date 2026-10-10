@@ -17,7 +17,8 @@ async function load(rel) {
   return import(`data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`);
 }
 const { products } = await load("lib/site-data.ts");
-const { filterProductsByQuery, matchesProductQuery } = await load("lib/product-search.ts");
+const search = await load("lib/product-search.ts");
+const { filterProductsByQuery, matchesProductQuery } = search;
 
 test("blank or whitespace query keeps every product", () => {
   assert.equal(filterProductsByQuery(products, "").length, products.length);
@@ -47,4 +48,18 @@ test("product grid wires the search input into filteredProducts", () => {
   const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
   assert.match(grid, /data-testid="product-search"/);
   assert.match(grid, /const filteredProducts = filterProductsByQuery\(/);
+});
+
+test("search query is mirrored into the ?q= URL param so a searched view can be shared/reloaded", () => {
+  const { withSearchQueryParam, SEARCH_QUERY_PARAM } = search;
+  assert.equal(SEARCH_QUERY_PARAM, "q");
+  const base = new URL("https://lamplitlabs.com/?category=AI");
+  const withQ = withSearchQueryParam(base, " ai ");
+  assert.equal(withQ.searchParams.get("q"), "ai");
+  assert.equal(withQ.searchParams.get("category"), "AI", "category param is preserved");
+  assert.equal(withSearchQueryParam(withQ, "").searchParams.has("q"), false, "blank query removes ?q=");
+
+  const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
+  assert.match(grid, /window\.history\.replaceState\([\s\S]*?withSearchQueryParam\(new URL\(window\.location\.href\), next\)/, "grid writes ?q= via replaceState on search input");
+  assert.match(grid, /params\.get\(SEARCH_QUERY_PARAM\)/, "grid restores ?q= on mount");
 });

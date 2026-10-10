@@ -13,7 +13,11 @@ import {
   type Product,
   type ProductCategory,
 } from "@/lib/site-data";
-import { filterProductsByQuery } from "@/lib/product-search";
+import {
+  filterProductsByQuery,
+  SEARCH_QUERY_PARAM,
+  withSearchQueryParam,
+} from "@/lib/product-search";
 import styles from "./product-grid.module.css";
 
 const CATEGORY_QUERY_PARAM = "category";
@@ -154,9 +158,11 @@ export function ProductGrid({ products }: { products: Product[] }) {
   // be reloaded, bookmarked or shared. Read on mount (after hydration, so the
   // static export still matches) and write back with replaceState on click.
   useEffect(() => {
-    const param = new URLSearchParams(window.location.search).get(
-      CATEGORY_QUERY_PARAM
-    );
+    const params = new URLSearchParams(window.location.search);
+    const param = params.get(CATEGORY_QUERY_PARAM);
+    // Restore a shared/reloaded search (`?q=ai`) alongside the category.
+    const initialQuery = params.get(SEARCH_QUERY_PARAM);
+    if (initialQuery) setQuery(initialQuery);
     if (param && (productCategories as string[]).includes(param)) {
       setActiveCategoryState(param as ProductCategory);
       // A shared /?category=AI link should land on the filtered cards, not the
@@ -178,6 +184,16 @@ export function ProductGrid({ products }: { products: Product[] }) {
       url.searchParams.set(CATEGORY_QUERY_PARAM, category);
     }
     window.history.replaceState(window.history.state, "", url);
+  };
+  // Mirror the search box into `?q=` (like `?category=`) so a searched view
+  // can be reloaded, bookmarked or shared.
+  const updateQuery = (next: string) => {
+    setQuery(next);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      withSearchQueryParam(new URL(window.location.href), next)
+    );
   };
   const categoryCounts = useMemo(() => {
     return products.reduce<Partial<Record<ProductCategory, number>>>(
@@ -222,7 +238,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
           id="product-search"
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => updateQuery(event.target.value)}
           placeholder="Search products…"
           autoComplete="off"
           data-testid="product-search"
@@ -299,7 +315,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
           <button
             type="button"
             onClick={() => {
-              setQuery("");
+              updateQuery("");
               setActiveCategory("All");
             }}
             className="text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"

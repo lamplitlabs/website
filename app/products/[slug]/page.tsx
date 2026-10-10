@@ -354,6 +354,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     </span>
                   </p>
                 )}
+                {isInDevelopment && (
+                  <p
+                    data-testid="product-notify-me-expectation"
+                    className="mt-2 text-xs text-muted-foreground"
+                  >
+                    The link opens your mail app with the subject pre-filled.
+                    Send the email and we&apos;ll reply once when {product.name}{" "}
+                    launches — no newsletter, no other emails.
+                  </p>
+                )}
               </div>
             </div>
           </div>

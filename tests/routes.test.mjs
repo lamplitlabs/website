@@ -577,8 +577,17 @@ test("static export (out/) /products/light page offers a 'Notify me' mailto whil
     // Plain-text fallback: users without a configured mail client must still be able to read/copy the address.
     const plain = html.match(/data-testid="product-notify-me-email"[^>]*>\(hello@lamplitlabs\.com\)<\/span>/g) ?? [];
     assert.equal(plain.length, 1, "in-development product page should render the contact email as visible plain text next to the Notify-me link");
+    // Confirmation state: a mailto has no on-site "submitted" screen, so the page must say
+    // what happens after sending (mail app opens; one reply at launch; no newsletter).
+    const expectation = html.match(/data-testid="product-notify-me-expectation"[^>]*>([\s\S]*?)<\/p>/) ?? [];
+    assert.equal(expectation.length, 2, "in-development product page should explain what happens after the Notify-me email is sent");
+    const text = expectation[1].replace(/<[^>]+>/g, "");
+    assert.match(text, /opens your mail app/, "expectation must say the link opens the visitor's mail app");
+    assert.match(text, /reply once/, "expectation must promise a single reply at launch");
+    assert.match(text, /no newsletter/, "expectation must rule out a newsletter/mailing list");
   } else {
     assert.equal(links.length, 0, "live product page should not offer a Notify-me link");
+    assert.doesNotMatch(html, /data-testid="product-notify-me-expectation"/, "live product page should not render the Notify-me expectation note");
     assert.doesNotMatch(html, /data-testid="product-notify-me-email"/, "live product page should not render the Notify-me email fallback");
   }
 });

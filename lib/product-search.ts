@@ -1,26 +1,34 @@
 /**
  * Free-text filter for the product grid. Case-insensitive substring match on
- * name and description, so a user can type "ai" or part of a tool's name
- * instead of hunting through category tabs. Blank queries match everything.
+ * name, description and tags (the chips shown on each card), so a user can
+ * type "ai", "AI Agents" or part of a tool's name instead of hunting through
+ * category tabs. Blank queries match everything.
  */
+export type SearchableProduct = {
+  name: string;
+  description: string;
+  tags?: string[];
+};
+
 export function matchesProductQuery(
-  product: { name: string; description: string },
+  product: SearchableProduct,
   query: string
 ): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return true;
   return (
     product.name.toLowerCase().includes(q) ||
-    product.description.toLowerCase().includes(q)
+    product.description.toLowerCase().includes(q) ||
+    (product.tags ?? []).some((tag) => tag.toLowerCase().includes(q))
   );
 }
 
-export function filterProductsByQuery<
-  T extends { name: string; description: string },
->(products: T[], query: string): T[] {
+export function filterProductsByQuery<T extends SearchableProduct>(
+  products: T[],
+  query: string
+): T[] {
   return products.filter((product) => matchesProductQuery(product, query));
 }
-
 /** URL query parameter that mirrors the search box (`/?q=ai`). */
 export const SEARCH_QUERY_PARAM = "q";
 

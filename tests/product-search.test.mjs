@@ -63,3 +63,21 @@ test("search query is mirrored into the ?q= URL param so a searched view can be 
   assert.match(grid, /window\.history\.replaceState\([\s\S]*?withSearchQueryParam\(new URL\(window\.location\.href\), next\)/, "grid writes ?q= via replaceState on search input");
   assert.match(grid, /\.get\(\s*SEARCH_QUERY_PARAM\s*\)/, "grid restores ?q= on mount");
 });
+
+test("query matches a product by tag substring (case-insensitive) when name/description do not", () => {
+  const target = products.find((p) => p.tags?.some((t) => {
+    const needle = t.slice(0, Math.min(t.length, 6)).toLowerCase();
+    return needle.length >= 3 && !p.name.toLowerCase().includes(needle) && !p.description.toLowerCase().includes(needle);
+  }));
+  assert.ok(target, "catalog has a product whose tag is not in its name/description");
+  const tag = target.tags.find((t) => {
+    const needle = t.slice(0, Math.min(t.length, 6)).toLowerCase();
+    return needle.length >= 3 && !target.name.toLowerCase().includes(needle) && !target.description.toLowerCase().includes(needle);
+  });
+  const fragment = tag.slice(0, Math.min(tag.length, 6)).toUpperCase();
+  const result = filterProductsByQuery(products, fragment);
+  assert.ok(result.includes(target), `expected ${target.name} to match tag fragment "${fragment}"`);
+  for (const p of result) assert.ok(matchesProductQuery(p, fragment));
+  assert.ok(matchesProductQuery(target, tag.toLowerCase()), "full tag matches lower-cased");
+  assert.deepEqual(filterProductsByQuery(products, "zzqxv-no-such-tag-or-name"), []);
+});

@@ -892,3 +892,26 @@ test("static export (out/) no exported page has an ai.lamplitlabs.com href while
     assert.ok(liveLinks >= 1, "live Light should be linked from at least one exported page");
   }
 });
+
+// Dead external link fallback (evolution/job-20261010t051739z-bfa302): a live
+// product's CTAs leave for an external domain this site does not control. When
+// that domain is down or redirects badly the visitor must not dead-end, so
+// every exported product page offers an on-site "Explore our other products"
+// section linking to every other product (and never to itself).
+test("static export (out/) every product page offers an on-site 'Explore our other products' fallback", skipWithoutOut, () => {
+  const out = resolve(root, "out");
+  for (const slug of slugs) {
+    const file = [join(out, `products/${slug}.html`), join(out, `products/${slug}/index.html`)].find((f) => existsSync(f));
+    assert.ok(file, `no exported page for /products/${slug}`);
+    const html = readFileSync(file, "utf8");
+    const section = html.match(/<section[^>]*data-testid="product-explore-others"[^>]*>([\s\S]*?)<\/section>/);
+    assert.ok(section, `/products/${slug} must render the "Explore our other products" fallback section`);
+    assert.match(section[1], /Explore our other products/, `/products/${slug} fallback section needs its heading`);
+    const linked = [...section[1].matchAll(/<a\b[^>]*data-testid="product-explore-other-link"[^>]*>/g)]
+      .map((m) => m[0].match(/href="\/products\/([^"]+)"/)?.[1])
+      .filter(Boolean);
+    assert.equal(linked.length, slugs.length - 1, `/products/${slug} must link to every other product, found ${linked.length}`);
+    assert.ok(!linked.includes(slug), `/products/${slug} must not link to itself as an "other" product`);
+    assert.deepEqual(new Set(linked), new Set(slugs.filter((s) => s !== slug)), `/products/${slug} must link exactly the other products`);
+  }
+});

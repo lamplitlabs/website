@@ -111,3 +111,19 @@ test("app/error.tsx exists as a client error boundary with a default export", ()
   assert.match(src, /export default function/, "app/error.tsx must export a default function");
   assert.match(src, /reset\(\)/, "app/error.tsx must call reset() so users can retry");
 });
+
+// app/global-error.tsx is the root error boundary: app/error.tsx cannot catch
+// errors thrown by app/layout.tsx itself, so without this file a layout-level
+// render error still shows Next's default crash screen. It replaces the root
+// layout, so it must render its own <html> and <body>.
+test("app/global-error.tsx exists as a root client error boundary rendering html and body", () => {
+  const file = resolve(root, "app/global-error.tsx");
+  assert.ok(existsSync(file), "missing app/global-error.tsx");
+  const src = readFileSync(file, "utf8");
+  assert.match(src, /^\s*["']use client["'];?/m, "app/global-error.tsx must be a Client Component");
+  assert.match(src, /export default function/, "app/global-error.tsx must export a default function");
+  assert.match(src, /reset\(\)/, "app/global-error.tsx must call reset() so users can retry");
+  assert.match(src, /<html[\s>]/, "app/global-error.tsx must render its own <html> (it replaces the root layout)");
+  assert.match(src, /<body[\s>]/, "app/global-error.tsx must render its own <body>");
+  assert.match(src, /Lamplit Labs/, "app/global-error.tsx must be branded");
+});

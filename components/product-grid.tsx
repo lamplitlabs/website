@@ -158,10 +158,13 @@ export function ProductGrid({ products }: { products: Product[] }) {
   // be reloaded, bookmarked or shared. Read on mount (after hydration, so the
   // static export still matches) and write back with replaceState on click.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const param = params.get(CATEGORY_QUERY_PARAM);
+    const param = new URLSearchParams(window.location.search).get(
+      CATEGORY_QUERY_PARAM
+    );
     // Restore a shared/reloaded search (`?q=ai`) alongside the category.
-    const initialQuery = params.get(SEARCH_QUERY_PARAM);
+    const initialQuery = new URLSearchParams(window.location.search).get(
+      SEARCH_QUERY_PARAM
+    );
     if (initialQuery) setQuery(initialQuery);
     if (param && (productCategories as string[]).includes(param)) {
       setActiveCategoryState(param as ProductCategory);

@@ -61,5 +61,5 @@ test("search query is mirrored into the ?q= URL param so a searched view can be 
 
   const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
   assert.match(grid, /window\.history\.replaceState\([\s\S]*?withSearchQueryParam\(new URL\(window\.location\.href\), next\)/, "grid writes ?q= via replaceState on search input");
-  assert.match(grid, /params\.get\(SEARCH_QUERY_PARAM\)/, "grid restores ?q= on mount");
+  assert.match(grid, /\.get\(\s*SEARCH_QUERY_PARAM\s*\)/, "grid restores ?q= on mount");
 });

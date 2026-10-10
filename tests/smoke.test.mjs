@@ -100,3 +100,14 @@ test("public product copy contains no training-method words", () => {
     });
   }
 });
+
+// app/error.tsx is the App Router error boundary: without it, a runtime render
+// error shows Next's default unstyled crash screen instead of a branded page.
+test("app/error.tsx exists as a client error boundary with a default export", () => {
+  const file = resolve(root, "app/error.tsx");
+  assert.ok(existsSync(file), "missing app/error.tsx");
+  const src = readFileSync(file, "utf8");
+  assert.match(src, /^\s*["']use client["'];?/m, "app/error.tsx must be a Client Component");
+  assert.match(src, /export default function/, "app/error.tsx must export a default function");
+  assert.match(src, /reset\(\)/, "app/error.tsx must call reset() so users can retry");
+});

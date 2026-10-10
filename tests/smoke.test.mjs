@@ -127,3 +127,23 @@ test("app/global-error.tsx exists as a root client error boundary rendering html
   assert.match(src, /<body[\s>]/, "app/global-error.tsx must render its own <body>");
   assert.match(src, /Lamplit Labs/, "app/global-error.tsx must be branded");
 });
+
+// docs/memory/2026-09-06-vercel-static-export-root-route.md: the Vercel static
+// export emits no route for `/`, so without this rewrite the homepage returns a
+// production 404 while every other page works. Guard it before deploy.
+test("vercel.json rewrites the root route to /index so the homepage does not 404 on Vercel", () => {
+  const file = resolve(root, "vercel.json");
+  assert.ok(existsSync(file), "missing vercel.json");
+  const config = JSON.parse(readFileSync(file, "utf8"));
+  assert.ok(Array.isArray(config.rewrites), "vercel.json must declare a rewrites array");
+  const rootRewrite = config.rewrites.find((r) => r.source === "/");
+  assert.ok(
+    rootRewrite,
+    'vercel.json must rewrite "/" — the static export has no route for the homepage without it',
+  );
+  assert.equal(
+    rootRewrite.destination,
+    "/index",
+    'the "/" rewrite must target "/index" (the extensionless out/index.html Vercel serves)',
+  );
+});

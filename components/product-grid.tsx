@@ -27,9 +27,11 @@ const PRODUCTS_SECTION_ID = "products";
 function ProductCard({
   product,
   index,
+  onTagClick,
 }: {
   product: Product;
   index: number;
+  onTagClick: (tag: string) => void;
 }) {
   const isFeatured = product.featured;
   const isInDevelopment = isProductInDevelopment(product);
@@ -71,9 +73,23 @@ function ProductCard({
         {product.tags && product.tags.length > 0 && (
           <div className={styles.tags}>
             {product.tags.map((tag) => (
-              <span key={tag} className={styles.tag}>
+              // Tags double as filter triggers: clicking one searches for the
+              // tag text so the grid shows every product sharing it. The chip
+              // sits inside the card link, so stop the click from navigating.
+              <button
+                key={tag}
+                type="button"
+                className={styles.tag}
+                data-testid="product-tag"
+                aria-label={`Show products tagged ${tag}`}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onTagClick(tag);
+                }}
+              >
                 {tag}
-              </span>
+              </button>
             ))}
           </div>
         )}
@@ -226,6 +242,15 @@ export function ProductGrid({ products }: { products: Product[] }) {
   // substring so a user can type a tool name instead of clicking tabs.
   const filteredProducts = filterProductsByQuery(categoryProducts, query);
   const hasQuery = query.trim().length > 0;
+  // A tag chip filters across every category (tags like "AI" span tabs), so
+  // reset the category and reuse the search box/`?q=` path for the tag text.
+  const filterByTag = (tag: string) => {
+    setActiveCategory("All");
+    updateQuery(tag);
+    document
+      .getElementById(PRODUCTS_SECTION_ID)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   // In-development cards are deliberately not clickable, so give those users
   // a concrete next step: the homepage AI section (#ai) explains what is
   // coming and how to follow it. Rendered only while something is in development.
@@ -303,7 +328,12 @@ export function ProductGrid({ products }: { products: Product[] }) {
         }`}
       >
         {filteredProducts.map((product, i) => (
-          <ProductCard key={product.slug} product={product} index={i} />
+          <ProductCard
+            key={product.slug}
+            product={product}
+            index={i}
+            onTagClick={filterByTag}
+          />
         ))}
       </div>
       {filteredProducts.length === 0 && (

@@ -177,6 +177,18 @@
   color: hsl(40 15% 85%);
   font-size: 0.75rem;
   line-height: 1.5;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.tag:hover,
+.tag:focus-visible {
+  border-color: hsl(var(--primary) / 0.5);
+  color: hsl(var(--primary));
+  background: hsl(var(--primary) / 0.1);
+  outline: none;
 }
 
 .name {

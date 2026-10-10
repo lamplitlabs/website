@@ -81,3 +81,21 @@ test("query matches a product by tag substring (case-insensitive) when name/desc
   assert.ok(matchesProductQuery(target, tag.toLowerCase()), "full tag matches lower-cased");
   assert.deepEqual(filterProductsByQuery(products, "zzqxv-no-such-tag-or-name"), []);
 });
+
+test("clicking a product tag chip filters the grid to products sharing that tag", () => {
+  const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
+  // The rendered tag element is a button whose onClick hands the tag text to the grid…
+  assert.match(grid, /<button[\s\S]*?data-testid="product-tag"[\s\S]*?onClick=\{\(event\) => \{[\s\S]*?onTagClick\(tag\);/, "tag chip has an onClick that forwards the tag");
+  // …and the grid's handler feeds it into the same query state that filterProductsByQuery reads.
+  assert.match(grid, /const filterByTag = \(tag: string\) => \{[\s\S]*?setActiveCategory\("All"\);[\s\S]*?updateQuery\(tag\);/, "tag handler resets the category and sets the search query");
+  assert.match(grid, /onTagClick=\{filterByTag\}/);
+  assert.match(grid, /const filteredProducts = filterProductsByQuery\(categoryProducts, query\)/);
+  // Every product's tags narrow the catalog to products sharing the tag (and never to zero).
+  for (const p of products) {
+    for (const tag of p.tags ?? []) {
+      const result = filterProductsByQuery(products, tag);
+      assert.ok(result.includes(p), `${p.name} matches its own tag "${tag}"`);
+      for (const r of result) assert.ok(matchesProductQuery(r, tag));
+    }
+  }
+});

@@ -5,6 +5,7 @@
   ],
   "redirects": [
     { "source": "/products", "destination": "/#products", "permanent": true },
+    { "source": "/ai", "destination": "/#ai", "permanent": true },
     { "source": "/about", "destination": "/#about", "permanent": true },
     { "source": "/contact", "destination": "/#contact", "permanent": true }
   ]

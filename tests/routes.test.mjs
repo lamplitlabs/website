@@ -994,7 +994,7 @@ test("static export (out/) every product page offers an on-site 'Explore our oth
   }
 });
 
-// Hand-typed section URLs (fleet-1007): /products, /about and /contact are
+// Hand-typed section URLs (fleet-1007, meridian-2): /products, /ai, /about and /contact are
 // nav anchors on the homepage, not routes, so they 404 on the static export.
 // `next.config.js` redirects are ignored with `output: "export"`, so the
 // redirects live in vercel.json next to the existing `/` rewrite and must
@@ -1003,7 +1003,7 @@ test("vercel.json redirects hand-typed section URLs to the homepage anchors", ()
   const vercel = JSON.parse(read("vercel.json"));
   const redirects = Object.fromEntries((vercel.redirects ?? []).map((r) => [r.source, r]));
   const nav = read("lib/site-data.ts");
-  for (const slug of ["products", "about", "contact"]) {
+  for (const slug of ["products", "ai", "about", "contact"]) {
     assert.match(nav, new RegExp(`href:\\s*"#${slug}"`), `nav must still link to #${slug}`);
     const r = redirects[`/${slug}`];
     assert.ok(r, `vercel.json must redirect /${slug}`);

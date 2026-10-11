@@ -400,14 +400,26 @@ test("every product's cover file exists in public/", () => {
 // Every product `url` is the external CTA target ("Visit <product>"). A typo'd
 // or http:// value would send a real visitor to a broken or insecure
 // destination, so each must parse as a URL with protocol exactly "https:".
-test("every product url is a well-formed https URL", () => {
+// Seven products carry no canonicalUrl, so this is the only guard on their
+// outbound link: also reject whitespace, trailing-slash drift, query/fragment
+// noise and two products pointing at the same site (a copy-paste misdirect).
+test("every product url is a well-formed, unique https URL without trailing-slash drift", () => {
+  const seen = new Map();
   for (const product of products) {
-    assert.equal(typeof product.url, "string", `${product.slug}: url must be a string`);
+    const u = product.url;
+    assert.equal(typeof u, "string", `${product.slug}: url must be a string`);
+    assert.equal(u, u.trim(), `${product.slug}: url "${u}" has surrounding whitespace`);
     let parsed;
     assert.doesNotThrow(() => {
-      parsed = new URL(product.url);
-    }, `${product.slug}: url "${product.url}" does not parse as a URL`);
-    assert.equal(parsed.protocol, "https:", `${product.slug}: url "${product.url}" must use https://`);
+      parsed = new URL(u);
+    }, `${product.slug}: url "${u}" does not parse as a URL`);
+    assert.equal(parsed.protocol, "https:", `${product.slug}: url "${u}" must use https://`);
+    assert.equal(parsed.hostname, parsed.hostname.toLowerCase(), `${product.slug}: url host must be lowercase`);
+    assert.equal(parsed.search, "", `${product.slug}: url "${u}" must not carry a query string`);
+    assert.equal(parsed.hash, "", `${product.slug}: url "${u}" must not carry a fragment`);
+    assert.ok(!u.endsWith("/"), `${product.slug}: url "${u}" must not end with a trailing slash`);
+    assert.ok(!seen.has(u), `${product.slug}: duplicate url "${u}" (also used by ${seen.get(u)})`);
+    seen.set(u, product.slug);
   }
 });
 

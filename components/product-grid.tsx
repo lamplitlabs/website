@@ -238,8 +238,11 @@ export function ProductGrid({ products }: { products: Product[] }) {
     activeCategory === "All"
       ? products
       : products.filter((product) => product.category === activeCategory);
-  // Free-text search narrows the active category by name/description
-  // substring so a user can type a tool name instead of clicking tabs.
+  // Free-text search narrows the active category by name/title/description/
+  // tags/longDescription substring so a user can type a tool name, or a word
+  // that only appears on the product detail page, instead of clicking tabs.
+  // Product items carry longDescription (lib/site-data.ts Product), which
+  // SearchableProduct picks up, so the detail-page copy is searchable too.
   const filteredProducts = filterProductsByQuery(categoryProducts, query);
   const hasQuery = query.trim().length > 0;
   // A tag chip filters across every category (tags like "AI" span tabs), so

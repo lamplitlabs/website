@@ -115,3 +115,30 @@ test("query matches a product by title (tagline) word when name/description/tags
   assert.ok(matchesProductQuery({ name: "x", description: "y", title: "Stay in control" }, "CONTROL"));
   assert.equal(matchesProductQuery({ name: "x", description: "y" }, "control"), false, "missing title does not throw or match");
 });
+
+test("query matches a product by longDescription (PDP body) word when name/title/description/tags do not", () => {
+  const notElsewhere = (p, needle) =>
+    needle.length >= 4 &&
+    !p.name.toLowerCase().includes(needle) &&
+    !(p.title ?? "").toLowerCase().includes(needle) &&
+    !p.description.toLowerCase().includes(needle) &&
+    !(p.tags ?? []).some((t) => t.toLowerCase().includes(needle));
+  // Concrete case from the task: kenntnistrainer's detail copy mentions doctors.
+  const kennt = products.find((p) => p.slug === "kenntnistrainer");
+  assert.ok(kennt, "catalog has kenntnistrainer");
+  assert.ok(kennt.longDescription.toLowerCase().includes("doctors"), "longDescription mentions doctors");
+  assert.ok(notElsewhere(kennt, "doctors"), "'doctors' appears only in longDescription");
+  const result = filterProductsByQuery(products, "DOCTORS");
+  assert.ok(result.includes(kennt), "expected Kenntnistrainer to match a longDescription-only word");
+  for (const p of result) assert.ok(matchesProductQuery(p, "doctors"));
+  assert.ok(matchesProductQuery({ name: "x", description: "y", longDescription: "Built for doctors in Germany" }, "germany"));
+  assert.equal(matchesProductQuery({ name: "x", description: "y" }, "germany"), false, "missing longDescription does not throw or match");
+  // The grid must actually hand longDescription to the matcher.
+  const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
+  assert.match(grid, /const filteredProducts = filterProductsByQuery\(categoryProducts, query\)/);
+  const siteData = readFileSync(resolve(root, "lib/site-data.ts"), "utf8");
+  assert.match(siteData, /longDescription: string;/, "Product type carries longDescription so categoryProducts items expose it to the matcher");
+  const searchSrc = readFileSync(resolve(root, "lib/product-search.ts"), "utf8");
+  assert.match(searchSrc, /longDescription\?: string;/);
+  assert.match(searchSrc, /^\s*\*.*longDescription/m, "doc comment mentions longDescription");
+});

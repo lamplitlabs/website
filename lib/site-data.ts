@@ -89,6 +89,38 @@ export function productCreativeWorkStatus(
 }
 
 /**
+ * Months after which an "In development" label is considered stale: the same
+ * threshold tests/site-data.test.mjs enforces on the catalog, exported so the
+ * detail page and the test can never disagree about what "stale" means.
+ */
+export const staleInDevelopmentMonths = 12;
+
+/** Whole months elapsed from a `statusSince` month (YYYY-MM) to `now`; NaN when unparsable. */
+export function monthsSinceStatus(
+  product: Pick<Product, "statusSince">,
+  now: Date = new Date(),
+): number {
+  const [year, month] = (product.statusSince ?? "").split("-").map(Number);
+  if (!Number.isInteger(year) || !Number.isInteger(month)) return NaN;
+  return now.getUTCFullYear() * 12 + now.getUTCMonth() - (year * 12 + (month - 1));
+}
+
+/**
+ * True when a product has carried the "In development" label for more than
+ * `staleInDevelopmentMonths`. The detail page uses it to tell visitors plainly
+ * that the status has not been refreshed and to point them at the tracking
+ * page, instead of showing an indefinite "coming soon".
+ */
+export function isProductStatusStale(
+  product: Pick<Product, "status" | "statusSince">,
+  now: Date = new Date(),
+): boolean {
+  if (!isProductInDevelopment(product)) return false;
+  const months = monthsSinceStatus(product, now);
+  return Number.isFinite(months) && months > staleInDevelopmentMonths;
+}
+
+/**
  * `href` for the "Notify me" link on in-development product pages. The
  * subject is percent-encoded so product names containing `&`, `?`, `#`, `+`
  * or non-ASCII characters survive the mailto URL instead of being cut off

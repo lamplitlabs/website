@@ -19,7 +19,7 @@ const { outputText } = ts.transpileModule(source, {
 const siteData = await import(
   `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
 );
-const { products, isProductLive, isProductInDevelopment, productCreativeWorkStatus } = siteData;
+const { products, isProductLive, isProductInDevelopment, productCreativeWorkStatus, isProductStatusStale, staleInDevelopmentMonths } = siteData;
 
 const literalStatuses = [...source.matchAll(/^\s*status:\s*"([^"]+)"/gm)].map((m) => m[1]);
 
@@ -528,9 +528,27 @@ test("statusSince is not in the future and in-development labels are not >12 mon
     );
     if (product.status === "In development") {
       assert.ok(
-        currentMonths - sinceMonths <= 12,
+        currentMonths - sinceMonths <= staleInDevelopmentMonths,
         `${product.slug}: "In development since ${product.statusSince}" is more than 12 months old; update status, or refresh statusSince and roadmapNote so visitors see current progress`,
       );
     }
   }
+});
+
+// If the catalog ever does go stale (the guard above is only a warning for the
+// maintainer at test time), visitors must not be left with an indefinite
+// "coming soon": the detail page renders an explicit stale-status note driven
+// by isProductStatusStale, which shares the 12-month threshold with the guard.
+test("isProductStatusStale flags in-development labels older than the threshold and the detail page renders the note", () => {
+  const at = new Date(Date.UTC(2027, 9, 1)); // 2027-10
+  assert.equal(isProductStatusStale({ status: "In development", statusSince: "2026-09" }, at), true, "13 months is stale");
+  assert.equal(isProductStatusStale({ status: "In development", statusSince: "2026-10" }, at), false, "exactly 12 months is not stale");
+  assert.equal(isProductStatusStale({ status: "Live", statusSince: "2020-01" }, at), false, "Live products are never stale");
+  assert.equal(isProductStatusStale({ status: "In development", statusSince: "" }, at), false, "unparsable month is not flagged");
+  for (const product of products) {
+    assert.equal(isProductStatusStale(product), false, `${product.slug}: catalog must not ship a stale in-development label`);
+  }
+  const page = readFileSync(resolve(root, "app/products/[slug]/page.tsx"), "utf8");
+  assert.ok(page.includes("isProductStatusStale(product)"), "detail page must compute staleness from the shared helper");
+  assert.ok(page.includes('data-testid="stale-status-note"'), "detail page must render the stale-status note");
 });

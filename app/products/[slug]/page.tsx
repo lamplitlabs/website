@@ -11,6 +11,7 @@ import {
   contactEmail,
   getProductBySlug,
   isProductInDevelopment,
+  isProductStatusStale,
   productCreativeWorkStatus,
   productNotifyMeHref,
   products,
@@ -117,6 +118,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   const isInDevelopment = isProductInDevelopment(product);
+  const isStatusStale = isProductStatusStale(product);
   // While a product is in development its URL is not live yet, so every CTA
   // points at the on-page About section instead of the external product URL.
   const ctaHref = isInDevelopment ? "#about" : product.url;
@@ -197,6 +199,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </span>
               ))}
             </div>
+
+            {isStatusStale && (
+              <p
+                role="note"
+                data-testid="stale-status-note"
+                className="mb-6 max-w-2xl rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-foreground"
+              >
+                This product has been listed as in development since{" "}
+                {product.statusSince} and its status has not been updated for
+                over a year. Check the tracking page below for the latest
+                progress; there is no confirmed release date.
+              </p>
+            )}
 
             {isInDevelopment && product.roadmapNote && (
               <p className="mb-6 max-w-2xl text-sm text-muted-foreground">

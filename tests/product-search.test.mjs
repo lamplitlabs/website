@@ -142,3 +142,15 @@ test("query matches a product by longDescription (PDP body) word when name/title
   assert.match(searchSrc, /longDescription\?: string;/);
   assert.match(searchSrc, /^\s*\*.*longDescription/m, "doc comment mentions longDescription");
 });
+
+test("query folds diacritics so plain-ASCII typing matches accented catalog copy (Kenntnisprüfung)", () => {
+  const kenntnistrainer = products.find((p) => p.slug === "kenntnistrainer");
+  assert.ok(kenntnistrainer, "catalog has kenntnistrainer");
+  const hasAccent = kenntnistrainer.title.includes("ü") || kenntnistrainer.longDescription.includes("ü");
+  assert.ok(hasAccent, "kenntnistrainer copy uses an accented character the ASCII query must still match");
+  const result = filterProductsByQuery(products, "prufung");
+  assert.ok(result.includes(kenntnistrainer), "expected ASCII 'prufung' to match accented 'Kenntnisprüfung' copy");
+  assert.ok(matchesProductQuery({ name: "x", description: "y", title: "Kenntnisprüfung simulation" }, "prufung"));
+  // Accented queries must still match accented copy (no regression from folding).
+  assert.ok(matchesProductQuery({ name: "x", description: "y", title: "Kenntnisprüfung simulation" }, "prüfung"));
+});

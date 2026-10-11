@@ -1,11 +1,14 @@
 /**
- * Free-text filter for the product grid. Case-insensitive substring match on
- * name, title (the tagline shown under the name on each card), description,
- * tags (the chips shown on each card) and longDescription (the fuller body
- * copy on each product's detail page), so a user can type "ai", "AI Agents",
- * part of a tool's name or a word that only appears on the detail page (e.g.
- * "doctors") instead of hunting through category tabs. Blank queries match
- * everything.
+ * Free-text filter for the product grid. Case-insensitive, diacritic-folded
+ * substring match on name, title (the tagline shown under the name on each
+ * card), description, tags (the chips shown on each card) and longDescription
+ * (the fuller body copy on each product's detail page), so a user can type
+ * "ai", "AI Agents", part of a tool's name or a word that only appears on the
+ * detail page (e.g. "doctors") instead of hunting through category tabs.
+ * Several products use German/accented vocabulary (e.g. "Kenntnisprüfung",
+ * "Einbürgerungstest"); folding diacritics lets a visitor who types the
+ * plain-ASCII spelling ("prufung") still find the product. Blank queries
+ * match everything.
  */
 export type SearchableProduct = {
   name: string;
@@ -15,18 +18,25 @@ export type SearchableProduct = {
   longDescription?: string;
 };
 
+function fold(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 export function matchesProductQuery(
   product: SearchableProduct,
   query: string
 ): boolean {
-  const q = query.trim().toLowerCase();
+  const q = fold(query.trim());
   if (!q) return true;
   return (
-    product.name.toLowerCase().includes(q) ||
-    (product.title ?? "").toLowerCase().includes(q) ||
-    product.description.toLowerCase().includes(q) ||
-    (product.tags ?? []).some((tag) => tag.toLowerCase().includes(q)) ||
-    (product.longDescription ?? "").toLowerCase().includes(q)
+    fold(product.name).includes(q) ||
+    fold(product.title ?? "").includes(q) ||
+    fold(product.description).includes(q) ||
+    (product.tags ?? []).some((tag) => fold(tag).includes(q)) ||
+    fold(product.longDescription ?? "").includes(q)
   );
 }
 

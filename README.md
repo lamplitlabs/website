@@ -4,7 +4,7 @@ The official website for [Lamplit Labs](https://www.lamplitlabs.com) — a techn
 
 Formerly known as Bites In Byte.
 
-From visual AI agents with Amistio and sovereign small-model AI with Lamplit Light to medical exam prep, citizenship tools, career resources, developer utilities, and Azure resources — small, practical software packed into every byte.
+From visual AI agents with Amistio and sovereign small-model AI with Lamplit Light to medical exam prep, citizenship tools, developer utilities, and Azure resources — small, practical software packed into every byte.
 
 ## Products
 

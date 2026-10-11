@@ -36,7 +36,7 @@ export function AboutSection() {
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Lamplit Labs builds the visual AI agent builder Amistio and the
             sovereign-AI lab Lamplit Light alongside practical tools for
-            education, careers, developer workflows, and compliance.
+            education, developer workflows, and compliance.
           </p>
         </RevealSection>
 

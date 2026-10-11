@@ -1,11 +1,13 @@
 /**
  * Free-text filter for the product grid. Case-insensitive substring match on
- * name, description and tags (the chips shown on each card), so a user can
+ * name, title (the tagline shown under the name on each card), description and
+ * tags (the chips shown on each card), so a user can
  * type "ai", "AI Agents" or part of a tool's name instead of hunting through
  * category tabs. Blank queries match everything.
  */
 export type SearchableProduct = {
   name: string;
+  title?: string;
   description: string;
   tags?: string[];
 };
@@ -18,6 +20,7 @@ export function matchesProductQuery(
   if (!q) return true;
   return (
     product.name.toLowerCase().includes(q) ||
+    (product.title ?? "").toLowerCase().includes(q) ||
     product.description.toLowerCase().includes(q) ||
     (product.tags ?? []).some((tag) => tag.toLowerCase().includes(q))
   );

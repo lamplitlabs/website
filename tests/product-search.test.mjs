@@ -99,3 +99,19 @@ test("clicking a product tag chip filters the grid to products sharing that tag"
     }
   }
 });
+
+test("query matches a product by title (tagline) word when name/description/tags do not", () => {
+  const notElsewhere = (p, w) => {
+    const needle = w.toLowerCase();
+    return needle.length >= 4 && !p.name.toLowerCase().includes(needle) && !p.description.toLowerCase().includes(needle) && !(p.tags ?? []).some((t) => t.toLowerCase().includes(needle));
+  };
+  const pick = (p) => (p.title ?? "").split(/\s+/).map((w) => w.replace(/[^a-z0-9]/gi, "")).find((w) => notElsewhere(p, w));
+  const target = products.find((p) => pick(p));
+  assert.ok(target, "catalog has a product with a title word absent from its name/description/tags");
+  const word = pick(target);
+  const result = filterProductsByQuery(products, word.toUpperCase());
+  assert.ok(result.includes(target), `expected ${target.name} to match title word "${word}"`);
+  for (const p of result) assert.ok(matchesProductQuery(p, word));
+  assert.ok(matchesProductQuery({ name: "x", description: "y", title: "Stay in control" }, "CONTROL"));
+  assert.equal(matchesProductQuery({ name: "x", description: "y" }, "control"), false, "missing title does not throw or match");
+});

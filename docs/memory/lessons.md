@@ -7,7 +7,7 @@
 
 ## Summary
 
-Failure pattern `MEM-failure-pattern-0474745e` ("blocked: kestrel-N whole-page ai.lamplitlabs.com assertion still deferred") is superseded: the whole-page assertion landed in commit `2ecc780` and `npm test` passes cleanly on HEAD (100 pass, 0 fail, including `tests/routes.test.mjs` around line 398).
+Failure pattern `MEM-failure-pattern-0474745e` ("blocked: kestrel-N whole-page ai.lamplitlabs.com assertion still deferred") is superseded: the whole-page assertion landed in commit `2ecc780` and `npm test` passes cleanly on HEAD (119 pass, 0 fail as of 2026-10-12 (a dated snapshot — re-run `npm test` for the current count), including `tests/routes.test.mjs` around line 398).
 
 ## Context
 

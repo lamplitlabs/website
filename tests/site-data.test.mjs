@@ -411,6 +411,35 @@ test("every product url is a well-formed https URL", () => {
   }
 });
 
+// Every product `canonicalUrl` feeds the <link rel="canonical">, the Open
+// Graph url and the JSON-LD `url` on the detail page and in the site-wide
+// graph. A malformed, http://, trailing-slash or duplicated value would
+// misdirect search engines (and the outbound CTA) without any visible build
+// error, so guard its shape here the same way metaDescription is guarded.
+test("every product canonicalUrl is a well-formed, unique https URL without trailing-slash drift", () => {
+  const seen = new Map();
+  for (const product of products) {
+    const c = product.canonicalUrl;
+    if (c === undefined) continue;
+    assert.equal(typeof c, "string", `${product.slug}: canonicalUrl must be a string when set`);
+    assert.equal(c, c.trim(), `${product.slug}: canonicalUrl "${c}" has surrounding whitespace`);
+    let parsed;
+    assert.doesNotThrow(() => {
+      parsed = new URL(c);
+    }, `${product.slug}: canonicalUrl "${c}" does not parse as a URL`);
+    assert.equal(parsed.protocol, "https:", `${product.slug}: canonicalUrl "${c}" must use https://`);
+    assert.equal(parsed.hostname, parsed.hostname.toLowerCase(), `${product.slug}: canonicalUrl host must be lowercase`);
+    assert.equal(parsed.search, "", `${product.slug}: canonicalUrl "${c}" must not carry a query string`);
+    assert.equal(parsed.hash, "", `${product.slug}: canonicalUrl "${c}" must not carry a fragment`);
+    assert.ok(!c.endsWith("/"), `${product.slug}: canonicalUrl "${c}" must not end with a trailing slash`);
+    // canonicalUrl must stay on the same origin as the outbound `url`, so the
+    // canonical never points visitors/crawlers at a different site than the CTA.
+    assert.equal(parsed.origin, new URL(product.url).origin, `${product.slug}: canonicalUrl "${c}" origin differs from url "${product.url}"`);
+    assert.ok(!seen.has(c), `${product.slug}: duplicate canonicalUrl "${c}" (also used by ${seen.get(c)})`);
+    seen.set(c, product.slug);
+  }
+});
+
 test("product grid renders a visible empty-state message when a category filter matches nothing", () => {
   const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
   // The empty state must be gated on the filtered list being empty, carry a

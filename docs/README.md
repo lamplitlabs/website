@@ -44,6 +44,8 @@ workflows/       Repeatable engineering procedures
   - `npm run build` — static export
   - `npm run lint` — ESLint check
   - `npm run typecheck` — TypeScript check
+  - `npm run test` — static export build, then smoke tests (`node --test`)
+  - `npm run check` — canonical verify: lint → typecheck → test (run this before committing)
   - `npm run clean` — clean artifacts
 
 ## Why PULSE

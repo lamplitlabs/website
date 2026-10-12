@@ -57,9 +57,12 @@ npm run clean
 ```bash
 # Run the smoke tests (tests/**/*.test.mjs) with the Node.js built-in test runner
 npm run test
+
+# Full verification before committing: lint → typecheck → test (test builds first)
+npm run check
 ```
 
-The smoke tests live in `tests/` and need no extra dependencies. `npm test` runs `next build` first so the static-export tests in `tests/routes.test.mjs` (which need `./out`) never skip; `npm run test:unit` runs the tests without building (the `tests/routes.test.mjs` export tests skip if `./out` is absent; the exact count appears as `# skipped N` in the output). Lint and typecheck with `npm run lint` and `npm run typecheck`.
+The smoke tests live in `tests/` and need no extra dependencies. `npm test` runs `next build` first so the static-export tests in `tests/routes.test.mjs` (which need `./out`) never skip; `npm run test:unit` runs the tests without building (the `tests/routes.test.mjs` export tests skip if `./out` is absent; the exact count appears as `# skipped N` in the output). Lint and typecheck individually with `npm run lint` and `npm run typecheck`; `npm run check` runs all of them in sequence and is the canonical verification command (it covers `npm run build` because `npm test` builds first).
 
 ## Project Structure
 
@@ -69,6 +72,8 @@ components/     → UI components (product grid, hero globe, social bar, etc.)
 hooks/          → Custom React hooks
 lib/            → Utility functions
 public/         → Static assets (favicons, product cover SVGs, OG image)
+tests/          → Smoke tests (`*.test.mjs`, Node.js built-in test runner; run via `npm test`)
+tools/          → Maintenance scripts (`verify.sh` full check, `audit-watch.sh` dependency audit watcher)
 vercel.json     → Vercel routing config (explicit `/` → `/index` rewrite for the static export)
 .github/        → GitHub Actions workflows for CI and Vercel deployment
 ```

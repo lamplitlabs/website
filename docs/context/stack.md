@@ -120,7 +120,7 @@ Both `package.json` and `tools/vercel-cli/package.json` carry an npm `overrides`
 2. **No API routes** — This is a static site; external APIs only
 3. **No database** — All content is static or fetched from external sources
 4. **Node version lock** — `.nvmrc` specifies Node 24; the deploy workflow reads it (`node-version-file`)
-5. **Pulse environment recipe** — the Pulse environment recipe (`CTX-environment`, ADR-026) must pin Node 20.20.2 so `mise exec -- node -v` in agent clones matches `.nvmrc`, CI (`node-version: 20` / `node-version-file: .nvmrc`) and `package.json` `engines.node` (pinned to the exact version `20.20.2`); a recipe pinning another version (e.g. 22.x or even a different 20.x patch) falls outside the engines pin and produces npm `EBADENGINE` warnings on `npm ci`
+5. **Pulse environment recipe** — the Pulse environment recipe (`CTX-environment`, ADR-026) is owner-set and currently pins `node@v20.20.2`, which is outside `package.json` `engines.node` (`24.x`) and `.nvmrc` (`24`); `npm ci` in agent clones therefore emits a non-fatal `EBADENGINE` warning until the owner moves the recipe to a 24.x release
 
 ## Development Workflow
 

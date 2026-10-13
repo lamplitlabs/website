@@ -33,7 +33,7 @@ Product descriptions, availability, and URLs follow the website catalog in [`lib
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 24 or later
+- [Node.js](https://nodejs.org/) 24.x (matches the `engines` field in `package.json`; Node 25+ fails the engines check)
 - npm
 
 ### Development

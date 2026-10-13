@@ -47,6 +47,14 @@ export interface Product {
    */
   statusSince: string;
   /**
+   * Date (YYYY-MM-DD) this product's listing was last changed in any way
+   * (copy, highlights, links, status), independent of `statusSince`, which
+   * only moves when the status label changes. Rendered on the detail page as
+   * "Listing updated …" so visitors can tell a current page from a stale one.
+   * Bump it whenever you edit this product's entry.
+   */
+  lastUpdated: string;
+  /**
    * Where a visitor can follow real progress on an unreleased product: an
    * https URL or a repository-relative doc path. tests/site-data.test.mjs
    * requires it for every product whose status is "In development", so a
@@ -118,6 +126,22 @@ export function isProductStatusStale(
   if (!isProductInDevelopment(product)) return false;
   const months = monthsSinceStatus(product, now);
   return Number.isFinite(months) && months > staleInDevelopmentMonths;
+}
+
+/**
+ * Human-readable form of a product's `lastUpdated` date (YYYY-MM-DD), e.g.
+ * "6 October 2026". Rendered in UTC so the static export does not depend on
+ * the build machine's time zone; returns the raw string when unparsable.
+ */
+export function formatLastUpdated(lastUpdated: string): string {
+  const [year, month, day] = (lastUpdated ?? "").split("-").map(Number);
+  if (![year, month, day].every(Number.isInteger)) return lastUpdated;
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 /**
@@ -200,6 +224,7 @@ export const products: Product[] = [
     featured: true,
     status: "Live",
     statusSince: "2026-03",
+    lastUpdated: "2026-10-06",
     metaTitle: "Amistio - Visual AI Agent Builder",
     metaDescription:
       "Build visual AI agents with app connectors, immutable versions, approval gates, shareable run pages, and inspectable execution history.",
@@ -260,6 +285,7 @@ export const products: Product[] = [
     featured: true,
     status: "In development",
     statusSince: "2026-09",
+    lastUpdated: "2026-10-08",
     trackingDoc: "https://huggingface.co/lamplitlabs",
     roadmapNote:
       "The first light-<purpose> models are being trained and run through the offline gates and judge panel; a model is listed here only once it passes and its weights are published.",
@@ -285,6 +311,7 @@ export const products: Product[] = [
     slug: "kenntnistrainer",
     status: "Live",
     statusSince: "2026-04",
+    lastUpdated: "2026-10-07",
     name: "Kenntnistrainer",
     title: "AI-powered Kenntnisprüfung simulation and training",
     description:
@@ -309,6 +336,7 @@ export const products: Product[] = [
     slug: "fachsprachprufung",
     status: "Live",
     statusSince: "2026-04",
+    lastUpdated: "2026-10-06",
     name: "Fachsprachprüfung",
     title: "AI-powered FSP simulation and training",
     description:
@@ -333,6 +361,7 @@ export const products: Product[] = [
     slug: "leben-in-deutschland",
     status: "Live",
     statusSince: "2026-03",
+    lastUpdated: "2026-10-07",
     name: "Leben in Deutschland",
     title: "Citizenship test prep for Germany",
     description:
@@ -357,6 +386,7 @@ export const products: Product[] = [
     slug: "developer-tools",
     status: "Live",
     statusSince: "2026-03",
+    lastUpdated: "2026-10-06",
     name: "Developer Tools",
     title: "Everyday utilities for developers",
     description:
@@ -381,6 +411,7 @@ export const products: Product[] = [
     slug: "edmx-tools",
     status: "Live",
     statusSince: "2026-03",
+    lastUpdated: "2026-10-06",
     name: "EDMX Tools",
     title: "Tools for EDMX and OData metadata",
     description:
@@ -404,6 +435,7 @@ export const products: Product[] = [
     slug: "azure-drawio-assets",
     status: "Live",
     statusSince: "2026-04",
+    lastUpdated: "2026-10-06",
     name: "Azure Draw.io Assets",
     title: "Azure icons for architecture diagrams",
     description:
@@ -427,6 +459,7 @@ export const products: Product[] = [
     slug: "azure-compliance-matrix",
     status: "Live",
     statusSince: "2026-04",
+    lastUpdated: "2026-10-04",
     name: "Azure Compliance Matrix",
     title: "Azure services compliance coverage",
     description:

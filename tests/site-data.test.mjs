@@ -495,6 +495,27 @@ test("every product carries a statusSince month and the detail page surfaces it"
   assert.ok(page.includes("product.statusSince"), "product detail page must render statusSince next to the status label");
 });
 
+test("every product carries a lastUpdated date and the detail page surfaces it", () => {
+  const { formatLastUpdated } = siteData;
+  const datePattern = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+  for (const product of products) {
+    assert.match(
+      product.lastUpdated ?? "",
+      datePattern,
+      `${product.slug}: lastUpdated must be YYYY-MM-DD so visitors see when the listing last changed`,
+    );
+    assert.ok(
+      product.lastUpdated >= `${product.statusSince}-01`,
+      `${product.slug}: lastUpdated (${product.lastUpdated}) must not predate statusSince (${product.statusSince})`,
+    );
+  }
+  assert.equal(formatLastUpdated("2026-10-06"), "6 October 2026");
+  assert.equal(formatLastUpdated("not-a-date"), "not-a-date");
+  const page = readFileSync(new URL("../app/products/[slug]/page.tsx", import.meta.url), "utf8");
+  assert.ok(page.includes("product.lastUpdated"), "product detail page must render lastUpdated");
+  assert.ok(page.includes("formatLastUpdated("), "product detail page must format lastUpdated for readers");
+});
+
 test("every in-development product carries a roadmapNote and the detail page surfaces it", () => {
   for (const product of products.filter((p) => p.status === "In development")) {
     assert.ok(

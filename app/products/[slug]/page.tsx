@@ -9,6 +9,7 @@ import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
 import {
   contactEmail,
+  formatLastUpdated,
   getProductBySlug,
   isProductInDevelopment,
   isProductStatusStale,
@@ -258,6 +259,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <Link href="/">View all products</Link>
               </Button>
             </div>
+
+            <p
+              data-testid="product-last-updated"
+              className="mt-6 text-sm text-muted-foreground"
+            >
+              Listing updated{" "}
+              <time dateTime={product.lastUpdated}>
+                {formatLastUpdated(product.lastUpdated)}
+              </time>
+            </p>
           </div>
         </section>
 

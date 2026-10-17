@@ -8,9 +8,12 @@
 # stored in a machine-local state file. When the set is unchanged from the
 # last run the script stays silent, so a known Tier 2 blocker (lockfile change
 # needed) does not spawn a no-op Tier 1 job on every schedule tick. A new,
-# removed or changed advisory alerts again. The state lives outside the clone
-# (clones are throwaway) under $XDG_STATE_HOME, overridable with
+# removed or changed advisory alerts again, and the alert names which advisory
+# ids were added/removed since the last run (so the Tier 2 plan update does not
+# need a manual `npm audit` re-run). The state lives outside the clone (clones
+# are throwaway) under $XDG_STATE_HOME, overridable with
 # AUDIT_WATCH_STATE=<file>; AUDIT_WATCH_FORCE=1 prints regardless of the hash.
+# State file format: line 1 = hash, following lines = sorted "pkg:advisory" ids.
 set -eu
 cd "$(dirname "$0")/.."
 
@@ -45,8 +48,10 @@ process.stdin.on("end", () => {
         if (via && typeof via === "object") ids.add(`${v.name}:${via.url || via.source || via.title}`);
       }
     }
-    const hash = total === 0 ? "" : require("crypto").createHash("sha256").update([...ids].sort().join("\n")).digest("hex");
-    console.log(`${total}|${breakdown}|${fix}|${hash}`);
+    const sorted = [...ids].sort();
+    const hash = total === 0 ? "" : require("crypto").createHash("sha256").update(sorted.join("\n")).digest("hex");
+    // ids are space-separated (no spaces occur in pkg names or advisory URLs).
+    console.log(`${total}|${breakdown}|${fix}|${hash}|${sorted.join(" ")}`);
   } catch (e) {
     console.log("0|||");
   }
@@ -57,16 +62,37 @@ rest="${summary#*|}"
 breakdown="${rest%%|*}"
 rest="${rest#*|}"
 fix="${rest%%|*}"
-hash="${rest#*|}"
+rest="${rest#*|}"
+hash="${rest%%|*}"
+ids="${rest#*|}"
 
 if [ "${total:-0}" -gt 0 ]; then
   previous=""
-  [ -r "$state_file" ] && previous="$(cat "$state_file")"
+  previous_ids=""
+  if [ -r "$state_file" ]; then
+    previous="$(head -n 1 "$state_file")"
+    previous_ids="$(tail -n +2 "$state_file")"
+  fi
   if [ "${AUDIT_WATCH_FORCE:-0}" != "1" ] && [ -n "$hash" ] && [ "$hash" = "$previous" ]; then
     exit 0 # same advisory set as last run: already alerted, stay quiet
   fi
-  mkdir -p "$(dirname "$state_file")" 2>/dev/null && printf '%s\n' "$hash" > "$state_file" 2>/dev/null || true
-  echo "npm audit (--omit=dev): $total vulnerabilities reported ($breakdown); $fix — run \`npm audit --omit=dev\` for detail."
+  # Diff of advisory ids against the last alert, so the output names exactly
+  # which GHSA triggered it. No prior state => every id is "added".
+  current_ids="$(printf '%s' "$ids" | tr ' ' '\n' | sed '/^$/d')"
+  tmpdir="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/audit-watch.$$")"
+  mkdir -p "$tmpdir"
+  printf '%s\n' "$current_ids" > "$tmpdir/cur"
+  printf '%s\n' "$previous_ids" | sed '/^$/d' > "$tmpdir/prev"
+  added="$(grep -vxF -f "$tmpdir/prev" "$tmpdir/cur" | tr '\n' ' ' | sed 's/ $//')"
+  removed="$(grep -vxF -f "$tmpdir/cur" "$tmpdir/prev" | tr '\n' ' ' | sed 's/ $//')"
+  rm -rf "$tmpdir"
+  mkdir -p "$(dirname "$state_file")" 2>/dev/null \
+    && { printf '%s\n' "$hash"; printf '%s\n' "$current_ids"; } > "$state_file" 2>/dev/null || true
+  diff=""
+  [ -n "$added" ] && diff="$diff; added: $added"
+  [ -n "$removed" ] && diff="$diff; removed: $removed"
+  [ -z "$diff" ] && diff="; advisory set unchanged (forced)"
+  echo "npm audit (--omit=dev): $total vulnerabilities reported ($breakdown); $fix$diff — run \`npm audit --omit=dev\` for detail."
 elif [ -f "$state_file" ]; then
   rm -f "$state_file" 2>/dev/null || true # clean again: next finding alerts
 fi

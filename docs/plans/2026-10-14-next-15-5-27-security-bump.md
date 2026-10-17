@@ -64,6 +64,31 @@ Card: `20261013T234919Z-fleet-1011-fsp-1-2`. Worker `umber` stopped job
 `git revert <commit>` restores `package-lock.json` to 15.5.25, then `npm ci`. No data, config or
 deploy changes are involved; Vercel redeploys from `main` automatically.
 
+## Update 2026-10-17 (audit-watch run 3, job `job-20261017T040039Z-cbccc7`)
+
+`npm audit --omit=dev` at HEAD `f0f7bc9`: **10 vulnerabilities (7 high, 3 moderate), fix
+available for all 10**. Three of them are plain semver-compatible lockfile moves and can land in
+the same owner commit as Task 1.1 (`^` ranges already admit them):
+
+| package | installed | fixed in | advisory | severity |
+|---|---|---|---|---|
+| `next` | 15.5.25 | 15.5.27 | GHSA-4jqv-mc3x-m676, GHSA-mcj8-r9mp-w47p | moderate |
+| `sharp` (via `next`) | 0.35.4 | 0.35.5 | GHSA-wq5f-xc86-pv6w (librsvg CVE-2026-96889) | high |
+| `source-map-js` (via `postcss`) | 1.2.1 | 1.2.2 | GHSA-68fv-2mgg-jv7q | high |
+
+Suggested single owner step replacing Task 1.1:
+
+```bash
+npm install next@15.5.27 eslint-config-next@15.5.27 --no-fund && npm audit fix --omit=dev
+```
+
+The remaining findings (`braces`, `micromatch`, `fast-glob`, `chokidar`, `postcss-nested`,
+`postcss-selector-parser` GHSA-rj75-hqrm-r3gf) are under `tailwindcss@3.4.19`; `npm audit fix`
+only clears them with `--force` → `tailwindcss@4.3.3` (breaking, needs its own ADR). Note that the
+`overrides."postcss-selector-parser": "6.1.3"` pin in `package.json` now *holds* that package
+below the fixed `7.1.6`; the owner may try raising the override to `^7.1.6` (postcss-nested 6.x
+declares `^6.x`, so verify `npm run check` and the Tailwind build output before keeping it).
+
 ## Out of scope (noted for later cards)
 
 The same audit also lists transitive `high` findings that need **major** bumps and are not

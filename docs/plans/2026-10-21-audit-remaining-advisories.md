@@ -26,11 +26,25 @@ commit `4035a55` followed and partially executed).
 Advisory set cleared since the last plan (by commit `4035a55`, next 15.5.28):
 `next` GHSA-4jqv-mc3x-m676, `next` GHSA-mcj8-r9mp-w47p, `sharp` GHSA-wq5f-xc86-pv6w.
 
+### Update 2026-10-24 (watcher alert 2026-10-24T08:47:14Z)
+
+- `npm audit --omit=dev` now reports **5 vulnerabilities (1 high, 4 moderate)**, down
+  from 9: GHSA-vfj7-8cjw-p6xm (`braces`) is **cleared** — the existing
+  `brace-expansion` overrides (`^1.1.18` / `^5.0.9`) resolve outside the advisory
+  ranges, so `braces@3.0.3` no longer flags. Phase 3 is obsolete.
+- Remaining: `source-map-js@1.2.1` high (GHSA-68fv-2mgg-jv7q — Phase 1; advisory range
+  `>=1.0.0 <1.2.2`, fixed at `1.2.2`) and the `postcss-selector-parser@6.1.3` moderate
+  chain (GHSA-rj75-hqrm-r3gf — Phase 2). Note: the existing override pins
+  `postcss-selector-parser` at `6.1.3`, which is **inside** the advisory range
+  `<7.1.6`; the fix needs `>=7.1.6`, which `postcss-nested@6.2.0` cannot accept
+  (`^6.1.1`), so Phase 2's `postcss-nested` major bump (or a tailwindcss 4 migration)
+  is still the only path.
+
 ## Success Criteria
 
-- [ ] `npm audit --omit=dev` exits clean (0 vulnerabilities) — or, while GHSA-vfj7-8cjw-p6xm
-      has no upstream fix, all advisories except the unfixable `braces` chain are cleared and
-      the watcher is expected to stay suppressed (unchanged advisory set = silent).
+- [ ] `npm audit --omit=dev` exits clean (0 vulnerabilities). As of 2026-10-24 the
+      `braces` chain (GHSA-vfj7-8cjw-p6xm) is already gone; the remaining work is Phase 1
+      (source-map-js patch) and Phase 2 (postcss-selector-parser major chain).
 - [ ] `npm run check` (lint → typecheck → build+test) green after each bump.
 - [ ] `tailwind.config.ts` / PostCSS pipeline still compiles the full utility set used by
       `app/` and `components/` (visual smoke via `npm run dev` or the `out/` export).
@@ -54,17 +68,20 @@ Advisory set cleared since the last plan (by commit `4035a55`, next 15.5.28):
 - [ ] Task 2.2 — `npm run check`; spot-check rendered pages for selector regressions
       (nested rules in `app/globals.css` are the blast radius).
 
-### Phase 3: braces GHSA-vfj7-8cjw-p6xm (blocked upstream)
+### Phase 3: braces GHSA-vfj7-8cjw-p6xm — CLEARED 2026-10-24 (no repo change needed)
 
-- [ ] Task 3.1 — No action possible today: no fixed `braces` release exists. Re-check on
-      each watcher alert; the watcher re-alerts the moment the advisory set changes
-      (e.g. when a fix ships and the ids/ranges change).
+- [x] Task 3.1 — Resolved without a repo change: the `brace-expansion` overrides from
+      `2de8274` (`^1.1.18` / `^5.0.9`) resolve outside the brace-expansion advisory ranges,
+      so `braces@3.0.3` no longer flags. `npm audit --omit=dev` no longer lists the
+      `braces`/`chokidar`/`micromatch`/`typescript-eslint` nodes. Nothing to do; the
+      original note ("no fixed `braces` release exists, re-check on each watcher alert")
+      is superseded.
 
 ## Verification Steps
 
-1. **Audit:** `npm audit --omit=dev` — target 0 total; acceptable interim state is only the
-   unfixable `braces` chain remaining (4 of the 9 nodes: braces, chokidar, micromatch,
-   fast-glob, plus tailwindcss/tailwindcss-animate umbrella nodes).
+1. **Audit:** `npm audit --omit=dev` — target 0 total (5 remaining as of 2026-10-24:
+   `source-map-js` high + the 4-node `postcss-selector-parser` moderate chain; the
+   `braces` chain is already gone — see Phase 3).
 2. **Checks:** `npm run check` (builds the static export, so `tests/routes.test.mjs`
    out/-tests run too).
 3. **Watcher:** `AUDIT_WATCH_FORCE=1 tools/audit-watch.sh` prints the reduced advisory set.
@@ -90,7 +107,8 @@ Advisory set cleared since the last plan (by commit `4035a55`, next 15.5.28):
 - [ ] Phase 2 depends on a `postcss-nested` major bump (installed 6.2.0 pins
       `postcss-selector-parser: ^6.1.1`) and on `tailwindcss@3.4.x` /
       `tailwindcss-animate@1.0.7` compiling cleanly against parser 7.x.
-- [ ] Phase 3 depends on an upstream `braces` release fixing GHSA-vfj7-8cjw-p6xm.
+- [x] ~~Phase 3 depends on an upstream `braces` release~~ — cleared 2026-10-24 by the
+      existing `brace-expansion` overrides; see Phase 3.
 
 ## Related Artifacts
 

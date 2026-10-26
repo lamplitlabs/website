@@ -107,6 +107,21 @@ test("static export (out/) sitemap.xml lists exactly the routes the app exports"
   assert.equal(locs.length, routes.length, "sitemap must not repeat a route");
 });
 
+// app/sitemap.ts feeds each product's `lastUpdated` (lib/site-data.ts) into
+// lastModified so search engines can see which product pages changed.
+test("static export (out/) sitemap.xml carries a <lastmod> for each product route", skipWithoutOut, () => {
+  const sitemap = readFileSync(resolve(root, "out", "sitemap.xml"), "utf8");
+  const lastUpdated = [...siteData.matchAll(/^\s*lastUpdated:\s*"([^"]+)"/gm)].map((m) => m[1]);
+  assert.equal(lastUpdated.length, slugs.length, "every product needs a lastUpdated date");
+  for (const slug of slugs) {
+    const entry = sitemap.match(
+      new RegExp(`<url>[\\s\\S]*?<loc>https:\\/\\/www\\.lamplitlabs\\.com\\/products\\/${slug}<\\/loc>[\\s\\S]*?<\\/url>`),
+    );
+    assert.ok(entry, `sitemap must have a <url> entry for /products/${slug}`);
+    assert.match(entry[0], /<lastmod>[^<]+<\/lastmod>/, `sitemap entry for /products/${slug} must carry a <lastmod>`);
+  }
+});
+
 // app/robots.ts generates robots.txt from app/sitemap.ts's siteUrl so crawlers get
 // an explicit allow rule and sitemap pointer; a static public/robots.txt must not shadow it.
 test("static export (out/) robots.txt allows crawling and points at the sitemap", skipWithoutOut, () => {

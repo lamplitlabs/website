@@ -23,6 +23,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...products.map((product) => ({
       url: `${siteUrl}/products/${product.slug}`,
+      // `lastUpdated` is the product's content-updated field in lib/site-data.ts;
+      // emitting it as <lastmod> lets search engines see which product pages changed
+      // (tests/routes.test.mjs checks out/sitemap.xml carries one per product route).
+      lastModified: product.lastUpdated,
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),

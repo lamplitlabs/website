@@ -148,6 +148,25 @@ test("static export (out/) has HTML for each route and no dangling local assets"
   }
 });
 
+// Structured data: search engines pick up the Product schema (ProductJsonLd in
+// app/products/[slug]/page.tsx) from application/ld+json script blocks. Each
+// exported product page must carry at least one; a regression that strips it
+// (removed component, changed script type) would silently drop rich results.
+test("static export (out/) every product page contains an application/ld+json script block", skipWithoutOut, () => {
+  const out = resolve(root, "out");
+  for (const slug of slugs) {
+    const flat = join(out, "products", `${slug}.html`);
+    const nested = join(out, "products", slug, "index.html");
+    assert.ok(existsSync(flat) || existsSync(nested), `no exported page for /products/${slug}`);
+    const page = readFileSync(existsSync(flat) ? flat : nested, "utf8");
+    assert.match(
+      page,
+      /<script type="application\/ld\+json">/,
+      `/products/${slug} must render an application/ld+json script block (ProductJsonLd)`,
+    );
+  }
+});
+
 // Accessibility: keyboard and screen-reader users must be able to bypass the
 // repeated header/nav links. Every exported route renders a "Skip to content"
 // anchor (first focusable element) that targets <main id="main-content">.

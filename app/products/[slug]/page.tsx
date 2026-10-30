@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowDown, ArrowUpRight, ExternalLink } from "lucide-react";
 import { OutboundLink } from "@/components/outbound-link";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/logo";
+import { ProductAbout } from "@/components/product/product-about";
+import { ProductCoverShowcase } from "@/components/product/product-cover-showcase";
+import { ProductFooter } from "@/components/product/product-footer";
+import { ProductHighlights } from "@/components/product/product-highlights";
+import { ProductRelated } from "@/components/product/product-related";
 import { SiteNav } from "@/components/site-nav";
 import {
   contactEmail,
@@ -272,63 +275,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </section>
 
-        {/* ── Cover image showcase ─────────────────────────── */}
-        <section className="border-y bg-muted/30">
-          <div className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
-            <div className="overflow-hidden rounded-2xl border bg-card shadow-lg">
-              <Image
-                src={product.cover}
-                alt={`${product.name} cover`}
-                width={800}
-                height={400}
-                sizes="(min-width: 1024px) 1024px, 100vw"
-                priority
-                className="aspect-[16/9] w-full object-cover sm:aspect-[2/1]"
-              />
-            </div>
-          </div>
-        </section>
+        <ProductCoverShowcase product={product} />
 
-        {/* ── About section ────────────────────────────────── */}
-        <section id="about" className="border-b">
-          <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
-            <div className="mx-auto max-w-3xl">
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-                About
-              </h2>
-              <p className="mt-4 text-lg leading-8 text-foreground/90 sm:text-xl sm:leading-9">
-                {product.longDescription}
-              </p>
-            </div>
-          </div>
-        </section>
+        <ProductAbout product={product} />
 
-        {/* ── Highlights / Features grid ───────────────────── */}
-        {product.highlights.length > 0 && (
-          <section className="border-b">
-            <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
-              <h2 className="mb-10 text-center text-2xl font-bold tracking-tight sm:text-3xl">
-                Key Features
-              </h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                {product.highlights.map((highlight, index) => (
-                  <div
-                    key={index}
-                    className="group rounded-xl border bg-card p-6 transition-all duration-300 hover:border-foreground/10 hover:shadow-md"
-                  >
-                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-sm font-bold text-muted-foreground transition-colors group-hover:bg-foreground/10 group-hover:text-foreground">
-                      {index + 1}
-                    </div>
-                    <h3 className="font-semibold">{highlight.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {highlight.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        <ProductHighlights product={product} />
 
         {/* ── CTA banner ───────────────────────────────────── */}
         <section>
@@ -394,56 +345,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </div>
         </section>
-        {/* ── Explore other products (on-site fallback) ───── */}
         {otherProducts.length > 0 && (
-          <section
-            aria-labelledby="explore-other-products"
-            data-testid="product-explore-others"
-            className="border-t bg-muted/30"
-          >
-            <div className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
-              <h2
-                id="explore-other-products"
-                className="text-sm font-semibold uppercase tracking-widest text-muted-foreground"
-              >
-                Explore our other products
-              </h2>
-              <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {otherProducts.map((other) => (
-                  <li key={other.slug}>
-                    <Link
-                      href={`/products/${other.slug}`}
-                      data-testid="product-explore-other-link"
-                      className="block h-full rounded-xl border bg-card p-5 transition-all duration-300 hover:border-foreground/10 hover:shadow-md"
-                    >
-                      <span className="font-semibold">{other.name}</span>
-                      <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
-                        {other.title}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
+          <ProductRelated otherProducts={otherProducts} />
         )}
       </main>
 
-      {/* ── Footer ───────────────────────────────────────── */}
-      <footer className="border-t">
-        <div className="mx-auto max-w-5xl px-4 py-8 text-center text-sm text-muted-foreground">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 transition-colors hover:text-foreground"
-          >
-            <Logo className="h-5 w-5" />
-            Lamplit Labs
-          </Link>
-          <p className="mt-2">
-            &copy; {new Date().getFullYear()} Lamplit Labs. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <ProductFooter />
     </>
   );
 }

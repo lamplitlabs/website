@@ -2,8 +2,9 @@
 // stale product claims. Each phrase the hero names must map to a product
 // category or tag that exists in lib/site-data.ts, and phrases for products
 // that were removed (e.g. "career resources" from the deleted Resume Builder /
-// Career category) must never come back, so a first-time visitor is not
-// promised a product that does not exist.
+// Career category, or the retired visual AI agent builder Amistio) must never
+// come back, so a first-time visitor is not promised a product that does not
+// exist.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -28,7 +29,6 @@ const live = new Set(
 
 // hero phrase -> catalog category/tag that backs it
 const claims = {
-  "ai agent builder": "ai",
   "ai lab": "ai",
   "medical exam prep": "education",
   "citizenship tools": "education",
@@ -37,7 +37,7 @@ const claims = {
   compliance: "compliance",
 };
 
-const stale = ["career", "resume"];
+const stale = ["career", "resume", "amistio", "agent builder"];
 
 test("hero paragraph mentions each claimed product area and each maps to a live category or tag", () => {
   for (const [phrase, backing] of Object.entries(claims)) {

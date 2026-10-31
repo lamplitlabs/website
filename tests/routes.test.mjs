@@ -711,7 +711,7 @@ test("footer nav prefixes hash-only navLinks with '/' off the home page", () => 
 });
 
 // 404 near-miss suggestion (evolution/job-20261006t150740z-66120f): a visitor
-// who mistypes a product slug (e.g. /products/amistio -> /products/amistiio)
+// who mistypes a product slug (e.g. /products/kenntnistrainer -> /products/kenntnistrainerr)
 // should land on a 404 that offers the product they likely meant, not a bare
 // dead end. Source-level check since the page is a client component.
 test("not-found page offers a near-miss product slug suggestion", () => {
@@ -779,10 +779,12 @@ test("not-found page offers a near-miss product slug suggestion", () => {
   assert.equal(findNearMiss(twoCharTypo)?.slug, longSlug, `a two-character typo of "${longSlug}" ("${twoCharTypo}") should suggest it`);
 
   // False-positive guard: slugs that are clearly not a typo of any product
-  // must never produce a suggestion. "amnesia" is within the loose
-  // length/3 threshold of nothing but still shares a first letter with
-  // "amistio"; "lights-out" and "settings" are plausible unrelated URLs.
-  for (const unrelated of ["settings", "pricing", "amnesia", "amigo", "lint", "lights-out", "developer", "azure"]) {
+  // must never produce a suggestion. "kenntnis" is a plausible partial URL
+  // for "kenntnistrainer" but far outside its threshold; "lighter" shares a
+  // first letter with "light" but fails both the threshold and the
+  // last-character guard; "lights-out" and "settings" are plausible
+  // unrelated URLs.
+  for (const unrelated of ["settings", "pricing", "kenntnis", "lighter", "lint", "lights-out", "developer", "azure"]) {
     assert.ok(!slugs.includes(unrelated), `fixture "${unrelated}" must not be a real slug`);
     const hit = findNearMiss(unrelated);
     assert.equal(hit, undefined, `unrelated slug "${unrelated}" must not suggest "${hit?.slug}"`);
@@ -856,7 +858,7 @@ test("not-found near-miss matcher: two-character typo and unrelated short slug",
   assert.equal(findNearMiss(shortTypo), undefined, `two-character typo "${shortTypo}" of short slug "${short}" is outside its threshold of 1 and must not be suggested`);
 
   // (2) Unrelated short slugs must never produce a suggestion.
-  for (const junk of ["abc", "a", "xyz", "night", "sight", "eight", "flight", "lights", "amistios"]) {
+  for (const junk of ["abc", "a", "xyz", "night", "sight", "eight", "flight", "lights", "kenntnistrainers"]) {
     const hit = findNearMiss(junk);
     assert.equal(hit, undefined, `unrelated slug "${junk}" must not suggest a product (got ${hit?.slug})`);
   }

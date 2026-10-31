@@ -61,7 +61,7 @@ export function LamplitIllustration({ className }: { className?: string }) {
 
       {/* Illuminated items in the light cone */}
       {[
-        { label: "visual AI agents", x: 145, y: 125 },
+        { label: "sovereign AI", x: 161, y: 125 },
         { label: "education", x: 165, y: 165 },
         { label: "developer tools", x: 270, y: 165 },
         { label: "career", x: 170, y: 210 },

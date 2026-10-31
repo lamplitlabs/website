@@ -15,7 +15,7 @@ const aboutItems = [
   {
     icon: Globe,
     title: "Germany and beyond",
-    desc: "From visual AI agents and self-hosted models to medical prep, citizenship, and developer tools - built locally, used globally.",
+    desc: "From self-hosted AI models to medical prep, citizenship, and developer tools - built locally, used globally.",
   },
   {
     icon: Heart,
@@ -34,9 +34,8 @@ export function AboutSection() {
           </div>
           <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Who we are</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Lamplit Labs builds the visual AI agent builder Amistio and the
-            sovereign-AI lab Lamplit Light alongside practical tools for
-            education, developer workflows, and compliance.
+            Lamplit Labs builds the sovereign-AI lab Lamplit Light alongside
+            practical tools for education, developer workflows, and compliance.
           </p>
         </RevealSection>
 

@@ -6,6 +6,7 @@ import {
   HeartHandshake,
   Lamp,
   Lightbulb,
+  Smartphone,
   Sparkles,
   Stethoscope,
 } from "lucide-react";
@@ -56,6 +57,12 @@ const milestones: Milestone[] = [
     title: "Lamplit Light: our AI lab",
     desc: "We start building small, specialised models you host yourself - one model per job, each measured before it ships. AI that runs where you are.",
     icon: Sparkles,
+  },
+  {
+    year: "2026",
+    title: "Eszett: a German tutor on the phone",
+    desc: "Our first Lamplit Light model in people's hands: a 3B tutor that explains, corrects and rates German entirely on the phone. Website live, Android in testing.",
+    icon: Smartphone,
   },
 ];
 

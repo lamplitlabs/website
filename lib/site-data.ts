@@ -383,6 +383,34 @@ export const products: Product[] = [
       "Free Einbürgerungstest preparation: practice all 310 official Leben in Deutschland questions plus Bundesland-specific ones, with progress tracking.",
   },
   {
+    slug: "eszett",
+    status: "In development",
+    statusSince: "2026-10",
+    lastUpdated: "2026-10-31",
+    name: "Eszett",
+    title: "Your German tutor, on your phone, offline",
+    description:
+      "Learn German A1–C2 with a tutor that runs on your phone: grammar, real conversations, speaking practice and mock exams – offline, in 12 languages.",
+    longDescription:
+      "Eszett is a German tutor that lives on your phone. A 3B language model trained to teach German runs on the device itself: it explains, corrects your sentences, plays the other person in everyday scenes – the bakery, the Bürgeramt, a job interview – and rates how you speak, the way an examiner would. A 56-week course from A1 to C2 built from the official exam syllabi, 71 grammar rules, 58 scenes, stories from Grimm to Kafka, and mock oral exams for Goethe, telc, DTZ, TestDaF and DSH. Nothing you type leaves the phone; there is no analytics and no advertising. Free for a week, then one purchase – no subscription – and a pay-it-forward pool so those who can pay fund those who cannot.",
+    url: "https://eszett.lamplitlabs.com",
+    cover: "/covers/eszett.svg",
+    tags: ["Education", "German", "On-device AI"],
+    category: "Education",
+    highlights: [
+      { title: "A tutor on the phone", description: "A language model trained to teach German runs on the device – no internet, nothing leaves the phone." },
+      { title: "Course A1 to C2", description: "56 weeks with grammar cards, words, scenes, reading, listening, writing and a check, built from the exam syllabi." },
+      { title: "Speak and be rated", description: "One minute of free speech a day, real-life scenes and mock oral exams for Goethe, telc, TestDaF and DSH." },
+      { title: "Fair pricing", description: "Free for a week, then one purchase. No subscription. Pay it forward for a learner who cannot afford it." },
+    ],
+    featured: true,
+    trackingDoc: "https://eszett.lamplitlabs.com",
+    roadmapNote: "The Android app is in internal testing on Google Play; the public listing follows Google's review. The course, grammar, exam guides and stories are already free to read on the website in twelve languages.",
+    metaTitle: "Eszett – a German tutor that runs on your phone, offline",
+    metaDescription:
+      "Eszett by Lamplit Labs: learn German A1–C2 with an on-device AI tutor – grammar, conversations, speaking, mock exams. Offline, private, no subscription.",
+  },
+  {
     slug: "developer-tools",
     status: "Live",
     statusSince: "2026-03",

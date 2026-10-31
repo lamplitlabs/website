@@ -8,6 +8,8 @@
 **Worker starting commit:** `e757e942e45fa46d2c024c706d66701da31fcfe2`
 **Job:** `job-20260909T061008Z-12f9c2`
 
+> **Addendum (2026-10-31):** Amistio was retired and removed from the catalog ([ADR](../decisions/2026-10-31-retire-amistio-from-website.md)). The hero paragraph, the About section, and the illustration label no longer mention Amistio or visual AI agents; the phrases prescribed below are historical.
+
 ## Catalog Source and Scope
 
 The shipped Amistio entry in [`lib/site-data.ts`](../../lib/site-data.ts) describes a visual AI agent builder; its metadata also uses "visual AI agents". [`docs/context/product.md`](../context/product.md) follows that catalog. [`homepage-product-metadata.md`](homepage-product-metadata.md) documents the matching metadata repair and the intentional external canonical URL.

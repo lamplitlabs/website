@@ -8,7 +8,7 @@ import { SiteNav } from "@/components/site-nav";
 import { navLinks, products } from "@/lib/site-data";
 
 // Levenshtein distance, used to catch a visitor mistyping a product slug
-// (e.g. /products/amistio -> /products/amistiio) so the 404 page can offer
+// (e.g. /products/kenntnistrainer -> /products/kenntnistrainerr) so the 404 page can offer
 // the product they meant instead of a bare dead end.
 function levenshtein(a: string, b: string): number {
   const dp: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>

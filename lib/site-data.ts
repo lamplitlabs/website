@@ -74,6 +74,8 @@ export interface Product {
   metaDescription?: string;
   canonicalUrl?: string;
   schema?: ProductSchema;
+  /** Platform for the JSON-LD `operatingSystem` (e.g. "Android"); defaults to "Web" when unset. */
+  operatingSystem?: string;
 }
 
 /** Single source of truth for product status checks used across the UI. */
@@ -351,6 +353,7 @@ export const products: Product[] = [
     metaTitle: "Eszett – a German tutor that runs on your phone, offline",
     metaDescription:
       "Eszett by Lamplit Labs: learn German A1–C2 with an on-device AI tutor – grammar, conversations, speaking, mock exams. Offline, private, no subscription.",
+    operatingSystem: "Android",
   },
   {
     slug: "developer-tools",

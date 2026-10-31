@@ -25,7 +25,8 @@ public Play listing follows Google's review.
    (with `statusSince`, `trackingDoc` and `roadmapNote`, as the existing tests require for that
    status), category `Education` and `featured: true`. The copy comes from TASK-046. Like the
    other Education products it has no `schema` block, so the JSON-LD falls back to the defaults
-   in `app/layout.tsx`.
+   in `app/layout.tsx`, with one exception: `operatingSystem` (see "Structured Data Platform"
+   below).
 2. **Cover** at [`public/covers/eszett.svg`](../../public/covers/eszett.svg): 800×400 like the
    other covers (following the `leben.svg` pattern of a background gradient, a subtle grid and a
    centred motif). The motif is a large white **ß** on a Königsblau radial gradient from
@@ -39,6 +40,22 @@ public Play listing follows Google's review.
 4. **README product table**: one row for Eszett. The README table drift tests in
    `tests/site-data.test.mjs` require a row, with a matching status marker, for every product in
    `lib/site-data.ts`.
+
+## Structured Data Platform
+
+This section lifts the "defaults only" JSON-LD scope of item 1 for one field.
+
+- The SoftwareApplication JSON-LD `operatingSystem` follows the product's real platform. A
+  product sets it with the optional `operatingSystem` field of `Product` in
+  [`lib/site-data.ts`](../../lib/site-data.ts). Without the field it defaults to `"Web"`.
+- Both JSON-LD builders read the field the same way (`product.operatingSystem ?? "Web"`): the
+  per-page `ProductJsonLd` in `app/products/[slug]/page.tsx` and the site-wide product list in
+  `app/layout.tsx`. Otherwise one page would describe the same app as two platforms.
+- Eszett sets `operatingSystem: "Android"`. It is an Android app that runs offline on the phone
+  ([product context](../context/product.md), Current Products row "Eszett": "Android app
+  (Android first)"). The other products keep the `"Web"` default. Set the field on another
+  product only after its platform is recorded in `docs/context/product.md`.
+- No other JSON-LD field and no visible page copy changes.
 
 ## Deviations From the Brief (Forced by Existing Checks)
 
@@ -65,5 +82,8 @@ independent additions, and nothing else refers to them.
       canonical URL is the internal `/products/eszett` path (as for every In development product).
 - [ ] The homepage product grid lists Eszett under Education, and the journey shows the new
       milestone after "Lamplit Light: our AI lab".
+- [ ] The exported `/products/eszett` page's JSON-LD for Eszett says
+      `"operatingSystem":"Android"`. A web product's page (e.g. `/products/light`) still says
+      `"Web"` for that product (checked in `tests/routes.test.mjs`).
 - [ ] `npm run check` (lint → typecheck → build → all tests, including `tests/site-data.test.mjs`
       and the out/ export tests in `tests/routes.test.mjs`) passes.

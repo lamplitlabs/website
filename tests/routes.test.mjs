@@ -167,6 +167,45 @@ test("static export (out/) every product page contains an application/ld+json sc
   }
 });
 
+// Structured data platform (docs/features/eszett-product-entry.md, "Structured
+// Data Platform"): the SoftwareApplication `operatingSystem` follows the
+// product's real platform (`Product.operatingSystem` in lib/site-data.ts,
+// default "Web"). Eszett is an Android app, so its page must not tell search
+// engines and link previews it is a web app; a web product keeps "Web". The
+// per-page ProductJsonLd block is the one carrying `image`; the site-wide list
+// from app/layout.tsx names the same product and must agree with it.
+test("static export (out/) product JSON-LD operatingSystem is Android for Eszett and Web for a web product", skipWithoutOut, () => {
+  const out = resolve(root, "out");
+  const appsOn = (slug) => {
+    const flat = join(out, "products", `${slug}.html`);
+    const nested = join(out, "products", slug, "index.html");
+    assert.ok(existsSync(flat) || existsSync(nested), `no exported page for /products/${slug}`);
+    const page = readFileSync(existsSync(flat) ? flat : nested, "utf8");
+    return [...page.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+      .map((m) => JSON.parse(m[1]))
+      .filter((item) => item["@type"] === "SoftwareApplication");
+  };
+  for (const [slug, expected] of [["eszett", "Android"], ["light", "Web"]]) {
+    const apps = appsOn(slug);
+    const own = apps.filter((item) => "image" in item);
+    assert.equal(own.length, 1, `/products/${slug} must render exactly one per-page SoftwareApplication block`);
+    assert.equal(
+      own[0].operatingSystem,
+      expected,
+      `/products/${slug} JSON-LD operatingSystem must be "${expected}"`,
+    );
+    const same = apps.filter((item) => item.name === own[0].name);
+    assert.ok(same.length >= 2, `/products/${slug}: site-wide product JSON-LD must also name "${own[0].name}"`);
+    for (const item of same) {
+      assert.equal(
+        item.operatingSystem,
+        expected,
+        `/products/${slug}: every JSON-LD block for "${own[0].name}" must say operatingSystem "${expected}"`,
+      );
+    }
+  }
+});
+
 // Accessibility: keyboard and screen-reader users must be able to bypass the
 // repeated header/nav links. Every exported route renders a "Skip to content"
 // anchor (first focusable element) that targets <main id="main-content">.

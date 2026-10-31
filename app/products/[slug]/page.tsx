@@ -96,7 +96,7 @@ function ProductJsonLd({ slug }: { slug: string }) {
     description: product.metaDescription ?? product.longDescription,
     creativeWorkStatus: productCreativeWorkStatus(product),
     featureList: product.schema?.featureList,
-    operatingSystem: "Web",
+    operatingSystem: product.operatingSystem ?? "Web",
     image: `https://www.lamplitlabs.com${product.cover}`,
     creator: {
       "@type": "Organization",

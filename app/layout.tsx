@@ -164,7 +164,7 @@ const productJsonLd = products.map((product) => ({
   description: product.metaDescription ?? product.longDescription,
   creativeWorkStatus: productCreativeWorkStatus(product),
   featureList: product.schema?.featureList,
-  operatingSystem: "Web",
+  operatingSystem: product.operatingSystem ?? "Web",
   creator: {
     "@type": "Organization",
     name: "Lamplit Labs",

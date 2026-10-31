@@ -18,6 +18,7 @@ Lamplit Labs now presents two connected pillars: practical products and the Lamp
 | **Kenntnistrainer** | KI-gestützte medical exam prep (Germany) | Next.js | Live |
 | **Fachsprachprüfung** | FSP simulation & training (Germany) | Next.js | Live |
 | **Leben in Deutschland** | German citizenship test prep (310 questions) | Next.js | Live |
+| **Eszett** | German tutor A1–C2 that runs on the phone, offline | Android app (Android first) with an on-device Lamplit Light model; app framework not recorded | In development (website live at [eszett.lamplitlabs.com](https://eszett.lamplitlabs.com); Android app in Google Play internal testing, public listing follows Google's review; see [the feature spec](../features/eszett-product-entry.md)) |
 | **Developer Tools** | JSON formatter, Base64, UUID, etc. | Next.js | Live |
 | **EDMX Tools** | Tools for EDMX/OData metadata files | Next.js | Live |
 | **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams | Not recorded | Live |

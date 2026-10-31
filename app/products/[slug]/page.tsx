@@ -258,6 +258,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   <CtaIcon aria-hidden="true" className="ml-2 h-4 w-4" />
                 </OutboundLink>
               </Button>
+              {isInDevelopment && product.websiteUrl && (
+                <Button size="lg" variant="outline" asChild>
+                  <OutboundLink
+                    href={product.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    trackingTarget={product.slug}
+                    trackingContext="product_page_website_link"
+                    trackingUrl={product.websiteUrl}
+                  >
+                    Visit the website
+                    <ArrowUpRight aria-hidden="true" className="ml-2 h-4 w-4" />
+                  </OutboundLink>
+                </Button>
+              )}
               <Button size="lg" variant="outline" asChild>
                 <Link href="/">View all products</Link>
               </Button>

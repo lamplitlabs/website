@@ -34,6 +34,8 @@ export interface Product {
   description: string;
   longDescription: string;
   url: string;
+  /** Live marketing site while the app itself is still in development. */
+  websiteUrl?: string;
   cover: string;
   tags: string[];
   category: ProductCategory;
@@ -333,6 +335,7 @@ export const products: Product[] = [
     longDescription:
       "Eszett is a German tutor that lives on your phone. A 3B language model trained to teach German runs on the device itself: it explains, corrects your sentences, plays the other person in everyday scenes – the bakery, the Bürgeramt, a job interview – and rates how you speak, the way an examiner would. A 56-week course from A1 to C2 built from the official exam syllabi, 71 grammar rules, 58 scenes, stories from Grimm to Kafka, and mock oral exams for Goethe, telc, DTZ, TestDaF and DSH. Nothing you type leaves the phone; there is no analytics and no advertising. Free for a week, then one purchase – no subscription – and a pay-it-forward pool so those who can pay fund those who cannot.",
     url: "https://eszett.lamplitlabs.com",
+    websiteUrl: "https://eszett.lamplitlabs.com",
     cover: "/covers/eszett.svg",
     tags: ["Education", "German", "On-device AI"],
     category: "Education",

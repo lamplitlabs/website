@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Lamplit Labs",
   },
   description:
-    "Lamplit Labs builds practical tools that solve real problems, including the sovereign-AI lab Lamplit Light, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Developer Tools, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
+    "Lamplit Labs builds practical tools that solve real problems, including the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Developer Tools, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
   metadataBase: new URL("https://www.lamplitlabs.com"),
   keywords: [
     "Lamplit Labs",
@@ -45,6 +45,10 @@ export const metadata: Metadata = {
     "Leben in Deutschland",
     "Einbürgerungstest",
     "German citizenship test",
+    "Eszett",
+    "German tutor",
+    "learn German",
+    "offline AI tutor",
     "Developer Tools",
     "JSON formatter",
     "Base64 encoder",
@@ -81,7 +85,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lamplit Labs - Practical Tools for Real Problems",
     description:
-      "Lamplit Labs builds the sovereign-AI lab Lamplit Light and practical tools across education, developer workflows, and Azure compliance.",
+      "Lamplit Labs builds the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, and practical tools across education, developer workflows, and Azure compliance.",
     url: "https://www.lamplitlabs.com",
     siteName: "Lamplit Labs",
     type: "website",
@@ -99,7 +103,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Lamplit Labs - Practical Tools for Real Problems",
     description:
-      "Lamplit Labs builds the sovereign-AI lab Lamplit Light and practical tools across education, developer workflows, and Azure compliance.",
+      "Lamplit Labs builds the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, and practical tools across education, developer workflows, and Azure compliance.",
     images: ["/og-image.png"],
   },
   icons: {

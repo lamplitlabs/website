@@ -26,16 +26,11 @@ export const metadata: Metadata = {
     template: "%s | Lamplit Labs",
   },
   description:
-    "Lamplit Labs builds practical tools that solve real problems, including the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Developer Tools, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
+    "Lamplit Labs builds practical tools that solve real problems, including the sovereign-AI lab Lamplit Light, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Developer Tools, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
   metadataBase: new URL("https://www.lamplitlabs.com"),
   keywords: [
     "Lamplit Labs",
     "lamplitlabs",
-    "Amistio",
-    "visual AI agent builder",
-    "app connectors",
-    "approval gates",
-    "AI agent platform",
     "Lamplit Light",
     "sovereign AI",
     "small language models",
@@ -86,7 +81,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lamplit Labs - Practical Tools for Real Problems",
     description:
-      "Lamplit Labs builds the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, and practical tools across education, developer workflows, and Azure compliance.",
+      "Lamplit Labs builds the sovereign-AI lab Lamplit Light and practical tools across education, developer workflows, and Azure compliance.",
     url: "https://www.lamplitlabs.com",
     siteName: "Lamplit Labs",
     type: "website",
@@ -104,7 +99,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Lamplit Labs - Practical Tools for Real Problems",
     description:
-      "Lamplit Labs builds the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, and practical tools across education, developer workflows, and Azure compliance.",
+      "Lamplit Labs builds the sovereign-AI lab Lamplit Light and practical tools across education, developer workflows, and Azure compliance.",
     images: ["/og-image.png"],
   },
   icons: {
@@ -127,7 +122,7 @@ const organizationJsonLd = {
   url: "https://www.lamplitlabs.com",
   logo: "https://www.lamplitlabs.com/icon-512.png",
   description:
-    "A technology organization building the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, and practical products for medical exam prep, citizenship, developer workflows, and Azure compliance.",
+    "A technology organization building the sovereign-AI lab Lamplit Light and practical products for medical exam prep, citizenship, developer workflows, and Azure compliance.",
   foundingDate: "2020",
   sameAs: Object.values(socialLinks),
   contactPoint: {
@@ -143,7 +138,7 @@ const websiteJsonLd = {
   name: "Lamplit Labs",
   url: "https://www.lamplitlabs.com",
   description:
-    "Lamplit Labs builds the visual AI agent builder Amistio, the sovereign-AI lab Lamplit Light, and practical tools for education, developer workflows, and compliance.",
+    "Lamplit Labs builds the sovereign-AI lab Lamplit Light and practical tools for education, developer workflows, and compliance.",
   publisher: {
     "@type": "Organization",
     name: "Lamplit Labs",

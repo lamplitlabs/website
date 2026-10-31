@@ -14,7 +14,6 @@ Lamplit Labs now presents two connected pillars: practical products and the Lamp
 
 | Product | Purpose | Technology | Status |
 |---------|---------|-----------|--------|
-| **Amistio** | Visual AI agent builder with app connectors and approval gates | Next.js | Live |
 | **Lamplit Light** | Sovereign AI lab: small, specialised models you host yourself (browser, laptop, on-prem, private cloud, app, edge) | Python distillation toolkit + React/Vite site; models exported to ONNX for transformers.js | In development (ai.lamplitlabs.com resolves and serves the AI site as of 2026-09-17; catalog status flip to Live awaits owner confirmation) |
 | **Kenntnistrainer** | KI-gestützte medical exam prep (Germany) | Next.js | Live |
 | **Fachsprachprüfung** | FSP simulation & training (Germany) | Next.js | Live |
@@ -24,7 +23,7 @@ Lamplit Labs now presents two connected pillars: practical products and the Lamp
 | **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams | Not recorded | Live |
 | **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services | Not recorded | Live |
 
-Product descriptions and availability follow the website catalog in [`lib/site-data.ts`](../../lib/site-data.ts). Each product lives in its own repository and deploys independently; technologies not documented here are marked "Not recorded".
+Product descriptions and availability follow the website catalog in [`lib/site-data.ts`](../../lib/site-data.ts). Each product lives in its own repository and deploys independently; technologies not documented here are marked "Not recorded". Amistio (visual AI agent builder) was retired from the catalog on 2026-10-31; see [the ADR](../decisions/2026-10-31-retire-amistio-from-website.md).
 
 Product categories are now catalog data too. Each `Product` carries a `category` value used by the homepage product filter: `AI`, `Education`, `Developer Tools`, or `Azure`.
 

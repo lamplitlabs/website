@@ -50,7 +50,7 @@ Expect `{'src': '^/$', 'dest': '/index', 'check': True}` right after `{'handle':
 ```bash
 curl -sS -o /dev/null -w "%{http_code}\n" https://www.lamplitlabs.com/          # expect 200
 curl -sS -o /dev/null -w "%{http_code}\n" https://www.lamplitlabs.com/index     # expect 200
-curl -sS -o /dev/null -w "%{http_code}\n" https://www.lamplitlabs.com/products/amistio  # expect 200
+curl -sS -o /dev/null -w "%{http_code}\n" https://www.lamplitlabs.com/products/kenntnistrainer  # expect 200
 ```
 
 ## Examples

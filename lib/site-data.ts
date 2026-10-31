@@ -183,67 +183,6 @@ export const socialLinks: SocialLinks = {
 
 export const products: Product[] = [
   {
-    slug: "amistio",
-    name: "Amistio",
-    title: "Build agents that do the work. Stay in control.",
-    description:
-      "A visual AI agent builder for turning goals into versioned automations with real app actions, approval gates, shareable run pages, and inspectable runs.",
-    longDescription:
-      "Amistio helps individuals, small businesses, and teams build agents that do more than chat. Start from a template, describe a goal, or assemble a flow on the visual canvas; connect AI and app actions; test the editable draft; then freeze, publish, and activate an exact version. Agents can run manually, on schedules, from webhooks, or through shareable forms, with encrypted connections, human approvals, agent-owned data, and a clear run history. Remote MCP servers can be connected, while MCP tool execution, organization-owned agents, and supported customer-managed deployment remain planned.",
-    url: "https://www.amistio.com",
-    cover: "/covers/amistio.svg",
-    tags: ["AI Agents", "Visual Automation", "App Connectors"],
-    category: "AI",
-    highlights: [
-      {
-        title: "Visual Agent Builder",
-        description:
-          "Start from a working template, describe an outcome in plain language, or drag and connect plain-language blocks on the canvas.",
-      },
-      {
-        title: "Real App Actions",
-        description:
-          "Use typed actions for Slack, GitHub, Notion, Airtable, Discord, Google Sheets, HTTP, time, random IDs, and each agent's own data store.",
-      },
-      {
-        title: "Versioned Releases",
-        description:
-          "Test an editable draft, freeze an immutable signed version, publish it, and activate the exact graph that should run.",
-      },
-      {
-        title: "Flexible Runs",
-        description:
-          "Run manually, from a webhook, on a schedule, or through a shareable page with a designed form and optional voice conversation.",
-      },
-      {
-        title: "Controls Built In",
-        description:
-          "Keep credentials encrypted, pause sensitive steps for human approval, share versions without credentials, and inspect every run's steps and outcome.",
-      },
-    ],
-    featured: true,
-    status: "Live",
-    statusSince: "2026-03",
-    lastUpdated: "2026-10-06",
-    metaTitle: "Amistio - Visual AI Agent Builder",
-    metaDescription:
-      "Build visual AI agents with app connectors, immutable versions, approval gates, shareable run pages, and inspectable execution history.",
-    canonicalUrl: "https://www.amistio.com",
-    schema: {
-      name: "Amistio visual AI agent builder",
-      applicationCategory: "BusinessApplication",
-      featureList: [
-        "Visual drag-and-drop agent flow builder",
-        "Starter templates and goal-to-draft generation",
-        "Built-in tools and provider app connectors",
-        "Encrypted per-user connection credentials",
-        "Immutable agent versions and activation",
-        "Manual, webhook, scheduled, share-link, and voice runs",
-        "Human approval gates and inspectable run history",
-      ],
-    },
-  },
-  {
     slug: "light",
     name: "Lamplit Light",
     title: "AI that runs where you are",

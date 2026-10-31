@@ -8,6 +8,8 @@
 **Worker starting commit:** `99f9c01819c64669c9957f98e8443753c68a6643`
 **Job:** `job-20260908T134123Z-5aebfa`
 
+> **Addendum (2026-10-31):** Amistio was retired and removed from the catalog ([ADR](../decisions/2026-10-31-retire-amistio-from-website.md)). The eight Amistio positioning strings and keywords described below were removed from [`app/layout.tsx`](../../app/layout.tsx) and `public/manifest.json`; the wording prescribed here is historical.
+
 ## Catalog Source
 
 The shipped Amistio entry in [`lib/site-data.ts`](../../lib/site-data.ts), lines 57-115 at the starting commit, describes a visual AI agent builder with app connectors and approval gates. [`docs/context/product.md`](../context/product.md) follows this catalog. MCP tool execution, organization-owned agents, and supported customer-managed deployment remain planned in the catalog; this correction must not imply they are shipped.

@@ -154,3 +154,14 @@ test("query folds diacritics so plain-ASCII typing matches accented catalog copy
   // Accented queries must still match accented copy (no regression from folding).
   assert.ok(matchesProductQuery({ name: "x", description: "y", title: "Kenntnisprüfung simulation" }, "prüfung"));
 });
+
+test("search finds a product by its Key Features highlight titles", () => {
+  const withHighlights = products.filter((p) => p.highlights?.length);
+  assert.ok(withHighlights.length > 0);
+  for (const p of withHighlights) {
+    for (const h of p.highlights) {
+      const hits = search.filterProductsByQuery(products, h.title);
+      assert.ok(hits.includes(p), `"${h.title}" should find ${p.name}`);
+    }
+  }
+});

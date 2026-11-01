@@ -2,7 +2,8 @@
  * Free-text filter for the product grid. Case-insensitive, diacritic-folded
  * substring match on name, title (the tagline shown under the name on each
  * card), description, tags (the chips shown on each card) and longDescription
- * (the fuller body copy on each product's detail page), so a user can type
+ * (the fuller body copy on each product's detail page) and highlights (the
+ * "Key Features" titles and descriptions on the detail page), so a user can type
  * "ai", "AI Agents", part of a tool's name or a word that only appears on the
  * detail page (e.g. "doctors") instead of hunting through category tabs.
  * Several products use German/accented vocabulary (e.g. "Kenntnisprüfung",
@@ -16,6 +17,7 @@ export type SearchableProduct = {
   description: string;
   tags?: string[];
   longDescription?: string;
+  highlights?: { title: string; description: string }[];
 };
 
 function fold(value: string): string {
@@ -36,7 +38,10 @@ export function matchesProductQuery(
     fold(product.title ?? "").includes(q) ||
     fold(product.description).includes(q) ||
     (product.tags ?? []).some((tag) => fold(tag).includes(q)) ||
-    fold(product.longDescription ?? "").includes(q)
+    fold(product.longDescription ?? "").includes(q) ||
+    (product.highlights ?? []).some(
+      (h) => fold(h.title).includes(q) || fold(h.description).includes(q)
+    )
   );
 }
 

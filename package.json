@@ -44,12 +44,6 @@
     "postcss": "^8.5.23",
     "postcss-selector-parser": "6.1.5",
     "js-yaml": "^4.3.1",
-    "minimatch@3": {
-      "brace-expansion": "^1.1.18"
-    },
-    "minimatch@10": {
-      ".": "11.0.2",
-      "brace-expansion": "^5.0.9"
-    }
+    "minimatch": "11.0.3"
   }
 }

@@ -21,8 +21,12 @@
  * Results are ranked: products whose NAME contains more of the query words
  * come first, so typing "azure" or a tool's name puts that tool at the top
  * instead of below products that only mention the word in their description
- * or Key Features. The sort is stable, so products that rank equally (and
- * every product for a blank query) keep their catalogue order.
+ * or Key Features. Among products with the same number of name matches, those
+ * whose tags (the chips on each card) exactly match more of the query words
+ * come next, so "security" lists Security-tagged products before products
+ * that only mention security in their description. The sort is stable, so
+ * products that rank equally (and every product for a blank query) keep their
+ * catalogue order.
  *
  * Keep this module free of npm imports: an evolve fixture imports it directly
  * with Node type stripping.
@@ -75,9 +79,26 @@ export function filterProductsByQuery<T extends SearchableProduct>(
     const name = fold(product.name);
     return words.filter((word) => name.includes(word)).length;
   };
+  // A tag "matches" a query word when the word is the whole tag or one whole
+  // word of it ("ai" hits "AI" and "Sovereign AI", not "Training"), so short
+  // words do not rank every chip that merely contains them.
+  const tagHits = (product: SearchableProduct) => {
+    const tagWords = new Set(
+      (product.tags ?? []).flatMap((tag) => {
+        const folded = fold(tag).trim();
+        return [folded, ...folded.split(/\s+/)];
+      })
+    );
+    return words.filter((word) => tagWords.has(word)).length;
+  };
   return matches
-    .map((product, index) => ({ product, index, hits: nameHits(product) }))
-    .sort((a, b) => b.hits - a.hits || a.index - b.index)
+    .map((product, index) => ({
+      product,
+      index,
+      hits: nameHits(product),
+      tags: tagHits(product),
+    }))
+    .sort((a, b) => b.hits - a.hits || b.tags - a.tags || a.index - b.index)
     .map(({ product }) => product);
 }
 /** URL query parameter that mirrors the search box (`/?q=ai`). */

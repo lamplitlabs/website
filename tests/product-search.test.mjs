@@ -212,3 +212,33 @@ test("results rank name matches first: 'azure' lists Azure products before produ
   const azure = filterProductsByQuery(products, "azure");
   assert.ok(azure.length > 0 && azure[0].name.toLowerCase().includes("azure"), "first 'azure' result is an Azure product");
 });
+
+test("within equal name rank, tag matches come before description-only matches: 'security' lists Security-tagged products first", () => {
+  // Synthetic catalogue: neither name contains the word; the tagged product sits last.
+  const catalogue = [
+    { name: "Helper", description: "Hardens your security posture", tags: ["Utilities"] },
+    { name: "Notes", description: "Plain notes", tags: ["Productivity"], highlights: [{ title: "Security export", description: "x" }] },
+    { name: "Vault", description: "Stores secrets", tags: ["Azure", "Security"] },
+    { name: "Security Center", description: "A dashboard", tags: ["Web"] },
+  ];
+  assert.deepEqual(
+    filterProductsByQuery(catalogue, "security").map((p) => p.name),
+    ["Security Center", "Vault", "Helper", "Notes"],
+    "name match first, then tag match, then catalogue order"
+  );
+  // A tag matches only as a whole tag or a whole word of it: "ai" ranks "Sovereign AI", not "Training".
+  const chips = [
+    { name: "One", description: "ai mention", tags: ["Training"] },
+    { name: "Two", description: "plain", tags: ["Sovereign AI"] },
+  ];
+  assert.deepEqual(filterProductsByQuery(chips, "ai").map((p) => p.name), ["Two", "One"]);
+
+  // Real catalogue: every non-name match tagged with the query word precedes the untagged ones.
+  for (const q of ["security", "german", "germany", "language", "medical", "education"]) {
+    const result = filterProductsByQuery(products, q);
+    const rest = result.filter((p) => !p.name.toLowerCase().includes(q));
+    const tagged = rest.map((p) => p.tags.some((t) => t.toLowerCase().split(/\s+/).includes(q) || t.toLowerCase() === q));
+    assert.deepEqual(tagged, [...tagged].sort((a, b) => Number(b) - Number(a)), `"${q}" lists tagged products first: ${result.map((p) => p.name).join(", ")}`);
+  }
+  assert.equal(filterProductsByQuery(products, "germany")[0].name, "Leben in Deutschland", "'germany' starts with the Germany-tagged product");
+});

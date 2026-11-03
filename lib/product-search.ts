@@ -8,7 +8,9 @@
  * detail page (e.g. "doctors") instead of hunting through category tabs.
  * Several products use German/accented vocabulary (e.g. "Kenntnisprüfung",
  * "Einbürgerungstest"); folding diacritics lets a visitor who types the
- * plain-ASCII spelling ("prufung") still find the product. Blank queries
+ * plain-ASCII spelling ("prufung") still find the product. Letters that NFD
+ * does not split into base + accent are spelled out too (ß→ss, æ→ae, ø→o,
+ * đ→d, ł→l), so "strasse" finds copy that says "Straße". Blank queries
  * match everything.
  *
  * Multi-word queries are matched word by word: the folded query is split on
@@ -40,11 +42,22 @@ export type SearchableProduct = {
   highlights?: { title: string; description: string }[];
 };
 
+// Letters NFD does not decompose into base + combining mark, spelled the way
+// a visitor without the key types them ("strasse" for "Straße").
+const LETTER_FOLDS: Record<string, string> = {
+  ß: "ss",
+  æ: "ae",
+  ø: "o",
+  đ: "d",
+  ł: "l",
+};
+
 function fold(value: string): string {
   return value
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/[ßæøđł]/g, (letter) => LETTER_FOLDS[letter]);
 }
 
 function searchableText(product: SearchableProduct): string[] {

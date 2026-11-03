@@ -155,6 +155,22 @@ test("query folds diacritics so plain-ASCII typing matches accented catalog copy
   assert.ok(matchesProductQuery({ name: "x", description: "y", title: "Kenntnisprüfung simulation" }, "prüfung"));
 });
 
+test("query folds letters NFD keeps whole: 'strasse' finds 'Straße' (and æ, ø, đ, ł)", () => {
+  const catalogue = [
+    { name: "Plain", description: "Nothing special" },
+    { name: "Kiez", description: "Finds every Straße in Berlin" },
+    { name: "Nord", description: "Træning for Øresund", tags: ["Đà Nẵng", "Łódź"] },
+  ];
+  assert.deepEqual(filterProductsByQuery(catalogue, "strasse").map((p) => p.name), ["Kiez"]);
+  assert.deepEqual(filterProductsByQuery(catalogue, "STRASSE berlin").map((p) => p.name), ["Kiez"]);
+  // The native spelling still matches, in either case.
+  assert.deepEqual(filterProductsByQuery(catalogue, "straße").map((p) => p.name), ["Kiez"]);
+  assert.deepEqual(filterProductsByQuery(catalogue, "STRAẞE").map((p) => p.name), ["Kiez"]);
+  for (const q of ["traening", "oresund", "da nang", "lodz", "Øresund", "łódź"]) {
+    assert.deepEqual(filterProductsByQuery(catalogue, q).map((p) => p.name), ["Nord"], `"${q}" finds Nord`);
+  }
+});
+
 test("search finds a product by its Key Features highlight titles", () => {
   const withHighlights = products.filter((p) => p.highlights?.length);
   assert.ok(withHighlights.length > 0);

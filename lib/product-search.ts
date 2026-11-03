@@ -18,6 +18,12 @@
  * different order, while "Azure zzqxnosuch" finds nothing. A single-word query
  * behaves exactly like a plain substring match.
  *
+ * Results are ranked: products whose NAME contains more of the query words
+ * come first, so typing "azure" or a tool's name puts that tool at the top
+ * instead of below products that only mention the word in their description
+ * or Key Features. The sort is stable, so products that rank equally (and
+ * every product for a blank query) keep their catalogue order.
+ *
  * Keep this module free of npm imports: an evolve fixture imports it directly
  * with Node type stripping.
  */
@@ -62,7 +68,17 @@ export function filterProductsByQuery<T extends SearchableProduct>(
   products: T[],
   query: string
 ): T[] {
-  return products.filter((product) => matchesProductQuery(product, query));
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  const matches = products.filter((product) => matchesProductQuery(product, query));
+  if (words.length === 0) return matches;
+  const nameHits = (product: SearchableProduct) => {
+    const name = fold(product.name);
+    return words.filter((word) => name.includes(word)).length;
+  };
+  return matches
+    .map((product, index) => ({ product, index, hits: nameHits(product) }))
+    .sort((a, b) => b.hits - a.hits || a.index - b.index)
+    .map(({ product }) => product);
 }
 /** URL query parameter that mirrors the search box (`/?q=ai`). */
 export const SEARCH_QUERY_PARAM = "q";

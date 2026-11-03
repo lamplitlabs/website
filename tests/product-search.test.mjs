@@ -187,3 +187,28 @@ test("an adjacent phrase that matched before still matches", () => {
   const target = products.find((p) => p.name === "Azure Compliance Matrix");
   assert.ok(filterProductsByQuery(products, "Compliance Matrix").includes(target));
 });
+
+test("results rank name matches first: 'azure' lists Azure products before products that only mention Azure elsewhere", () => {
+  // Synthetic catalogue: the Azure-named product sits last, the others only mention Azure in body copy.
+  const catalogue = [
+    { name: "Helper", description: "Works with Azure subscriptions" },
+    { name: "Notes", description: "Plain notes", highlights: [{ title: "Azure export", description: "x" }] },
+    { name: "Azure Widget", description: "A widget" },
+  ];
+  assert.deepEqual(
+    filterProductsByQuery(catalogue, "azure").map((p) => p.name),
+    ["Azure Widget", "Helper", "Notes"],
+    "name match first, ties keep catalogue order"
+  );
+  assert.deepEqual(filterProductsByQuery(catalogue, "").map((p) => p.name), ["Helper", "Notes", "Azure Widget"], "blank query keeps catalogue order");
+
+  // Real catalogue: every query that hits a product name lists the name matches before the rest.
+  for (const q of ["azure", "ai", "tools", "light"]) {
+    const result = filterProductsByQuery(products, q);
+    const hits = result.map((p) => p.name.toLowerCase().includes(q));
+    assert.ok(hits.includes(true), `"${q}" matches at least one product name`);
+    assert.deepEqual(hits, [...hits].sort((a, b) => Number(b) - Number(a)), `"${q}" lists name matches first: ${result.map((p) => p.name).join(", ")}`);
+  }
+  const azure = filterProductsByQuery(products, "azure");
+  assert.ok(azure.length > 0 && azure[0].name.toLowerCase().includes("azure"), "first 'azure' result is an Azure product");
+});

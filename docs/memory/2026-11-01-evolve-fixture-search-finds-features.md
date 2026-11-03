@@ -3,7 +3,7 @@
 **Date:** 2026-11-01  
 **Type:** Convention  
 **Scope:** Product search (`lib/product-search.ts`), catalog (`lib/site-data.ts`), self-improvement loop fixtures  
-**Resolution:** open (HEAD `72bebde` scores 11/37)  
+**Resolution:** resolved by `404f87d` (search matches highlights; 37/37 at `404f87d`)  
 
 ## Summary
 

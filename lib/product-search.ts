@@ -10,6 +10,16 @@
  * "Einbürgerungstest"); folding diacritics lets a visitor who types the
  * plain-ASCII spelling ("prufung") still find the product. Blank queries
  * match everything.
+ *
+ * Multi-word queries are matched word by word: the folded query is split on
+ * whitespace and a product matches when EVERY word is a substring of at least
+ * one of those fields (AND, not OR). So "Security Azure" finds Azure
+ * Compliance Matrix even though the words come from different chips and in a
+ * different order, while "Azure zzqxnosuch" finds nothing. A single-word query
+ * behaves exactly like a plain substring match.
+ *
+ * Keep this module free of npm imports: an evolve fixture imports it directly
+ * with Node type stripping.
  */
 export type SearchableProduct = {
   name: string;
@@ -27,22 +37,25 @@ function fold(value: string): string {
     .toLowerCase();
 }
 
+function searchableText(product: SearchableProduct): string[] {
+  return [
+    product.name,
+    product.title ?? "",
+    product.description,
+    ...(product.tags ?? []),
+    product.longDescription ?? "",
+    ...(product.highlights ?? []).flatMap((h) => [h.title, h.description]),
+  ].map(fold);
+}
+
 export function matchesProductQuery(
   product: SearchableProduct,
   query: string
 ): boolean {
-  const q = fold(query.trim());
-  if (!q) return true;
-  return (
-    fold(product.name).includes(q) ||
-    fold(product.title ?? "").includes(q) ||
-    fold(product.description).includes(q) ||
-    (product.tags ?? []).some((tag) => fold(tag).includes(q)) ||
-    fold(product.longDescription ?? "").includes(q) ||
-    (product.highlights ?? []).some(
-      (h) => fold(h.title).includes(q) || fold(h.description).includes(q)
-    )
-  );
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  if (words.length === 0) return true;
+  const fields = searchableText(product);
+  return words.every((word) => fields.some((field) => field.includes(word)));
 }
 
 export function filterProductsByQuery<T extends SearchableProduct>(

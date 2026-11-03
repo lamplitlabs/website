@@ -3,7 +3,7 @@
 **Date:** 2026-11-03  
 **Type:** Convention  
 **Scope:** Product search (`lib/product-search.ts`), catalog (`lib/site-data.ts`), self-improvement loop fixtures  
-**Resolution:** open (HEAD `404f87d` scores 3/54)  
+**Resolution:** resolved: `matchesProductQuery` matches word by word (AND); a local run of the same scoring gives 54/54 (was 3/54 at `404f87d`)  
 
 ## Summary
 

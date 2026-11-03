@@ -1,5 +1,5 @@
 // The product grid's free-text search (lib/product-search.ts) must filter the
-// real catalog by case-insensitive name/description substring, and the grid
+// real catalog by case-insensitive, word-by-word (AND) substring match, and the grid
 // must actually wire it into `filteredProducts`.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -164,4 +164,26 @@ test("search finds a product by its Key Features highlight titles", () => {
       assert.ok(hits.includes(p), `"${h.title}" should find ${p.name}`);
     }
   }
+});
+
+test("multi-word query matches word by word: 'Security Azure' finds Azure Compliance Matrix", () => {
+  const target = products.find((p) => p.name === "Azure Compliance Matrix");
+  assert.ok(target, "catalog has Azure Compliance Matrix");
+  const result = filterProductsByQuery(products, "Security Azure");
+  assert.ok(result.includes(target), "words in a different order from different chips still match");
+  assert.ok(result.length < products.length, "a two-word query narrows the catalog");
+  for (const p of result) {
+    assert.ok(matchesProductQuery(p, "security") && matchesProductQuery(p, "azure"), `${p.name} matches every word`);
+  }
+  assert.ok(filterProductsByQuery(products, "  azure\tSECURITY  ").includes(target), "extra whitespace and case are ignored");
+});
+
+test("multi-word query is AND, not OR: one unknown word matches nothing", () => {
+  assert.ok(filterProductsByQuery(products, "Azure").length > 0);
+  assert.deepEqual(filterProductsByQuery(products, "Azure zzqxnosuch"), []);
+});
+
+test("an adjacent phrase that matched before still matches", () => {
+  const target = products.find((p) => p.name === "Azure Compliance Matrix");
+  assert.ok(filterProductsByQuery(products, "Compliance Matrix").includes(target));
 });

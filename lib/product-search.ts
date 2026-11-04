@@ -132,6 +132,47 @@ export function filterProductsByQuery<T extends SearchableProduct>(
     .sort((a, b) => b.hits - a.hits || b.tags - a.tags || a.index - b.index)
     .map(({ product }) => product);
 }
+
+export type ProductQuerySuggestion<T> = {
+  /** The visitor's query with one word dropped, as they spelled it. */
+  query: string;
+  /** The word that was dropped. */
+  dropped: string;
+  /** filterProductsByQuery(products, query): never empty. */
+  products: T[];
+};
+
+/**
+ * "Did you mean" fallback for a query that matches nothing. A visitor who adds
+ * one stray or misspelled word to a good query ("drawio zzz", "azure
+ * complianse") gets "No products match" from the strict AND match above. This
+ * retries the query with each whitespace-separated word dropped in turn and
+ * returns the narrowest retry that still matches something (ties drop the
+ * later word, since a typo is usually the last thing typed). It returns null
+ * when the query already matches, is a single word, or no single drop helps.
+ *
+ * filterProductsByQuery itself stays strict ("Azure zzqxnosuch" finds
+ * nothing): the grid shows these products under an explicit hint instead.
+ */
+export function suggestProductQuery<T extends SearchableProduct>(
+  products: T[],
+  query: string
+): ProductQuerySuggestion<T> | null {
+  const terms = query.trim().split(/\s+/).filter(Boolean);
+  if (terms.length < 2) return null;
+  if (filterProductsByQuery(products, query).length > 0) return null;
+  let best: ProductQuerySuggestion<T> | null = null;
+  terms.forEach((dropped, index) => {
+    const retry = terms.filter((_, i) => i !== index).join(" ");
+    const matches = filterProductsByQuery(products, retry);
+    if (matches.length === 0) return;
+    if (!best || matches.length <= best.products.length) {
+      best = { query: retry, dropped, products: matches };
+    }
+  });
+  return best;
+}
+
 /** URL query parameter that mirrors the search box (`/?q=ai`). */
 export const SEARCH_QUERY_PARAM = "q";
 

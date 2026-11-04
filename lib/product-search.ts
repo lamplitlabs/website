@@ -50,6 +50,9 @@ const LETTER_FOLDS: Record<string, string> = {
   ø: "o",
   đ: "d",
   ł: "l",
+  œ: "oe",
+  ð: "d",
+  þ: "th",
 };
 
 function fold(value: string): string {
@@ -57,7 +60,7 @@ function fold(value: string): string {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[ßæøđł]/g, (letter) => LETTER_FOLDS[letter]);
+    .replace(/[ßæøđłœðþ]/g, (letter) => LETTER_FOLDS[letter]);
 }
 
 function searchableText(product: SearchableProduct): string[] {

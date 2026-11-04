@@ -169,6 +169,14 @@ test("query folds letters NFD keeps whole: 'strasse' finds 'Straße' (and æ, ø
   for (const q of ["traening", "oresund", "da nang", "lodz", "Øresund", "łódź"]) {
     assert.deepEqual(filterProductsByQuery(catalogue, q).map((p) => p.name), ["Nord"], `"${q}" finds Nord`);
   }
+  // œ→oe, ð→d, þ→th, upper and lower case, native spelling still matching.
+  const more = [
+    { name: "Plain", description: "Nothing special" },
+    { name: "Atelier", description: "Œuvre complète", tags: ["Þingvellir", "Guðrún"] },
+  ];
+  for (const q of ["oeuvre", "thingvellir", "gudrun", "Œuvre", "þingvellir", "guðrún"]) {
+    assert.deepEqual(filterProductsByQuery(more, q).map((p) => p.name), ["Atelier"], `"${q}" finds Atelier`);
+  }
 });
 
 test("search finds a product by its Key Features highlight titles", () => {

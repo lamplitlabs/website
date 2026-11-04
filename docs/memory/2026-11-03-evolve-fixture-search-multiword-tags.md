@@ -26,9 +26,12 @@ The first behaviour fixture, `behaviour-search-finds-features`, reached 37/37 wh
 - **How to move it honestly:** split the query on whitespace. A product matches when every folded word matches one of its searchable fields (name, title, description, tags, longDescription, highlights). Cover this in `tests/product-search.test.mjs`. Do not add tags or copy just to raise the count.
 - The fixture's full request text and scorer are stored in Pulse (`pulse evolve fixture list --project lamplitlabs`).
 
-## Follow-on fixture: `behaviour-search-stray-word` (proposed 2026-11-04)
+## Follow-on fixture: `behaviour-search-stray-word` (registered 2026-11-04)
 
-The same tag pairs also measure the "did you mean" hint that `b5e6408` added (`suggestProductQuery` in `lib/product-search.ts`). The search stays strict (AND), so one junk word still empties the results. The hint offers the query with that word dropped. Every enabled fixture ties on `b5e6408`, so the loop has no measure of this behaviour yet. This section writes the fixture down. It is not registered in Pulse yet.
+The same tag pairs also measure the "did you mean" hint that `b5e6408` added (`suggestProductQuery` in `lib/product-search.ts`). The search stays strict (AND), so one junk word still empties the results. The hint offers the query with that word dropped. Every other enabled fixture ties on `b5e6408`, so before this fixture the loop had no measure of this behaviour.
+
+- **Registered:** 2026-11-04 as public metric fixture `behaviour-search-stray-word` (weight 1, scale 108), from experiment card `20261104T182619Z-borealis-10-2`. The scorer is the same `pulse evolve score metric --higher --scale 108 -- sh -c 'for n in node /usr/local/bin/node; …'` wrapper as `behaviour-search-multiword-tags`. Read it with `sqlite3 -readonly ~/.pulse/pulse.sqlite "select scorer_cmd from evolution_fixtures where project='lamplitlabs' and name='behaviour-search-stray-word'"`.
+- **Registered scorer checked against regressions:** it scores 108 at `557cbd2`, 0 at `b5e6408~1`, 54 when `suggestProductQuery` only tries dropping the first word, and 0 when it also hints for queries that already match. It does not catch a tie-break flip (`<=` → `>`): tag-pair queries have only one dropping that matches, so that flip still scores 108. The unit test `did-you-mean: no suggestion when…` covers the tie-break instead.
 
 - **Score:** take each product and each ordered pair of two different tags whose query `"<tag A> <tag B>"` already finds that product. Add the junk word `zzqxnosuch` after the pair and, separately, before it. That gives 2 queries per pair, 108 at `b5e6408`. A query scores when all of these hold:
   - the real `filterProductsByQuery` over the real `products` returns nothing;
@@ -47,7 +50,7 @@ The same tag pairs also measure the "did you mean" hint that `b5e6408` added (`s
   - `"Security Azure zzqxnosuch"` suggests `"Security Azure"`.
 - **Runtime:** the same as above. It needs Node 22.18 or later, no `node_modules` and no build.
 - **How to move it honestly:** keep `filterProductsByQuery` strict and fix `suggestProductQuery`, covering the change in `tests/product-search.test.mjs`. Do not add tags, and do not special-case the junk word.
-- **Card check:** `node --test tests/product-search.test.mjs` passes on HEAD and on any tree that keeps the did-you-mean tests, so it ties. The registered fixture's score is what moves.
+- **Card check:** `node --test tests/product-search.test.mjs` passes on HEAD and on any tree that keeps the did-you-mean tests, so it ties. The registered fixture's score is what moves: a later change that breaks the hint drops it below 108.
 
 ## Related Patterns
 

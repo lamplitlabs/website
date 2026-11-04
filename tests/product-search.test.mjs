@@ -292,3 +292,52 @@ test("punctuation in the copy is optional: 'drawio', 'ondevice', 'selfhosted' fi
   assert.deepEqual(filterProductsByQuery(products, "drawiozzqx"), []);
   assert.deepEqual(filterProductsByQuery(products, "Azure zzqxnosuch"), []);
 });
+
+test("did-you-mean: a query with one stray word suggests the query without it", () => {
+  const { suggestProductQuery } = search;
+  const drawio = products.find((p) => p.name === "Azure Draw.io Assets");
+  assert.ok(drawio, "catalog has Azure Draw.io Assets");
+  // The strict match stays AND: the stray word still empties filterProductsByQuery…
+  assert.deepEqual(filterProductsByQuery(products, "drawio zzz"), []);
+  // …and the suggestion drops it, so the grid can still list the product.
+  const hint = suggestProductQuery(products, "drawio zzz");
+  assert.ok(hint, "a two-word query with one stray word gets a suggestion");
+  assert.equal(hint.query, "drawio");
+  assert.equal(hint.dropped, "zzz");
+  assert.ok(hint.products.includes(drawio));
+  assert.deepEqual(hint.products, filterProductsByQuery(products, "drawio"));
+  // The stray word can come first, and the kept words keep their spelling.
+  const lead = suggestProductQuery(products, "zzqx Draw.io");
+  assert.equal(lead?.query, "Draw.io");
+  assert.ok(lead.products.includes(drawio));
+  // Three words with one stray: the two good words still narrow (AND).
+  const three = suggestProductQuery(products, "Security Azure zzqxnosuch");
+  assert.equal(three?.query, "Security Azure");
+  assert.deepEqual(three.products, filterProductsByQuery(products, "Security Azure"));
+});
+
+test("did-you-mean: no suggestion when the query matches, is one word, or no single drop helps", () => {
+  const { suggestProductQuery } = search;
+  assert.equal(suggestProductQuery(products, "Security Azure"), null, "a matching query needs no hint");
+  assert.equal(suggestProductQuery(products, "drawiozzqx"), null, "a single word has nothing to drop");
+  assert.equal(suggestProductQuery(products, "   "), null);
+  assert.equal(suggestProductQuery(products, "zzqx no such product 7"), null, "nonsense still finds nothing");
+  assert.equal(suggestProductQuery(products, "zzqx yyqx"), null);
+  // The narrowest retry wins; on a tie the later word is dropped.
+  const catalogue = [
+    { name: "Alpha", description: "red green" },
+    { name: "Beta", description: "red" },
+    { name: "Gamma", description: "blue" },
+  ];
+  assert.equal(suggestProductQuery(catalogue, "red green blue")?.query, "red green");
+  assert.equal(suggestProductQuery(catalogue, "green blue")?.query, "green");
+});
+
+test("product grid lists the did-you-mean products under an explicit hint", () => {
+  const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
+  assert.match(grid, /suggestProductQuery\(categoryProducts, query\)/);
+  assert.match(grid, /const shownProducts = suggestion \? suggestion\.products : filteredProducts;/);
+  assert.match(grid, /\{shownProducts\.map\(\(product, i\) => \(/);
+  assert.match(grid, /Showing results for/);
+  assert.match(grid, /data-testid="product-search-suggestion"[\s\S]*?onClick=\{\(\) => updateQuery\(suggestion\.query\)\}/);
+});

@@ -15,6 +15,7 @@ import {
 } from "@/lib/site-data";
 import {
   filterProductsByQuery,
+  suggestProductQuery,
   SEARCH_QUERY_PARAM,
   withSearchQueryParam,
 } from "@/lib/product-search";
@@ -245,6 +246,14 @@ export function ProductGrid({ products }: { products: Product[] }) {
   // SearchableProduct picks up, so the detail-page copy is searchable too.
   const filteredProducts = filterProductsByQuery(categoryProducts, query);
   const hasQuery = query.trim().length > 0;
+  // One stray or misspelled word ("drawio zzz") should not empty the grid:
+  // when the strict AND match finds nothing, list what the query finds with
+  // one word dropped, under an explicit "showing results for" hint.
+  const suggestion =
+    filteredProducts.length === 0 && hasQuery
+      ? suggestProductQuery(categoryProducts, query)
+      : null;
+  const shownProducts = suggestion ? suggestion.products : filteredProducts;
   // A tag chip filters across every category (tags like "AI" span tabs), so
   // reset the category and reuse the search box/`?q=` path for the tag text.
   const filterByTag = (tag: string) => {
@@ -307,7 +316,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
         })}
       </div>
       <p aria-live="polite" className="sr-only">
-        Showing {filteredProducts.length} of {products.length} products
+        Showing {shownProducts.length} of {products.length} products
       </p>
       {hasInDevelopment && (
         <p className="mb-8 text-center text-sm text-muted-foreground">
@@ -324,30 +333,35 @@ export function ProductGrid({ products }: { products: Product[] }) {
           </a>
         </p>
       )}
-      <div
-        ref={ref}
-        className={`reveal-stagger ${styles.grid} ${
-          visible ? "visible" : ""
-        }`}
-      >
-        {filteredProducts.map((product, i) => (
-          <ProductCard
-            key={product.slug}
-            product={product}
-            index={i}
-            onTagClick={filterByTag}
-          />
-        ))}
-      </div>
       {filteredProducts.length === 0 && (
         <p
           role="status"
           data-testid="product-grid-empty"
-          className="py-12 text-center text-sm text-muted-foreground"
+          className={cn(
+            "text-center text-sm text-muted-foreground",
+            suggestion ? "mb-8" : "py-12"
+          )}
         >
-          {hasQuery
-            ? `No products match “${query.trim()}”.`
-            : "No products in this category yet."}{" "}
+          {hasQuery ? (
+            suggestion ? (
+              <>
+                No products match “{query.trim()}”. Showing results for{" "}
+                <button
+                  type="button"
+                  data-testid="product-search-suggestion"
+                  onClick={() => updateQuery(suggestion.query)}
+                  className="text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  “{suggestion.query}”
+                </button>{" "}
+                instead.
+              </>
+            ) : (
+              `No products match “${query.trim()}”.`
+            )
+          ) : (
+            "No products in this category yet."
+          )}{" "}
           <button
             type="button"
             onClick={() => {
@@ -360,6 +374,21 @@ export function ProductGrid({ products }: { products: Product[] }) {
           </button>
         </p>
       )}
+      <div
+        ref={ref}
+        className={`reveal-stagger ${styles.grid} ${
+          visible ? "visible" : ""
+        }`}
+      >
+        {shownProducts.map((product, i) => (
+          <ProductCard
+            key={product.slug}
+            product={product}
+            index={i}
+            onTagClick={filterByTag}
+          />
+        ))}
+      </div>
     </div>
   );
 }

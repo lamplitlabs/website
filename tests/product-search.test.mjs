@@ -266,3 +266,29 @@ test("within equal name rank, tag matches come before description-only matches: 
   }
   assert.equal(filterProductsByQuery(products, "germany")[0].name, "Leben in Deutschland", "'germany' starts with the Germany-tagged product");
 });
+
+test("punctuation in the copy is optional: 'drawio', 'ondevice', 'selfhosted' find their products", () => {
+  const names = (q) => filterProductsByQuery(products, q).map((p) => p.name);
+  for (const [q, name] of [
+    ["drawio", "Azure Draw.io Assets"],
+    ["Draw.io", "Azure Draw.io Assets"],
+    ["ondevice", "Eszett"],
+    ["on-device", "Eszett"],
+    ["selfhosted", "Lamplit Light"],
+    ["self-hosted", "Lamplit Light"],
+    ["a1c2", "Eszett"],
+  ]) {
+    const result = names(q);
+    assert.ok(result.includes(name), `"${q}" finds ${name}: got ${result.join(", ")}`);
+    assert.ok(result.length < products.length, `"${q}" does not return the whole catalogue`);
+  }
+  // Synthetic: slash- and dot-joined words match without their punctuation, AND still applies.
+  const catalogue = [
+    { name: "Codec", description: "An Encoder/Decoder for OData v4.01" },
+    { name: "Other", description: "Plain copy" },
+  ];
+  assert.deepEqual(filterProductsByQuery(catalogue, "encoderdecoder v401").map((p) => p.name), ["Codec"]);
+  assert.deepEqual(filterProductsByQuery(catalogue, "drawiozzqx"), []);
+  assert.deepEqual(filterProductsByQuery(products, "drawiozzqx"), []);
+  assert.deepEqual(filterProductsByQuery(products, "Azure zzqxnosuch"), []);
+});

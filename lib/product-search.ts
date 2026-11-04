@@ -13,6 +13,12 @@
  * đ→d, ł→l), so "strasse" finds copy that says "Straße". Blank queries
  * match everything.
  *
+ * Punctuation inside the copy is optional for the visitor: each field is also
+ * matched with every character that is not a letter, digit or whitespace
+ * removed, so "drawio" finds "Draw.io", "ondevice" finds "On-device" and
+ * "selfhosted" finds "self-hosted". The punctuated spelling still matches the
+ * original field.
+ *
  * Multi-word queries are matched word by word: the folded query is split on
  * whitespace and a product matches when EVERY word is a substring of at least
  * one of those fields (AND, not OR). So "Security Azure" finds Azure
@@ -63,8 +69,13 @@ function fold(value: string): string {
     .replace(/[ßæøđłœðþ]/g, (letter) => LETTER_FOLDS[letter]);
 }
 
+// Punctuation that joins compound words in the copy ("Draw.io", "On-device",
+// "self-hosted", "Encoder/Decoder", "A1–C2"). Each field is also matched with
+// it removed, so a visitor who types "drawio" or "selfhosted" still finds it.
+const JOINING_PUNCTUATION = /[^\p{L}\p{N}\s]+/gu;
+
 function searchableText(product: SearchableProduct): string[] {
-  return [
+  const fields = [
     product.name,
     product.title ?? "",
     product.description,
@@ -72,6 +83,10 @@ function searchableText(product: SearchableProduct): string[] {
     product.longDescription ?? "",
     ...(product.highlights ?? []).flatMap((h) => [h.title, h.description]),
   ].map(fold);
+  return [
+    ...fields,
+    ...fields.map((field) => field.replace(JOINING_PUNCTUATION, "")),
+  ];
 }
 
 export function matchesProductQuery(

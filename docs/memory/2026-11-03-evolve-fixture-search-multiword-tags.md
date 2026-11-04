@@ -26,6 +26,29 @@ The first behaviour fixture, `behaviour-search-finds-features`, reached 37/37 wh
 - **How to move it honestly:** split the query on whitespace. A product matches when every folded word matches one of its searchable fields (name, title, description, tags, longDescription, highlights). Cover this in `tests/product-search.test.mjs`. Do not add tags or copy just to raise the count.
 - The fixture's full request text and scorer are stored in Pulse (`pulse evolve fixture list --project lamplitlabs`).
 
+## Follow-on fixture: `behaviour-search-stray-word` (proposed 2026-11-04)
+
+The same tag pairs also measure the "did you mean" hint that `b5e6408` added (`suggestProductQuery` in `lib/product-search.ts`). The search stays strict (AND), so one junk word still empties the results. The hint offers the query with that word dropped. Every enabled fixture ties on `b5e6408`, so the loop has no measure of this behaviour yet. This section writes the fixture down. It is not registered in Pulse yet.
+
+- **Score:** take each product and each ordered pair of two different tags whose query `"<tag A> <tag B>"` already finds that product. Add the junk word `zzqxnosuch` after the pair and, separately, before it. That gives 2 queries per pair, 108 at `b5e6408`. A query scores when all of these hold:
+  - the real `filterProductsByQuery` over the real `products` returns nothing;
+  - `suggestProductQuery` returns `query` equal to the pair, as typed;
+  - its `dropped` is the junk word;
+  - its `products` include the product but not the whole catalogue.
+- **Measured:** 108/108 at `b5e6408` (HEAD `dc7bac4`), 0/108 at `b5e6408~1` (no `suggestProductQuery`). Both runs used `/usr/local/bin/node` v22.18.0 with type stripping. The scale has no headroom at HEAD. The fixture guards against regressions and records a measured gain for this commit. It does not leave room for future gains.
+- **What scores 0:**
+  - `suggestProductQuery(products, q)` returns a hint for a nonsense query, where `q` is `"zzqx no such product 7"`, `"zzqx yyqx"` or the single word `"drawiozzqx"`;
+  - it returns a hint for a query that already matches, such as the first two tags of a product;
+  - `filterProductsByQuery(products, "Azure zzqxnosuch")` returns anything. If the strict match stops being strict, the hint is never shown;
+  - the source does not load, or `suggestProductQuery` is missing.
+- **Spot checks:** these are the same queries as the unit test `did-you-mean: a query with one stray word…` in `tests/product-search.test.mjs`:
+  - `"drawio zzz"` suggests `"drawio"`;
+  - `"zzqx Draw.io"` suggests `"Draw.io"`;
+  - `"Security Azure zzqxnosuch"` suggests `"Security Azure"`.
+- **Runtime:** the same as above. It needs Node 22.18 or later, no `node_modules` and no build.
+- **How to move it honestly:** keep `filterProductsByQuery` strict and fix `suggestProductQuery`, covering the change in `tests/product-search.test.mjs`. Do not add tags, and do not special-case the junk word.
+- **Card check:** `node --test tests/product-search.test.mjs` passes on HEAD and on any tree that keeps the did-you-mean tests, so it ties. The registered fixture's score is what moves.
+
 ## Related Patterns
 
 - [`2026-11-01-evolve-fixture-search-finds-features.md`](2026-11-01-evolve-fixture-search-finds-features.md): the first search behaviour fixture (now 37/37)
@@ -34,3 +57,4 @@ The first behaviour fixture, `behaviour-search-finds-features`, reached 37/37 wh
 ## Impact
 
 - Any change to how `lib/product-search.ts` tokenises or matches a query moves this score. So does any change to product `tags` in `lib/site-data.ts`.
+- `behaviour-search-stray-word` also moves with any change to `suggestProductQuery`.

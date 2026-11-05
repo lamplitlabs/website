@@ -134,9 +134,12 @@ export function filterProductsByQuery<T extends SearchableProduct>(
 }
 
 export type ProductQuerySuggestion<T> = {
-  /** The visitor's query with one word dropped, as they spelled it. */
+  /**
+   * The visitor's query with one word dropped, as they spelled it, or, for a
+   * misspelled single word, the catalogue word it was one edit away from.
+   */
   query: string;
-  /** The word that was dropped. */
+  /** The word that was dropped (or, for a misspelled single word, replaced). */
   dropped: string;
   /** filterProductsByQuery(products, query): never empty. */
   products: T[];
@@ -149,7 +152,16 @@ export type ProductQuerySuggestion<T> = {
  * retries the query with each whitespace-separated word dropped in turn and
  * returns the narrowest retry that still matches something (ties drop the
  * later word, since a typo is usually the last thing typed). It returns null
- * when the query already matches, is a single word, or no single drop helps.
+ * when the query already matches or no single drop helps.
+ *
+ * A single word of 5+ letters that matches nothing ("complance",
+ * "secruity") is treated as a typo instead: it is compared with every word in
+ * the catalogue copy, and a word within one edit (one letter
+ * missing, extra or changed, or two neighbouring letters swapped) is
+ * suggested, with `dropped` holding the misspelled word. Among several such
+ * words the one that lists the most products wins (ties keep the first word
+ * found in catalogue order). Shorter words are not corrected, and nothing is
+ * suggested when no catalogue word is one edit away.
  *
  * filterProductsByQuery itself stays strict ("Azure zzqxnosuch" finds
  * nothing): the grid shows these products under an explicit hint instead.
@@ -159,8 +171,9 @@ export function suggestProductQuery<T extends SearchableProduct>(
   query: string
 ): ProductQuerySuggestion<T> | null {
   const terms = query.trim().split(/\s+/).filter(Boolean);
-  if (terms.length < 2) return null;
+  if (terms.length === 0) return null;
   if (filterProductsByQuery(products, query).length > 0) return null;
+  if (terms.length === 1) return suggestSpelling(products, terms[0]);
   let best: ProductQuerySuggestion<T> | null = null;
   terms.forEach((dropped, index) => {
     const retry = terms.filter((_, i) => i !== index).join(" ");
@@ -170,6 +183,46 @@ export function suggestProductQuery<T extends SearchableProduct>(
       best = { query: retry, dropped, products: matches };
     }
   });
+  return best;
+}
+
+// Shortest misspelled word suggestProductQuery tries to correct.
+const MIN_TYPO_LENGTH = 5;
+
+// True when a and b differ by exactly one insertion, deletion, substitution
+// or swap of two neighbouring letters (Damerau-Levenshtein distance 1).
+function isOneEditApart(a: string, b: string): boolean {
+  if (a === b || Math.abs(a.length - b.length) > 1) return false;
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) i++;
+  if (a.length === b.length) {
+    if (a.slice(i + 1) === b.slice(i + 1)) return true;
+    return a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2);
+  }
+  const [shorter, longer] = a.length < b.length ? [a, b] : [b, a];
+  return shorter.slice(i) === longer.slice(i + 1);
+}
+
+function suggestSpelling<T extends SearchableProduct>(
+  products: T[],
+  term: string
+): ProductQuerySuggestion<T> | null {
+  const word = fold(term);
+  if (word.length < MIN_TYPO_LENGTH) return null;
+  const vocabulary = new Set(
+    products.flatMap((product) =>
+      searchableText(product).flatMap((field) => field.split(/[^\p{L}\p{N}]+/u))
+    )
+  );
+  let best: ProductQuerySuggestion<T> | null = null;
+  for (const candidate of vocabulary) {
+    if (!isOneEditApart(word, candidate)) continue;
+    const matches = filterProductsByQuery(products, candidate);
+    if (matches.length === 0) continue;
+    if (!best || matches.length > best.products.length) {
+      best = { query: candidate, dropped: term, products: matches };
+    }
+  }
   return best;
 }
 

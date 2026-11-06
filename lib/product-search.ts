@@ -169,8 +169,11 @@ export type ProductQuerySuggestion<T> = {
  * In a multi-word query the same correction is tried first on every word of
  * 5+ letters that matches nothing on its own ("azure complianse" suggests
  * "azure compliance", "secruity complance" suggests "security compliance"),
- * keeping the other words as typed. Only when no correction makes the query
- * match does it fall back to dropping a word.
+ * keeping the other words as typed. When the corrected query still matches
+ * nothing because of a junk word as well ("azure complianse zzqx"), the
+ * corrections are kept and one uncorrected word is dropped ("azure
+ * compliance"; `dropped` lists the misspelled words, then the dropped one).
+ * Only when no correction helps does it fall back to dropping a word.
  *
  * filterProductsByQuery itself stays strict ("Azure zzqxnosuch" finds
  * nothing): the grid shows these products under an explicit hint instead.
@@ -207,9 +210,35 @@ export function suggestProductQuery<T extends SearchableProduct>(
     if (matches.length > 0) {
       return { query: retry, dropped: replaced.join(" "), products: matches };
     }
+    // A typo and a junk word together ("azure complianse zzqx"): keep the
+    // corrections and drop one word that was not corrected, so the hint reads
+    // "azure compliance" instead of nothing.
+    const fixedThenDropped = narrowestDrop(
+      products,
+      corrected,
+      (index) => corrected[index] !== terms[index]
+    );
+    if (fixedThenDropped) {
+      return {
+        ...fixedThenDropped,
+        dropped: [...replaced, fixedThenDropped.dropped].join(" "),
+      };
+    }
   }
+  return narrowestDrop(products, terms, () => false);
+}
+
+// The query with one word of `terms` dropped (skipping indexes `keep` says to
+// keep) that matches the fewest products, ties dropping the later word; null
+// when no single drop matches anything.
+function narrowestDrop<T extends SearchableProduct>(
+  products: T[],
+  terms: string[],
+  keep: (index: number) => boolean
+): ProductQuerySuggestion<T> | null {
   let best: ProductQuerySuggestion<T> | null = null;
   terms.forEach((dropped, index) => {
+    if (keep(index)) return;
     const retry = terms.filter((_, i) => i !== index).join(" ");
     const matches = filterProductsByQuery(products, retry);
     if (matches.length === 0) return;

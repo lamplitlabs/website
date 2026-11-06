@@ -293,6 +293,28 @@ test("punctuation in the copy is optional: 'drawio', 'ondevice', 'selfhosted' fi
   assert.deepEqual(filterProductsByQuery(products, "Azure zzqxnosuch"), []);
 });
 
+test("a product name typed joined or as its slug finds the product: 'edmxtools', 'azure-compliance-matrix'", () => {
+  const names = (q) => filterProductsByQuery(products, q).map((p) => p.name);
+  for (const [q, name] of [
+    ["edmxtools", "EDMX Tools"],
+    ["edmx-tools", "EDMX Tools"],
+    ["lamplitlight", "Lamplit Light"],
+    ["azurecompliancematrix", "Azure Compliance Matrix"],
+    ["azure-compliance-matrix", "Azure Compliance Matrix"],
+    ["leben-in-deutschland", "Leben in Deutschland"],
+    ["azure-drawio-assets", "Azure Draw.io Assets"],
+  ]) {
+    const result = names(q);
+    assert.ok(result.includes(name), `"${q}" finds ${name}: got ${result.join(", ")}`);
+    assert.ok(result.length < products.length, `"${q}" does not return the whole catalogue`);
+  }
+  // Every word still has to match: junk joined on or hyphenated in finds nothing.
+  for (const q of ["azurezzqxnosuch", "azure-zzqxnosuch", "zzqx-no-such", "qwerty-uiop"]) {
+    assert.deepEqual(names(q), [], `"${q}" finds nothing`);
+  }
+  assert.ok(names("azure").length < products.length, `"azure" does not return the whole catalogue`);
+});
+
 test("did-you-mean: a query with one stray word suggests the query without it", () => {
   const { suggestProductQuery } = search;
   const drawio = products.find((p) => p.name === "Azure Draw.io Assets");

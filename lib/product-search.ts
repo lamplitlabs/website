@@ -17,10 +17,14 @@
  * matched with every character that is not a letter, digit or whitespace
  * removed, so "drawio" finds "Draw.io", "ondevice" finds "On-device" and
  * "selfhosted" finds "self-hosted". The punctuated spelling still matches the
- * original field.
+ * original field. Each field is matched a third time with spaces removed as
+ * well, so a product name typed joined, the way it appears in a hashtag
+ * ("edmxtools", "lamplitlight", "azurecompliancematrix"), still finds it.
  *
  * Multi-word queries are matched word by word: the folded query is split on
- * whitespace and a product matches when EVERY word is a substring of at least
+ * whitespace and hyphens (so a product's URL slug such as
+ * "leben-in-deutschland" or "azure-compliance-matrix" is searched as its
+ * words) and a product matches when EVERY word is a substring of at least
  * one of those fields (AND, not OR). So "Security Azure" finds Azure
  * Compliance Matrix even though the words come from different chips and in a
  * different order, while "Azure zzqxnosuch" finds nothing. A single-word query
@@ -74,6 +78,16 @@ function fold(value: string): string {
 // it removed, so a visitor who types "drawio" or "selfhosted" still finds it.
 const JOINING_PUNCTUATION = /[^\p{L}\p{N}\s]+/gu;
 
+// Everything that is not a letter or digit, spaces included: a field matched
+// with these removed lets "edmxtools" find "EDMX Tools".
+const NON_ALPHANUMERIC = /[^\p{L}\p{N}]+/gu;
+
+// The folded query split into the words that must all match. Hyphens split
+// like spaces, so a slug ("azure-compliance-matrix") is searched as its words.
+function queryWords(query: string): string[] {
+  return fold(query).split(/[\s-]+/).filter(Boolean);
+}
+
 function searchableText(product: SearchableProduct): string[] {
   const fields = [
     product.name,
@@ -86,6 +100,7 @@ function searchableText(product: SearchableProduct): string[] {
   return [
     ...fields,
     ...fields.map((field) => field.replace(JOINING_PUNCTUATION, "")),
+    ...fields.map((field) => field.replace(NON_ALPHANUMERIC, "")),
   ];
 }
 
@@ -93,7 +108,7 @@ export function matchesProductQuery(
   product: SearchableProduct,
   query: string
 ): boolean {
-  const words = fold(query).split(/\s+/).filter(Boolean);
+  const words = queryWords(query);
   if (words.length === 0) return true;
   const fields = searchableText(product);
   return words.every((word) => fields.some((field) => field.includes(word)));
@@ -103,7 +118,7 @@ export function filterProductsByQuery<T extends SearchableProduct>(
   products: T[],
   query: string
 ): T[] {
-  const words = fold(query).split(/\s+/).filter(Boolean);
+  const words = queryWords(query);
   const matches = products.filter((product) => matchesProductQuery(product, query));
   if (words.length === 0) return matches;
   const nameHits = (product: SearchableProduct) => {

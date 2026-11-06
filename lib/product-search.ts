@@ -31,7 +31,8 @@
  * behaves exactly like a plain substring match.
  *
  * Results are ranked: products whose NAME contains more of the query words
- * come first, so typing "azure" or a tool's name puts that tool at the top
+ * come first (a name typed joined, "edmxtools", counts as a name match), so
+ * typing "azure" or a tool's name puts that tool at the top
  * instead of below products that only mention the word in their description
  * or Key Features. Among products with the same number of name matches, those
  * whose tags (the chips on each card) exactly match more of the query words
@@ -121,9 +122,14 @@ export function filterProductsByQuery<T extends SearchableProduct>(
   const words = queryWords(query);
   const matches = products.filter((product) => matchesProductQuery(product, query));
   if (words.length === 0) return matches;
+  // The name is also tested with every non-alphanumeric removed (the same
+  // fold the joined-name match uses), so "edmxtools" is a name hit for
+  // "EDMX Tools" and puts it above products that only mention the words.
   const nameHits = (product: SearchableProduct) => {
     const name = fold(product.name);
-    return words.filter((word) => name.includes(word)).length;
+    const joined = name.replace(NON_ALPHANUMERIC, "");
+    return words.filter((word) => name.includes(word) || joined.includes(word))
+      .length;
   };
   // A tag "matches" a query word when the word is the whole tag or one whole
   // word of it ("ai" hits "AI" and "Sovereign AI", not "Training"), so short

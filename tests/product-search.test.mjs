@@ -315,6 +315,25 @@ test("a product name typed joined or as its slug finds the product: 'edmxtools',
   assert.ok(names("azure").length < products.length, `"azure" does not return the whole catalogue`);
 });
 
+test("a name typed joined ranks as a name match: 'edmxtools' lists EDMX Tools first", () => {
+  // Synthetic: the mention comes first in catalogue order, the named product still leads.
+  const catalogue = [
+    { name: "Mention", description: "Pairs well with EDMX Tools and edmxtools exports" },
+    { name: "EDMX Tools", description: "Inspect OData metadata" },
+  ];
+  assert.deepEqual(filterProductsByQuery(catalogue, "edmxtools").map((p) => p.name), ["EDMX Tools", "Mention"]);
+  assert.deepEqual(filterProductsByQuery(catalogue, "EDMX Tools").map((p) => p.name), ["EDMX Tools", "Mention"]);
+  // Real catalogue: each joined name puts its product at the top.
+  for (const [q, name] of [
+    ["edmxtools", "EDMX Tools"],
+    ["lamplitlight", "Lamplit Light"],
+    ["azurecompliancematrix", "Azure Compliance Matrix"],
+    ["azuredrawioassets", "Azure Draw.io Assets"],
+  ]) {
+    assert.equal(filterProductsByQuery(products, q)[0]?.name, name, `"${q}" lists ${name} first`);
+  }
+});
+
 test("did-you-mean: a query with one stray word suggests the query without it", () => {
   const { suggestProductQuery } = search;
   const drawio = products.find((p) => p.name === "Azure Draw.io Assets");

@@ -135,11 +135,14 @@ export function filterProductsByQuery<T extends SearchableProduct>(
 
 export type ProductQuerySuggestion<T> = {
   /**
-   * The visitor's query with one word dropped, as they spelled it, or, for a
-   * misspelled single word, the catalogue word it was one edit away from.
+   * The visitor's query with one word dropped, as they spelled it, or with
+   * each misspelled word replaced by the catalogue word one edit away.
    */
   query: string;
-  /** The word that was dropped (or, for a misspelled single word, replaced). */
+  /**
+   * The word that was dropped, or the misspelled word(s) that were replaced
+   * (space-separated, as typed).
+   */
   dropped: string;
   /** filterProductsByQuery(products, query): never empty. */
   products: T[];
@@ -163,6 +166,12 @@ export type ProductQuerySuggestion<T> = {
  * found in catalogue order). Shorter words are not corrected, and nothing is
  * suggested when no catalogue word is one edit away.
  *
+ * In a multi-word query the same correction is tried first on every word of
+ * 5+ letters that matches nothing on its own ("azure complianse" suggests
+ * "azure compliance", "secruity complance" suggests "security compliance"),
+ * keeping the other words as typed. Only when no correction makes the query
+ * match does it fall back to dropping a word.
+ *
  * filterProductsByQuery itself stays strict ("Azure zzqxnosuch" finds
  * nothing): the grid shows these products under an explicit hint instead.
  */
@@ -173,7 +182,32 @@ export function suggestProductQuery<T extends SearchableProduct>(
   const terms = query.trim().split(/\s+/).filter(Boolean);
   if (terms.length === 0) return null;
   if (filterProductsByQuery(products, query).length > 0) return null;
-  if (terms.length === 1) return suggestSpelling(products, terms[0]);
+  if (terms.length === 1) return suggestSpelling(products, terms[0], []);
+  // Correct misspelled words before dropping any: "azure complianse" should
+  // become "azure compliance", not "azure". A word is corrected only when it
+  // matches nothing on its own, and only to a catalogue word that still
+  // matches together with the words already known to be good.
+  const corrected = [...terms];
+  const replaced: string[] = [];
+  const matchesAlone = (word: string) =>
+    filterProductsByQuery(products, word).length > 0;
+  terms.forEach((term, index) => {
+    if (matchesAlone(term)) return;
+    const context = corrected.filter(
+      (word, i) => i !== index && matchesAlone(word)
+    );
+    const fix = suggestSpelling(products, term, context);
+    if (!fix) return;
+    corrected[index] = fix.query;
+    replaced.push(term);
+  });
+  if (replaced.length > 0) {
+    const retry = corrected.join(" ");
+    const matches = filterProductsByQuery(products, retry);
+    if (matches.length > 0) {
+      return { query: retry, dropped: replaced.join(" "), products: matches };
+    }
+  }
   let best: ProductQuerySuggestion<T> | null = null;
   terms.forEach((dropped, index) => {
     const retry = terms.filter((_, i) => i !== index).join(" ");
@@ -203,9 +237,12 @@ function isOneEditApart(a: string, b: string): boolean {
   return shorter.slice(i) === longer.slice(i + 1);
 }
 
+// The catalogue word one edit away from `term` that, searched together with
+// the `context` words, lists the most products (null when none does).
 function suggestSpelling<T extends SearchableProduct>(
   products: T[],
-  term: string
+  term: string,
+  context: string[]
 ): ProductQuerySuggestion<T> | null {
   const word = fold(term);
   if (word.length < MIN_TYPO_LENGTH) return null;
@@ -217,7 +254,10 @@ function suggestSpelling<T extends SearchableProduct>(
   let best: ProductQuerySuggestion<T> | null = null;
   for (const candidate of vocabulary) {
     if (!isOneEditApart(word, candidate)) continue;
-    const matches = filterProductsByQuery(products, candidate);
+    const matches = filterProductsByQuery(
+      products,
+      [...context, candidate].join(" ")
+    );
     if (matches.length === 0) continue;
     if (!best || matches.length > best.products.length) {
       best = { query: candidate, dropped: term, products: matches };

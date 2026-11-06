@@ -333,6 +333,31 @@ test("did-you-mean: no suggestion when the query matches, is one word, or no sin
   assert.equal(suggestProductQuery(catalogue, "green blue")?.query, "green");
 });
 
+test("did-you-mean: a typo inside a multi-word query is corrected, not dropped", () => {
+  const { suggestProductQuery } = search;
+  const compliance = products.find((p) => p.name === "Azure Compliance Matrix");
+  assert.ok(compliance, "catalog has Azure Compliance Matrix");
+  // The strict match stays AND, so the misspelled word still empties the grid…
+  assert.deepEqual(filterProductsByQuery(products, "azure complianse"), []);
+  // …and the hint corrects it instead of dropping it to the broader "azure".
+  const hint = suggestProductQuery(products, "azure complianse");
+  assert.equal(hint?.query, "azure compliance");
+  assert.equal(hint.dropped, "complianse");
+  assert.deepEqual(hint.products, [compliance]);
+  assert.deepEqual(hint.products, filterProductsByQuery(products, "azure compliance"));
+  // A swapped pair of letters in the first word, other words kept as typed.
+  assert.equal(suggestProductQuery(products, "secruity Azure")?.query, "security Azure");
+  // Two misspelled words are both corrected.
+  const both = suggestProductQuery(products, "secruity complance");
+  assert.equal(both?.query, "security compliance");
+  assert.equal(both.dropped, "secruity complance");
+  assert.deepEqual(both.products, [compliance]);
+  // Junk that is no catalogue word one edit away still falls back to the drop.
+  assert.equal(suggestProductQuery(products, "drawio zzz")?.query, "drawio");
+  assert.equal(suggestProductQuery(products, "Security Azure zzqxnosuch")?.query, "Security Azure");
+  assert.equal(suggestProductQuery(products, "zzqx yyqx"), null);
+});
+
 test("product grid lists the did-you-mean products under an explicit hint", () => {
   const grid = readFileSync(resolve(root, "components/product-grid.tsx"), "utf8");
   assert.match(grid, /suggestProductQuery\(categoryProducts, query\)/);

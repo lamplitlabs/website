@@ -44,18 +44,38 @@ function nearMissDistance(attempted: string, slug: string): number | undefined {
   return distance <= threshold && sharesBoundaries ? distance : undefined;
 }
 
+// A product path a visitor may type or follow by hand: the real
+// /products/<slug>, the singular /product/<slug>, or the bare /<slug> at the
+// site root. The segment name is matched case-insensitively (/Products/...).
+const productPathPattern = /^\/(?:(products?)\/)?([^/]+)\/?$/i;
+
 // A near-miss slug suggestion: only offered when the mistyped product path is
 // close enough to a real one that it is very likely the product the visitor
-// wanted (small edit distance relative to the slug's own length).
+// wanted. Three kinds of slip count:
+// - the real slug in the wrong place or case (/eszett, /product/eszett,
+//   /products/Eszett): the static host is case-sensitive, so these 404 even
+//   though the slug itself is right;
+// - the slug with hyphens added or dropped (/products/edmxtools);
+// - a small typo, under nearMissDistance's threshold and boundary guard, so
+//   unrelated words such as /products/night still get no suggestion.
 function findNearMissProduct(pathname: string): NearMiss | undefined {
-  const match = pathname.match(/^\/products\/([^/]+)\/?$/);
+  const match = pathname.match(productPathPattern);
   if (!match) return undefined;
-  const attempted = match[1].toLowerCase();
+  const [, segment, raw] = match;
+  const attempted = raw.toLowerCase();
+  const isRealPath = (slug: string) => segment === "products" && raw === slug;
   let best: NearMiss | undefined;
   for (const product of products) {
-    const distance = nearMissDistance(attempted, product.slug);
+    const { slug } = product;
+    if (isRealPath(slug)) return undefined; // the real product page would not 404
+    const distance =
+      attempted === slug
+        ? 0 // case-only or path-only difference
+        : attempted.replace(/-/g, "") === slug.replace(/-/g, "")
+          ? 1 // hyphen-only difference
+          : nearMissDistance(attempted, slug);
     if (distance !== undefined && (!best || distance < best.distance)) {
-      best = { href: `/products/${product.slug}`, name: product.name, distance };
+      best = { href: `/products/${slug}`, name: product.name, distance };
     }
   }
   return best;

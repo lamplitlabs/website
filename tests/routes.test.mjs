@@ -16,7 +16,7 @@ const siteData = read("lib/site-data.ts");
 const slugs = [...siteData.matchAll(/^\s*slug:\s*"([^"]+)"/gm)].map((m) => m[1]);
 const covers = [...siteData.matchAll(/^\s*cover:\s*"([^"]+)"/gm)].map((m) => m[1]);
 // Static (non-product) routes exported from app/: each needs an app/<route>/page.tsx.
-const staticRoutes = ["/privacy"];
+const staticRoutes = ["/ai", "/privacy"];
 const routes = ["/", ...staticRoutes, ...slugs.map((s) => `/products/${s}`)];
 
 // Cookie banner trust gap (kestrel-2): "We use cookies for analytics" must
@@ -670,7 +670,7 @@ test("static export (out/) /products/light page offers a 'Notify me' mailto whil
 // page scroll); on every other exported route they must be "/#id" (or absent)
 // so the click navigates home and scrolls instead of doing nothing.
 test("static export (out/) footer section anchors are plain on the home page and /#-prefixed elsewhere", skipWithoutOut, () => {
-  const anchors = ["products", "ai", "about", "contact"];
+  const anchors = ["products", "about", "contact"];
   const footerHrefs = (file) => {
     const html = readFileSync(resolve(root, "out", file), "utf8");
     const footer = html.slice(html.lastIndexOf("<footer"));
@@ -689,6 +689,10 @@ test("static export (out/) footer section anchors are plain on the home page and
   for (const id of anchors) {
     assert.ok(privacy.includes(`/#${id}`), `privacy footer must link /#${id}`);
   }
+  // AI is a real page (/ai, TASK-084), linked as a route from every footer.
+  assert.ok(home.includes("/ai"), "home footer must link /ai");
+  assert.ok(privacy.includes("/ai"), "privacy footer must link /ai");
+  assert.ok(!home.includes("#ai") && !privacy.includes("/#ai"), "footer AI link must go to /ai, not the homepage anchor");
   // No non-home page may carry a bare "#id" footer anchor (a dead click).
   const nonHome = routes.filter((r) => r !== "/").map((r) => `${r.slice(1)}.html`);
   for (const file of nonHome) {
@@ -745,7 +749,14 @@ test("footer nav prefixes hash-only navLinks with '/' off the home page", () => 
     if (/external:\s*true/.test(entry)) continue;
     const href = entry.match(/href:\s*"([^"]+)"/);
     assert.ok(href, `navLink entry has a string href: ${entry}`);
-    assert.match(href[1], /^#[a-z-]+$/, `non-external navLink must be a bare hash anchor: ${href[1]}`);
+    // Either a bare hash anchor on the homepage, or an absolute top-level route
+    // that exists as app/<route>/page.tsx (e.g. "/ai", docs/features/ai-route.md).
+    if (href[1].startsWith("/")) {
+      assert.match(href[1], /^\/[a-z-]+$/, `non-external route navLink must be a top-level path: ${href[1]}`);
+      assert.ok(existsSync(resolve(root, "app", href[1].slice(1), "page.tsx")), `navLink ${href[1]} needs app${href[1]}/page.tsx`);
+    } else {
+      assert.match(href[1], /^#[a-z-]+$/, `non-external navLink must be a bare hash anchor or a route: ${href[1]}`);
+    }
   }
 });
 
@@ -922,7 +933,10 @@ test("not-found page offers a near-miss static route suggestion", () => {
   const anchors = [...siteData.matchAll(/\{\s*label:\s*"([^"]+)",\s*href:\s*"#([a-z-]+)"\s*\}/g)]
     .map((m) => ({ slug: m[2], href: `/#${m[2]}`, name: m[1] }));
   assert.ok(anchors.length >= 3, "site-data must expose several home-page anchor nav links");
-  const routes = [{ slug: "privacy", href: "/privacy", name: "Privacy Policy" }, ...anchors];
+  const pageRoutes = [...siteData.matchAll(/\{\s*label:\s*"([^"]+)",\s*href:\s*"\/([a-z-]+)"\s*\}/g)]
+    .map((m) => ({ slug: m[2], href: `/${m[2]}`, name: m[1] }));
+  assert.match(src, /link\.href\)\)[\s\S]*?\.map\(\(link\) => \(\{ slug: link\.href\.slice\(1\), href: link\.href, name: link\.label \}\)\)/, "nav links to real routes (/ai) must be static-route candidates");
+  const routes = [{ slug: "privacy", href: "/privacy", name: "Privacy Policy" }, ...anchors, ...pageRoutes];
 
   function levenshtein(a, b) {
     const dp = Array.from({ length: a.length + 1 }, (_, i) =>
@@ -971,6 +985,8 @@ test("not-found page offers a near-miss static route suggestion", () => {
     }
     assert.equal(findStatic(`/${route.slug}-us`)?.href, route.href, `"/${route.slug}-us" should suggest ${route.href}`);
   }
+  assert.ok(pageRoutes.some((r) => r.href === "/ai"), "the /ai nav link must be a static-route candidate");
+  assert.equal(findStatic("/ai-models")?.href, "/ai", '"/ai-models" should suggest the /ai page itself');
 
   // Never fire for the real routes themselves, deeper paths, or unrelated URLs.
   for (const real of routes) assert.equal(findStatic(`/${real.slug}`), undefined, `/${real.slug} is a real route`);
@@ -1087,12 +1103,47 @@ test("vercel.json redirects hand-typed section URLs to the homepage anchors", ()
   const vercel = JSON.parse(read("vercel.json"));
   const redirects = Object.fromEntries((vercel.redirects ?? []).map((r) => [r.source, r]));
   const nav = read("lib/site-data.ts");
-  for (const slug of ["products", "ai", "about", "contact"]) {
+  for (const slug of ["products", "about", "contact"]) {
     assert.match(nav, new RegExp(`href:\\s*"#${slug}"`), `nav must still link to #${slug}`);
     const r = redirects[`/${slug}`];
     assert.ok(r, `vercel.json must redirect /${slug}`);
     assert.equal(r.destination, `/#${slug}`);
     assert.equal(r.permanent, true);
     assert.ok(!existsSync(resolve(root, "app", slug, "page.tsx")), `/${slug} must not also be a real route`);
+  }
+  // /ai is a real page (app/ai/page.tsx, TASK-084), so a redirect to /#ai
+  // would hide it on Vercel.
+  assert.ok(existsSync(resolve(root, "app", "ai", "page.tsx")), "/ai must be a real route");
+  assert.equal(redirects["/ai"], undefined, "vercel.json must not redirect /ai away from the /ai page");
+});
+
+// /ai serves the AI project's content (TASK-084, docs/features/ai-route.md):
+// a static page built from lib/ai-models.ts, linked from the nav and the
+// sitemap. Asserted on the exported HTML so a broken build, a missing card or
+// a nav link that still points at the homepage anchor fails here.
+test("static export (out/) /ai page lists every model with its gates and a Hugging Face link", skipWithoutOut, () => {
+  const file = [join(root, "out", "ai.html"), join(root, "out", "ai", "index.html")].find((f) => existsSync(f));
+  assert.ok(file, "no exported page for /ai");
+  const html = readFileSync(file, "utf8");
+  assert.match(html, /<h1[^>]*>AI that runs/, "/ai must render its hero heading");
+  assert.match(html, /<link rel="canonical" href="https:\/\/www\.lamplitlabs\.com\/ai"/, "/ai must be its own canonical URL");
+
+  const models = read("lib/ai-models.ts");
+  const ids = [...models.matchAll(/^\s*id:\s*"([^"]+)"/gm)].map((m) => m[1]);
+  const repos = [...models.matchAll(/^\s*hubRepo:\s*"([^"]+)"/gm)].map((m) => m[1]);
+  assert.ok(ids.length >= 1, "lib/ai-models.ts must list at least one model");
+  const cards = html.split(/(?=<article\b[^>]*data-testid="ai-model-card")/).slice(1);
+  assert.equal(cards.length, ids.length, `expected ${ids.length} model cards on /ai, found ${cards.length}`);
+  cards.forEach((card, i) => {
+    assert.match(card, /data-testid="ai-model-gates"[^>]*>\d+(?:<!-- -->)?\/(?:<!-- -->)?\d+(?:<!-- -->)? release gates passed/, `card ${ids[i]} must summarise its release gates`);
+    assert.ok(card.includes(`href="https://huggingface.co/${repos[i]}"`), `card ${ids[i]} must link to its weights on Hugging Face`);
+  });
+
+  // The page's own nav marks AI as the current page; every page's AI link goes to /ai.
+  assert.match(html, /<a[^>]*aria-current="page"[^>]*href="\/ai"|<a[^>]*href="\/ai"[^>]*aria-current="page"/, "/ai nav must mark the AI link as the current page");
+  for (const page of ["index.html", "privacy.html", "404.html"]) {
+    const other = readFileSync(resolve(root, "out", page), "utf8");
+    assert.match(other, /<a[^>]*href="\/ai"/, `${page} must link to /ai from its nav`);
+    assert.doesNotMatch(other, /href="\/#ai"/, `${page} must not send the AI nav link to the homepage anchor`);
   }
 });

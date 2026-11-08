@@ -7,6 +7,8 @@
 
 > **Addendum (2026-10-08):** The `Career` category described below was later removed. Resume Builder was discontinued and dropped from the catalog, and commit `249bfd0` removed the now-empty `Career` entry from `productCategories`/`ProductCategory` in [`lib/site-data.ts`](../../lib/site-data.ts). The homepage filter chips today are `AI`, `Education`, `Developer Tools`, and `Azure`; references to `Career` and Resume Builder in the requirements below are historical.
 
+> **Addendum (2026-11-08):** The `AI` nav link now goes to the `/ai` page ([feature](ai-route.md)), not to the homepage `#ai` anchor. The homepage section keeps `id="ai"` and its place in `sectionIds`.
+
 > **Addendum (2026-10-31):** Amistio was retired and removed from the catalog ([ADR](../decisions/2026-10-31-retire-amistio-from-website.md)). Lamplit Light is now the first catalog entry and the only product in the `AI` category; references to Amistio below are historical.
 
 ## Overview

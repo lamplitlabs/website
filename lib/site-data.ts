@@ -454,13 +454,25 @@ export const products: Product[] = [
   },
 ];
 
+// Non-external entries are either a bare "#anchor" on the homepage or an
+// absolute path to a real route (e.g. "/ai", docs/features/ai-route.md).
+// Off-home consumers resolve them through navLinkHref().
 export const navLinks: NavLink[] = [
   { label: "Products", href: "#products" },
-  { label: "AI", href: "#ai" },
+  { label: "AI", href: "/ai" },
   { label: "About", href: "#about" },
   { label: "Blog", href: socialLinks.blog, external: true },
   { label: "Contact", href: "#contact" },
 ];
+
+/**
+ * The href a nav link needs on a page other than the homepage: a bare
+ * "#anchor" becomes "/#anchor" so it navigates home, while external URLs and
+ * absolute routes such as "/ai" are used as they are.
+ */
+export function navLinkHref(link: NavLink): string {
+  return !link.external && link.href.startsWith("#") ? `/${link.href}` : link.href;
+}
 
 export function getProductBySlug(slug: string): Product | undefined {
   return products.find((product) => product.slug === slug);

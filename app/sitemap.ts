@@ -11,6 +11,7 @@ export const siteUrl = "https://www.lamplitlabs.com";
 // Static (non-product) routes: each needs an app/<route>/page.tsx.
 export const staticRoutes: { path: string; changeFrequency: "monthly" | "yearly"; priority: number }[] = [
   { path: "/", changeFrequency: "monthly", priority: 1.0 },
+  { path: "/ai", changeFrequency: "monthly", priority: 0.8 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
 ];
 

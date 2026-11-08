@@ -152,7 +152,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {isInDevelopment && (
           <span
             data-testid="product-dev-note"
-            className="mr-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
+            className="mr-2 whitespace-nowrap text-xs font-medium uppercase tracking-wider text-muted-foreground sm:mr-3"
           >
             In development
           </span>
@@ -163,7 +163,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           trackingTarget={product.slug}
           trackingContext="product_page_nav_cta"
           trackingUrl={ctaTrackingUrl}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:px-4"
         >
           {isInDevelopment ? "Follow development" : `Visit ${product.name}`}
           <NavCtaIcon aria-hidden="true" className="h-3.5 w-3.5" />
@@ -187,7 +187,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
                   Status: {product.status}
                   {product.statusSince && (
-                    <span className="normal-case tracking-normal text-primary/80">
+                    <span className="normal-case tracking-normal">
                       {" "}
                       since {product.statusSince}
                     </span>

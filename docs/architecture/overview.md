@@ -41,6 +41,7 @@ A static, fast-loading corporate website showcasing Lamplit Labs and its product
 - **app/layout.tsx** — Root layout with theme provider, fonts, metadata, and global scripts (Header/Footer are rendered per-page, e.g. in `app/page.tsx`, not in the root layout)
 - **app/page.tsx** — Home page with all sections (hero, why Lamplit, AI, products, journey, about, contact) and the shared `Header`/`Footer`
 - **app/products/[slug]/page.tsx** — Statically generated product detail pages; `generateStaticParams` maps each product in [`lib/site-data.ts`](../../lib/site-data.ts) to its route.
+- **app/ai/page.tsx** — The `/ai` page: Lamplit Light's pitch and model offerings with their release-gate numbers, built from [`lib/ai-models.ts`](../../lib/ai-models.ts), a dated snapshot of the AI project's data file ([feature](../features/ai-route.md)).
 
 Features:
 - React Server Components by default (RSC)

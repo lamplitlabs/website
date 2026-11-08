@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
-import { navLinks } from "@/lib/site-data";
+import { navLinkHref, navLinks } from "@/lib/site-data";
 
 // Route-level error boundary (Next.js App Router convention). When a page
 // throws while rendering, this replaces Next's unstyled default crash screen
@@ -23,7 +23,7 @@ export default function Error({
           {navLinks.map((link) => (
             <li key={link.label}>
               <Link
-                href={link.external ? link.href : `/${link.href}`}
+                href={navLinkHref(link)}
                 target={link.external ? "_blank" : undefined}
                 rel={link.external ? "noopener noreferrer" : undefined}
                 className="transition-colors hover:text-foreground"

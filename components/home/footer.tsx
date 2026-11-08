@@ -51,7 +51,7 @@ export function Footer() {
                     {isProductInDevelopment(product) && (
                       <span
                         aria-hidden="true"
-                        className="mono-label ml-2 align-middle text-primary/80"
+                        className="mono-label ml-2 align-middle text-primary"
                       >
                         soon
                       </span>
@@ -129,7 +129,7 @@ export function Footer() {
             {" "}&middot;{" "}
             <CookieSettingsButton className="underline underline-offset-4 transition-colors hover:text-foreground" />
           </p>
-          <p className="mono-label mt-3 text-muted-foreground/60">
+          <p className="mono-label mt-3 text-muted-foreground">
             lamplitlabs.com
             {showAiDomain && aiDomain && <> &middot; {aiDomain}</>}
           </p>

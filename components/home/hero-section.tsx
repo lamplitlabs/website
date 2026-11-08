@@ -73,7 +73,7 @@ export function HeroSection() {
             <SocialBar links={socialLinks} context="hero_social" />
           </div>
 
-          <div className="hero-entrance hero-entrance-5 mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-muted-foreground/70 lg:justify-start">
+          <div className="hero-entrance hero-entrance-5 mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-muted-foreground lg:justify-start">
             <span className="mono-label">built in Germany</span>
             <span aria-hidden className="text-primary/60">
               &middot;

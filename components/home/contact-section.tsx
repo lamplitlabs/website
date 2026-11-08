@@ -18,7 +18,7 @@ export function ContactSection() {
             Have a question, suggestion, or want to collaborate? We&apos;d love
             to hear from you.
           </p>
-          <p className="mono-label mx-auto mt-4 max-w-lg text-muted-foreground/70">
+          <p className="mono-label mx-auto mt-4 max-w-lg text-muted-foreground">
             for products, partnerships and Lamplit Light pilots
           </p>
           <div className="mt-8">

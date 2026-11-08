@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
-import { navLinks, products } from "@/lib/site-data";
+import { navLinkHref, navLinks, products } from "@/lib/site-data";
 
 // Levenshtein distance, used to catch a visitor mistyping a product slug
 // (e.g. /products/kenntnistrainer -> /products/kenntnistrainerr) so the 404 page can offer
@@ -69,6 +69,10 @@ const staticRoutes: { slug: string; href: string; name: string }[] = [
   ...navLinks
     .filter((link) => !link.external && link.href.startsWith("#"))
     .map((link) => ({ slug: link.href.slice(1), href: `/${link.href}`, name: link.label })),
+  // Nav links to real top-level routes (/ai) are candidates under their own path.
+  ...navLinks
+    .filter((link) => !link.external && /^\/[a-z-]+$/.test(link.href))
+    .map((link) => ({ slug: link.href.slice(1), href: link.href, name: link.label })),
 ];
 
 // Near-miss for a single-segment path (e.g. /privcy, /prducts, /about-us,
@@ -110,7 +114,7 @@ export default function NotFound() {
           {navLinks.map((link) => (
             <li key={link.label}>
               <Link
-                href={link.external ? link.href : `/${link.href}`}
+                href={navLinkHref(link)}
                 target={link.external ? "_blank" : undefined}
                 rel={link.external ? "noopener noreferrer" : undefined}
                 className="transition-colors hover:text-foreground"

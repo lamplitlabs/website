@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/home/footer";
-import { contactEmail, navLinks } from "@/lib/site-data";
+import { contactEmail, navLinkHref, navLinks } from "@/lib/site-data";
 import { CONSENT_KEY } from "@/lib/consent-storage";
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           {navLinks.map((link) => (
             <li key={link.label}>
               <Link
-                href={link.external ? link.href : `/${link.href}`}
+                href={navLinkHref(link)}
                 target={link.external ? "_blank" : undefined}
                 rel={link.external ? "noopener noreferrer" : undefined}
                 className="transition-colors hover:text-foreground"

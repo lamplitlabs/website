@@ -86,6 +86,8 @@ test("public product copy contains no training-method words", () => {
   const files = [
     "lib/site-data.ts",
     "components/home/ai-section.tsx",
+    "app/ai/page.tsx",
+    "lib/ai-models.ts",
     ...readdirSync(resolve(root, "public/covers"))
       .filter((f) => f.endsWith(".svg"))
       .map((f) => `public/covers/${f}`),

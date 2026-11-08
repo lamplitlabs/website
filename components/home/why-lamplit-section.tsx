@@ -51,7 +51,7 @@ export function WhyLamplitSection() {
 
               <div className="rounded-xl border bg-muted/30 p-5">
                 <p className="text-sm text-muted-foreground">
-                  Formerly known as <span className="font-mono text-muted-foreground/70">bitesinbyte</span>,
+                  Formerly known as <span className="font-mono text-muted-foreground">bitesinbyte</span>,
                   we&apos;ve grown from a side project into a lab that ships
                   products used by thousands.
                 </p>

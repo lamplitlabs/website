@@ -221,7 +221,7 @@ export function JourneySection() {
                   >
                     Read the blog &rarr;
                   </OutboundLink>
-                  <span className="mx-2 text-muted-foreground/50">/</span>
+                  <span aria-hidden="true" className="mx-2 text-muted-foreground/50">/</span>
                   <a
                     href="#ai"
                     className="font-medium text-primary underline-offset-4 hover:underline"

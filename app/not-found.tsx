@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -125,7 +126,15 @@ function findNearMiss(pathname: string): NearMiss | undefined {
 
 export default function NotFound() {
   const pathname = usePathname();
-  const nearMiss = findNearMiss(pathname ?? "");
+  // The 404 is prerendered once as out/404.html, where the pathname is not the
+  // visitor's URL, so a suggestion computed during render would differ between
+  // that HTML and the first client render and throw React #418 (hydration
+  // mismatch). Compute it after mount instead: both renders start without a
+  // suggestion and it appears once the real URL is known.
+  const [nearMiss, setNearMiss] = useState<NearMiss | undefined>(undefined);
+  useEffect(() => {
+    setNearMiss(findNearMiss(pathname ?? ""));
+  }, [pathname]);
 
   return (
     <>

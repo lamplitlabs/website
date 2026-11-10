@@ -58,8 +58,10 @@ export function Footer() {
                     )}
                   </>
                 );
+                // inline-block py-1 makes each link at least 24px tall (WCAG
+                // 2.2 target size) so it is easy to tap on a phone.
                 const className =
-                  "text-sm text-muted-foreground transition-colors hover:text-foreground";
+                  "inline-block py-1 text-sm text-muted-foreground transition-colors hover:text-foreground";
                 // Only a live product links out to its own site from the
                 // footer. A product still in development points at its
                 // internal /products/<slug> page instead, so a not-yet-public
@@ -89,7 +91,8 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
+          {/* Same 24px+ tap target for the nav links as the product links. */}
+          <div className="[&_li>a]:inline-block [&_li>a]:py-1">
             <h4 className="mb-3 text-sm font-semibold">Navigation</h4>
             <FooterNavLinks />
           </div>

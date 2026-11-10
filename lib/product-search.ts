@@ -3,9 +3,12 @@
  * substring match on name, title (the tagline shown under the name on each
  * card), description, tags (the chips shown on each card) and longDescription
  * (the fuller body copy on each product's detail page) and highlights (the
- * "Key Features" titles and descriptions on the detail page), so a user can type
- * "ai", "AI Agents", part of a tool's name or a word that only appears on the
- * detail page (e.g. "doctors") instead of hunting through category tabs.
+ * "Key Features" titles and descriptions on the detail page), category (the
+ * tab a product sits under, e.g. "Education") and status (the badge on each
+ * card, "Live" or "In development"), so a user can type "ai", "AI Agents",
+ * part of a tool's name, a word that only appears on the detail page (e.g.
+ * "doctors") or a label they see on the page ("education", "in development")
+ * instead of hunting through category tabs.
  * Several products use German/accented vocabulary (e.g. "Kenntnisprüfung",
  * "Einbürgerungstest"); folding diacritics lets a visitor who types the
  * plain-ASCII spelling ("prufung") still find the product. Letters that NFD
@@ -51,6 +54,8 @@ export type SearchableProduct = {
   tags?: string[];
   longDescription?: string;
   highlights?: { title: string; description: string }[];
+  category?: string;
+  status?: string;
 };
 
 // Letters NFD does not decompose into base + combining mark, spelled the way
@@ -97,6 +102,8 @@ function searchableText(product: SearchableProduct): string[] {
     ...(product.tags ?? []),
     product.longDescription ?? "",
     ...(product.highlights ?? []).flatMap((h) => [h.title, h.description]),
+    product.category ?? "",
+    product.status ?? "",
   ].map(fold);
   return [
     ...fields,

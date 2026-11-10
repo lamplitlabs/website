@@ -424,3 +424,36 @@ test("product grid lists the did-you-mean products under an explicit hint", () =
   assert.match(grid, /Showing results for/);
   assert.match(grid, /data-testid="product-search-suggestion"[\s\S]*?onClick=\{\(\) => updateQuery\(suggestion\.query\)\}/);
 });
+
+test("search matches the category tab and status badge shown on each card", () => {
+  const names = (list) => list.map((p) => p.name).sort();
+  const withLabel = (key, label) => products.filter((p) => p[key] === label);
+  const live = withLabel("status", "Live");
+  const inDevelopment = withLabel("status", "In development");
+  const education = withLabel("category", "Education");
+  assert.ok(live.length > 1 && inDevelopment.length > 1 && education.length > 1, "catalogue carries the labels");
+
+  // "live" lists every Live product. Eszett (In development) still matches
+  // through its copy ("lives on your phone"): substring match, copy unchanged.
+  const liveHits = filterProductsByQuery(products, "live");
+  for (const p of live) assert.ok(liveHits.includes(p), `"live" lists ${p.name}`);
+  assert.ok(liveHits.length < products.length, `"live" does not list every product`);
+  assert.ok(!liveHits.some((p) => p.name === "Lamplit Light"), `"live" leaves out an In development product with no "live" in its copy`);
+
+  // "in development" lists exactly the In development products, with no did-you-mean fallback.
+  assert.deepEqual(names(filterProductsByQuery(products, "in development")), names(inDevelopment));
+  assert.equal(search.suggestProductQuery(products, "in development"), null);
+  assert.deepEqual(names(filterProductsByQuery(products, "In Development")), names(inDevelopment));
+
+  // A category tab name lists every product in that category.
+  const educationHits = filterProductsByQuery(products, "education");
+  for (const p of education) assert.ok(educationHits.includes(p), `"education" lists ${p.name}`);
+  for (const category of new Set(products.map((p) => p.category))) {
+    const hits = filterProductsByQuery(products, category.toLowerCase());
+    for (const p of withLabel("category", category)) assert.ok(hits.includes(p), `"${category}" lists ${p.name}`);
+  }
+
+  // Nonsense still finds nothing.
+  assert.deepEqual(filterProductsByQuery(products, "zzqxnosuch"), []);
+  assert.equal(search.suggestProductQuery(products, "zzqxnosuch"), null);
+});

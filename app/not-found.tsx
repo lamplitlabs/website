@@ -96,18 +96,24 @@ const staticRoutes: { slug: string; href: string; name: string }[] = [
 ];
 
 // Near-miss for a single-segment path (e.g. /privcy, /prducts, /about-us,
-// /privacy-policy): accepts the same typo rule as products, plus an exact
-// slug followed by a "-" qualifier, which is a common way to guess a URL.
+// /privacy-policy, /About, /AI): accepts the same typo rule as products, plus
+// an exact slug followed by a "-" qualifier, which is a common way to guess a
+// URL, plus the slug in the wrong case: the static host is case-sensitive, so
+// /PRIVACY 404s even though the word is right.
 function findNearMissStaticRoute(pathname: string): NearMiss | undefined {
   const match = pathname.match(/^\/([^/]+)\/?$/);
   if (!match) return undefined;
-  const attempted = match[1].toLowerCase();
+  const raw = match[1];
+  const attempted = raw.toLowerCase();
   let best: NearMiss | undefined;
   for (const route of staticRoutes) {
-    if (attempted === route.slug) continue; // /privacy itself would not 404
+    if (raw === route.slug) continue; // /privacy itself would not 404
     // Very short slugs (e.g. "ai") are one edit away from too many unrelated
-    // paths (/api, /ab), so only the "-" qualifier form counts for them.
-    const distance = attempted.startsWith(`${route.slug}-`)
+    // paths (/api, /ab), so only the case-only and "-" qualifier forms count
+    // for them.
+    const distance = attempted === route.slug
+      ? 0 // case-only difference
+      : attempted.startsWith(`${route.slug}-`)
       ? 1
       : route.slug.length >= 4
         ? nearMissDistance(attempted, route.slug)

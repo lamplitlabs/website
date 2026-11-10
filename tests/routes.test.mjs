@@ -928,6 +928,8 @@ test("not-found page offers a near-miss static route suggestion", () => {
   assert.match(src, /navLinks[\s\S]*?\.filter\(\(link\) => !link\.external && link\.href\.startsWith\("#"\)\)/, "home-page nav anchors must be static-route candidates");
   assert.match(src, /attempted\.startsWith\(`\$\{route\.slug\}-`\)/, "an exact slug with a '-' qualifier must count as a near miss");
   assert.match(src, /route\.slug\.length >= 4/, "very short slugs must only match via the '-' qualifier form, not edit distance");
+  assert.match(src, /if \(raw === route\.slug\) continue;/, "only the exact raw path is skipped, so a case-only slip (/About) still counts");
+  assert.match(src, /attempted === route\.slug\s*\?\s*0/, "a case-only difference from a route slug must count as a near miss");
   assert.match(src, /href=\{nearMiss\.href\}/, "suggestion link must use the match's own href so static routes resolve");
 
   const anchors = [...siteData.matchAll(/\{\s*label:\s*"([^"]+)",\s*href:\s*"#([a-z-]+)"\s*\}/g)]
@@ -962,13 +964,16 @@ test("not-found page offers a near-miss static route suggestion", () => {
   function findStatic(pathname) {
     const match = pathname.match(/^\/([^/]+)\/?$/);
     if (!match) return undefined;
-    const attempted = match[1].toLowerCase();
+    const raw = match[1];
+    const attempted = raw.toLowerCase();
     let best;
     for (const route of routes) {
-      if (attempted === route.slug) continue;
-      const distance = attempted.startsWith(`${route.slug}-`)
-        ? 1
-        : route.slug.length >= 4 ? nearMissDistance(attempted, route.slug) : undefined;
+      if (raw === route.slug) continue;
+      const distance = attempted === route.slug
+        ? 0
+        : attempted.startsWith(`${route.slug}-`)
+          ? 1
+          : route.slug.length >= 4 ? nearMissDistance(attempted, route.slug) : undefined;
       if (distance !== undefined && (!best || distance < best.distance)) best = { ...route, distance };
     }
     return best;
@@ -988,10 +993,18 @@ test("not-found page offers a near-miss static route suggestion", () => {
   assert.ok(pageRoutes.some((r) => r.href === "/ai"), "the /ai nav link must be a static-route candidate");
   assert.equal(findStatic("/ai-models")?.href, "/ai", '"/ai-models" should suggest the /ai page itself');
 
+  // The static host is case-sensitive: /About, /AI, /CONTACT and /PRIVACY 404,
+  // so a case-only slip from any route (even the short /ai) recovers to it.
+  for (const route of routes) {
+    const capital = route.slug[0].toUpperCase() + route.slug.slice(1);
+    assert.equal(findStatic(`/${capital}`)?.href, route.href, `"/${capital}" should suggest ${route.href}`);
+    assert.equal(findStatic(`/${route.slug.toUpperCase()}`)?.href, route.href, `"/${route.slug.toUpperCase()}" should suggest ${route.href}`);
+  }
+
   // Never fire for the real routes themselves, deeper paths, or unrelated URLs.
   for (const real of routes) assert.equal(findStatic(`/${real.slug}`), undefined, `/${real.slug} is a real route`);
   assert.equal(findStatic("/products/privcy"), undefined, "nested paths are left to the product matcher");
-  for (const junk of ["/", "/admin", "/login", "/pricing", "/blog", "/api", "/wp-admin", "/index.php", "/ab"]) {
+  for (const junk of ["/", "/admin", "/login", "/pricing", "/blog", "/api", "/wp-admin", "/index.php", "/ab", "/API", "/Ab", "/night"]) {
     const hit = findStatic(junk);
     assert.equal(hit, undefined, `unrelated path "${junk}" must not suggest ${hit?.href}`);
   }

@@ -10,7 +10,9 @@ import { navLinkHref, navLinks, products } from "@/lib/site-data";
 
 // Levenshtein distance, used to catch a visitor mistyping a product slug
 // (e.g. /products/kenntnistrainer -> /products/kenntnistrainerr) so the 404 page can offer
-// the product they meant instead of a bare dead end.
+// the product they meant instead of a bare dead end. A swap of two neighbouring
+// letters counts as one edit (optimal string alignment / Damerau-Levenshtein),
+// so /aobut is one slip from /about, as a visitor would count it.
 function levenshtein(a: string, b: string): number {
   const dp: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>
     Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
@@ -21,6 +23,9 @@ function levenshtein(a: string, b: string): number {
         a[i - 1] === b[j - 1]
           ? dp[i - 1][j - 1]
           : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + 1);
+      }
     }
   }
   return dp[a.length][b.length];

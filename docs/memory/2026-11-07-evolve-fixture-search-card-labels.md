@@ -3,7 +3,7 @@
 **Date:** 2026-11-07  
 **Type:** Convention  
 **Scope:** Product search (`lib/product-search.ts`), catalogue (`lib/site-data.ts`), self-improvement loop fixtures  
-**Resolution:** open: HEAD `583c75d` scores 7/18  
+**Resolution:** fixed: `lib/product-search.ts` adds `category` and `status` to the searched fields; the scorer goes from 7/18 at `ea00850` to 18/18 (job-20261110T104754Z-3ae7bc). This lands the experiment from job-20261107T160742Z-4a8ff7, which never reached main.  
 
 ## Summary
 

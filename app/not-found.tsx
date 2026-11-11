@@ -10,7 +10,9 @@ import { navLinkHref, navLinks, products } from "@/lib/site-data";
 
 // Levenshtein distance, used to catch a visitor mistyping a product slug
 // (e.g. /products/kenntnistrainer -> /products/kenntnistrainerr) so the 404 page can offer
-// the product they meant instead of a bare dead end.
+// the product they meant instead of a bare dead end. A swap of two neighbouring
+// letters counts as one edit (optimal string alignment / Damerau-Levenshtein),
+// so /aobut is one slip from /about, as a visitor would count it.
 function levenshtein(a: string, b: string): number {
   const dp: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>
     Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
@@ -21,6 +23,9 @@ function levenshtein(a: string, b: string): number {
         a[i - 1] === b[j - 1]
           ? dp[i - 1][j - 1]
           : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + 1);
+      }
     }
   }
   return dp[a.length][b.length];
@@ -97,18 +102,24 @@ const staticRoutes: { slug: string; href: string; name: string }[] = [
 ];
 
 // Near-miss for a single-segment path (e.g. /privcy, /prducts, /about-us,
-// /privacy-policy): accepts the same typo rule as products, plus an exact
-// slug followed by a "-" qualifier, which is a common way to guess a URL.
+// /privacy-policy, /About, /AI): accepts the same typo rule as products, plus
+// an exact slug followed by a "-" qualifier, which is a common way to guess a
+// URL, plus the slug in the wrong case: the static host is case-sensitive, so
+// /PRIVACY 404s even though the word is right.
 function findNearMissStaticRoute(pathname: string): NearMiss | undefined {
   const match = pathname.match(/^\/([^/]+)\/?$/);
   if (!match) return undefined;
-  const attempted = match[1].toLowerCase();
+  const raw = match[1];
+  const attempted = raw.toLowerCase();
   let best: NearMiss | undefined;
   for (const route of staticRoutes) {
-    if (attempted === route.slug) continue; // /privacy itself would not 404
+    if (raw === route.slug) continue; // /privacy itself would not 404
     // Very short slugs (e.g. "ai") are one edit away from too many unrelated
-    // paths (/api, /ab), so only the "-" qualifier form counts for them.
-    const distance = attempted.startsWith(`${route.slug}-`)
+    // paths (/api, /ab), so only the case-only and "-" qualifier forms count
+    // for them.
+    const distance = attempted === route.slug
+      ? 0 // case-only difference
+      : attempted.startsWith(`${route.slug}-`)
       ? 1
       : route.slug.length >= 4
         ? nearMissDistance(attempted, route.slug)

@@ -102,6 +102,21 @@ test("real pages, unrelated words and deeper paths get no product suggestion", (
   }
 });
 
+test("a swap of two neighbouring letters is one slip, and the guards still hold", () => {
+  // /aobut is one slip from /about as a visitor counts it; plain Levenshtein
+  // made it two edits, over the threshold of 1 for a 5-letter slug.
+  assert.equal(findNearMiss("/aobut")?.href, "/#about");
+  assert.equal(findNearMiss("/conatct")?.href, "/#contact");
+  assert.equal(findNearMiss("/prviacy")?.href, "/privacy");
+  assert.equal(findNearMiss("/products/lihgt")?.href, "/products/light");
+  // Swaps that touch the first or last letter still fail the boundary guard,
+  // and short or unrelated words stay silent.
+  for (const junk of ["/products/ligth", "/products/ilght", "/nigth", "/api", "/API", "/ab", "/night"]) {
+    const hit = findNearMiss(junk);
+    assert.equal(hit, undefined, `${junk} must not suggest ${hit?.href}`);
+  }
+});
+
 test("static-route suggestions still work beside the wider product matcher", () => {
   assert.equal(findNearMiss("/privcy")?.href, "/privacy");
   assert.equal(findNearMiss("/privacy-policy")?.href, "/privacy");

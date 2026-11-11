@@ -117,6 +117,26 @@ test("a swap of two neighbouring letters is one slip, and the guards still hold"
   }
 });
 
+test("an extra trailing s or a dropped last letter is one slip, for slugs of 4 letters or more", () => {
+  // nearMissDistance rejects these on short slugs (threshold 1 per 3 letters)
+  // and whenever the last letter changes (boundary guard).
+  assert.equal(findNearMiss("/products/lights")?.href, "/products/light");
+  assert.equal(findNearMiss("/products/ligh")?.href, "/products/light");
+  assert.equal(findNearMiss("/products/edmx-tool")?.href, "/products/edmx-tools");
+  assert.equal(findNearMiss("/products/eszetts")?.href, "/products/eszett");
+  assert.equal(findNearMiss("/products/kenntnistraine")?.href, "/products/kenntnistrainer");
+  for (const slug of slugs.filter((s) => s.length >= 4)) {
+    for (const path of [`/products/${slug}s`, `/products/${slug.slice(0, -1)}`]) {
+      assert.equal(findNearMiss(path)?.href, `/products/${slug}`, `${path} should suggest /products/${slug}`);
+    }
+  }
+  // Unrelated words one edit away from a short slug, and junk, stay silent.
+  for (const junk of ["/products/night", "/products/flight", "/products/zzqxnosuch", "/api", "/products/lightss", "/products/lig"]) {
+    const hit = findNearMiss(junk);
+    assert.equal(hit, undefined, `${junk} must not suggest ${hit?.href}`);
+  }
+});
+
 test("static-route suggestions still work beside the wider product matcher", () => {
   assert.equal(findNearMiss("/privcy")?.href, "/privacy");
   assert.equal(findNearMiss("/privacy-policy")?.href, "/privacy");

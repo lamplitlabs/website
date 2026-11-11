@@ -62,6 +62,10 @@ const productPathPattern = /^\/(?:(products?)\/)?([^/]+)\/?$/i;
 //   /products/Eszett): the static host is case-sensitive, so these 404 even
 //   though the slug itself is right;
 // - the slug with hyphens added or dropped (/products/edmxtools);
+// - the slug with one extra trailing "s" or its last letter dropped
+//   (/products/lights, /products/ligh, /products/edmx-tool), for slugs of 4
+//   letters or more: nearMissDistance's threshold and last-letter guard reject
+//   these on short slugs, yet they are the commonest slip at the end of a URL;
 // - a small typo, under nearMissDistance's threshold and boundary guard, so
 //   unrelated words such as /products/night still get no suggestion.
 function findNearMissProduct(pathname: string): NearMiss | undefined {
@@ -79,7 +83,9 @@ function findNearMissProduct(pathname: string): NearMiss | undefined {
         ? 0 // case-only or path-only difference
         : attempted.replace(/-/g, "") === slug.replace(/-/g, "")
           ? 1 // hyphen-only difference
-          : nearMissDistance(attempted, slug);
+          : slug.length >= 4 && (attempted === `${slug}s` || attempted === slug.slice(0, -1))
+            ? 1 // extra trailing "s" or dropped last letter
+            : nearMissDistance(attempted, slug);
     if (distance !== undefined && (!best || distance < best.distance)) {
       best = { href: `/products/${slug}`, name: product.name, distance };
     }

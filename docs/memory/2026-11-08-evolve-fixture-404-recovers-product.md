@@ -3,7 +3,7 @@
 **Date:** 2026-11-08  
 **Type:** Convention  
 **Scope:** 404 page (`app/not-found.tsx`), catalogue (`lib/site-data.ts`), self-improvement loop fixtures  
-**Resolution:** open: HEAD `af2e848` scores 17/59 (29)  
+**Resolution:** open: HEAD `af2e848` scores 17/59 (29); 44/59 after `07e8747`, 45/59 (76) after `68bd302`. The 14 misses left are a trailing "s" or a dropped last letter (`/products/lights`, `/products/ligh`, `/products/edmx-tool`).  
 
 ## Summary
 

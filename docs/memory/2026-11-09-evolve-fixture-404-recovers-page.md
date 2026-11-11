@@ -3,7 +3,7 @@
 **Date:** 2026-11-09  
 **Type:** Convention  
 **Scope:** 404 page (`app/not-found.tsx`), navigation (`lib/site-data.ts` `navLinks`), self-improvement loop fixtures  
-**Resolution:** open: HEAD `a8044ae` scores 3/14 (21)  
+**Resolution:** fixed: `app/not-found.tsx` treats a case-only difference from a route slug as a near miss and counts a swap of neighbouring letters as one edit; the scorer goes from 3/14 at `54377c7` to 14/14 (commit `68bd302`, RSI sitting 25). This lands the kept experiments B-028 (`fccaa31`) and B-029 (`0264df5`), which the experiment lane kept deferring as "delivered already" although neither reached main.  
 
 ## Summary
 

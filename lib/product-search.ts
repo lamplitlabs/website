@@ -13,8 +13,10 @@
  * "Einbürgerungstest"); folding diacritics lets a visitor who types the
  * plain-ASCII spelling ("prufung") still find the product. Letters that NFD
  * does not split into base + accent are spelled out too (ß→ss, æ→ae, ø→o,
- * đ→d, ł→l), so "strasse" finds copy that says "Straße". Blank queries
- * match everything.
+ * đ→d, ł→l), so "strasse" finds copy that says "Straße". A field with ä, ö
+ * or ü is also matched with them spelled out the German way (ae, oe, ue), so
+ * "kenntnispruefung", "einbuergerungstest" and "buergeramt" find their
+ * products too. Blank queries match everything.
  *
  * Punctuation inside the copy is optional for the visitor: each field is also
  * matched with every character that is not a letter, digit or whitespace
@@ -94,8 +96,23 @@ function queryWords(query: string): string[] {
   return fold(query).split(/[\s-]+/).filter(Boolean);
 }
 
+// German spells an umlaut out when the key is missing: "ü" as "ue", "ä" as
+// "ae", "ö" as "oe". A field with an umlaut is also matched spelled that way,
+// so "kenntnispruefung" finds "Kenntnisprüfung". Only the copy side changes:
+// folding the query ("ue" -> "u") would break "true", "queue" and "question".
+const UMLAUT_SPELLINGS: Record<string, string> = { ä: "ae", ö: "oe", ü: "ue" };
+
+function spellUmlauts(value: string): string {
+  return fold(
+    value
+      .normalize("NFC")
+      .toLowerCase()
+      .replace(/[äöü]/g, (letter) => UMLAUT_SPELLINGS[letter])
+  );
+}
+
 function searchableText(product: SearchableProduct): string[] {
-  const fields = [
+  const raw = [
     product.name,
     product.title ?? "",
     product.description,
@@ -104,7 +121,13 @@ function searchableText(product: SearchableProduct): string[] {
     ...(product.highlights ?? []).flatMap((h) => [h.title, h.description]),
     product.category ?? "",
     product.status ?? "",
-  ].map(fold);
+  ];
+  const fields = [
+    ...raw.map(fold),
+    ...raw
+      .filter((field) => /[äöü]/i.test(field.normalize("NFC")))
+      .map(spellUmlauts),
+  ];
   return [
     ...fields,
     ...fields.map((field) => field.replace(JOINING_PUNCTUATION, "")),

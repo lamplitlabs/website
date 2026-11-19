@@ -155,6 +155,26 @@ test("query folds diacritics so plain-ASCII typing matches accented catalog copy
   assert.ok(matchesProductQuery({ name: "x", description: "y", title: "Kenntnisprüfung simulation" }, "prüfung"));
 });
 
+test("umlauts spelled out (ue/ae/oe) find German copy: 'kenntnispruefung', 'einbuergerungstest', 'buergeramt'", () => {
+  const names = (q) => filterProductsByQuery(products, q).map((p) => p.slug);
+  assert.ok(names("kenntnispruefung").includes("kenntnistrainer"));
+  assert.ok(names("einbuergerungstest").includes("leben-in-deutschland"));
+  assert.ok(names("buergeramt").includes("eszett"));
+  assert.ok(names("Kenntnisprüfung").includes("kenntnistrainer"), "umlaut spelling still matches");
+  assert.ok(names("kenntnisprufung").includes("kenntnistrainer"), "plain fold still matches");
+  // ä and ö, upper case too, on a made-up catalogue.
+  const catalogue = [
+    { name: "Plain", description: "Nothing special" },
+    { name: "Amt", description: "Für Ärzte und Schöffen" },
+  ];
+  for (const q of ["fuer", "aerzte", "AERZTE", "schoeffen", "arzte", "schöffen"]) {
+    assert.deepEqual(filterProductsByQuery(catalogue, q).map((p) => p.name), ["Amt"], `"${q}" finds Amt`);
+  }
+  // The query is not folded: words that already hold "ue"/"oe" keep their meaning.
+  for (const q of ["true", "queue", "zzqxnosuch"]) assert.deepEqual(names(q), [], `"${q}" finds nothing`);
+  for (const q of ["question", "goethe", "dialogues"]) assert.ok(names(q).length > 0, `"${q}" still finds a product`);
+});
+
 test("query folds letters NFD keeps whole: 'strasse' finds 'Straße' (and æ, ø, đ, ł)", () => {
   const catalogue = [
     { name: "Plain", description: "Nothing special" },

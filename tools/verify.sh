@@ -4,8 +4,22 @@
 set -eu
 cd "$(dirname "$0")/.."
 # Honour the pinned toolchain (ADR-026) when mise is available and not already active.
-if [ -z "${MISE_SHELL:-}" ] && command -v mise >/dev/null 2>&1 && [ -z "${VERIFY_IN_MISE:-}" ]; then
-  VERIFY_IN_MISE=1 exec mise exec node@20.20.2 npm@10.9.9 -- sh "$0" "$@"
+# A scheduler may run this with a bare PATH (/usr/bin:/bin) that holds neither
+# mise nor npm, so also look where mise installs itself.
+MISE_BIN=$(command -v mise 2>/dev/null || true)
+if [ -z "$MISE_BIN" ]; then
+  for candidate in "${HOME:-}/.local/bin/mise" /opt/homebrew/bin/mise /usr/local/bin/mise; do
+    if [ -x "$candidate" ]; then MISE_BIN=$candidate; break; fi
+  done
+fi
+if [ -z "${MISE_SHELL:-}" ] && [ -n "$MISE_BIN" ] && [ -z "${VERIFY_IN_MISE:-}" ]; then
+  VERIFY_IN_MISE=1 exec "$MISE_BIN" exec node@20.20.2 npm@10.9.9 -- sh "$0" "$@"
+fi
+# Without mise the toolchain must already be on PATH; say so instead of a bare
+# "npm: command not found".
+if ! command -v npm >/dev/null 2>&1; then
+  echo "verify: npm not on PATH and mise not found (PATH=$PATH); install mise or put node@20.20.2/npm@10.9.9 on PATH" >&2
+  exit 1
 fi
 # A bare or partial node_modules (no next binary) means deps are not installed.
 if [ ! -x node_modules/.bin/next ]; then

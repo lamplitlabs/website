@@ -1,0 +1,198 @@
+# Architecture Overview - Lamplit Labs Website
+
+## System Purpose
+
+A static, fast-loading corporate website showcasing Lamplit Labs and its product portfolio. The site serves as a central hub linking visitors to individual product applications.
+
+## High-Level Design
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Browser / User                        │
+└─────────────────────────┬────────────────────────────────┘
+                          │ HTTPS
+                          ▼
+        ┌─────────────────────────────────┐
+        │   Vercel Global CDN             │
+        │  (lamplitlabs.com)              │
+        └────────┬────────────────────────┘
+                 │ Static HTML/CSS/JS
+                 ▼
+    ┌────────────────────────────────────┐
+    │   Next.js Static Export            │
+    │   (./out directory)                │
+    │                                    │
+    │  • Layout & Theme                  │
+    │  • Product grid & details          │
+    │  • Hero, why, AI sections          │
+    │  • About, journey, contact links   │
+    └────────────────────────────────────┘
+                 │
+        ┌────────┴─────────┐
+        ▼                  ▼
+    TypeScript          Tailwind CSS
+    Components          Utility Styles
+```
+
+## Key Layers
+
+### 1. Pages & Routing (app/)
+
+- **app/layout.tsx** — Root layout with theme provider, fonts, metadata, and global scripts (Header/Footer are rendered per-page, e.g. in `app/page.tsx`, not in the root layout)
+- **app/page.tsx** — Home page with all sections (hero, why Lamplit, AI, products, journey, about, contact) and the shared `Header`/`Footer`
+- **app/products/[slug]/page.tsx** — Statically generated product detail pages; `generateStaticParams` maps each product in [`lib/site-data.ts`](../../lib/site-data.ts) to its route.
+- **app/ai/page.tsx** — The `/ai` page: Lamplit Light's pitch and model offerings with their release-gate numbers, built from [`lib/ai-models.ts`](../../lib/ai-models.ts), a dated snapshot of the AI project's data file ([feature](../features/ai-route.md)).
+
+Features:
+- React Server Components by default (RSC)
+- Client-side interactive features with `"use client"`
+- Dynamic theme switching via `next-themes`
+
+### 2. Components (components/)
+
+Reusable UI building blocks organized by concern:
+
+#### Layout Components
+- **Header** — Navigation bar with theme toggle (`components/home/header.tsx`)
+- **Footer** — Social links and copyright (`components/home/footer.tsx`)
+
+#### Section Components (home/)
+- **HeroSection** — Main value proposition
+- **WhyLamplitSection** — Key differentiators
+- **AiSection** — Lamplit Light AI lab story (`components/home/ai-section.tsx`, `id="ai"`)
+- **ProductsSection** — Grid of products with category filter chips and links
+- **JourneySection** — Timeline or history
+- **AboutSection** — Company story and mission
+- **ContactSection** — Contact information and outbound links (mailto/social; no on-page form, see "Known Constraints & Limitations")
+- **EasterEggs** — Interactive elements
+
+#### Common Patterns
+- Sections use Tailwind utility classes and shadcn/ui component patterns
+- Dark mode support via `next-themes`
+- Responsive design (mobile, tablet, desktop)
+
+### 3. Hooks (hooks/)
+
+- **useReveal** (`hooks/use-reveal.ts`) — IntersectionObserver-backed reveal-on-scroll hook used by section components
+
+### 4. Utilities (lib/)
+
+- **lib/site-data.ts** — Single source of truth for product catalog, categories, contact email, and the `productNotifyMeHref` mailto builder for in-development product pages
+- **lib/analytics.ts** — `trackEvent`/`trackOutboundClick` wrappers around Plausible/GA4, gated by cookie consent
+- **lib/consent-storage.ts** — Cookie-consent read/write/clear helpers (`readConsent`, `writeConsent`, `clearConsent`) with legacy-key migration
+- **lib/copy-text.ts** — `execCommandCopy` clipboard fallback used by copy-to-clipboard UI
+- **lib/product-search.ts** — `filterProductsByQuery`/`matchesProductQuery` product search matching plus the `SEARCH_QUERY_PARAM` (`q`) URL helper `withSearchQueryParam`, used by the search box in `components/product-grid.tsx`
+- **lib/utils.ts** — `cn()` class-name merge helper (clsx + tailwind-merge)
+
+### 5. Static Assets (public/)
+
+- Favicons and app icons
+- Product cover images (SVG)
+- OG images for social sharing
+- Logos and brand assets
+
+## Data Flow
+
+```
+┌─ Product Data (hardcoded or fetched)
+│  
+├─ Home Page (app/page.tsx)
+│  ├─ useTheme() for dark mode
+│  ├─ useState for mobile menu, scroll state
+│  ├─ useEffect for scroll events and section tracking
+│  │
+│  └─ Renders Sections:
+│      ├─ HeroSection
+│      ├─ WhyLamplitSection
+│      ├─ AiSection (`id="ai"`)
+│      ├─ ProductsSection (maps products array; filters by Product.category)
+│      ├─ JourneySection
+│      ├─ AboutSection
+│      └─ ContactSection
+│
+└─ Static Output → ./out/ → Vercel CDN → Browser
+```
+
+**Key Points:**
+- No server-side data fetching (static export)
+- Product list likely in component state or config
+- User interactions (theme toggle, navigation) are client-side only
+- No backend API calls (external integrations only if needed)
+
+## Component Hierarchy
+
+```
+RootLayout (app/layout.tsx)
+├─ Header
+│  ├─ Logo/Brand
+│  ├─ Navigation Links
+│  └─ Theme Toggle Button
+├─ Main Content
+│  ├─ HeroSection
+│  ├─ WhyLamplitSection
+│  ├─ AiSection
+│  ├─ ProductsSection
+│  │  └─ ProductCard (repeated)
+│  ├─ JourneySection
+│  ├─ AboutSection
+│  ├─ ContactSection
+│  └─ EasterEggs
+└─ Footer
+   ├─ Social Links
+   ├─ Copyright
+   └─ Additional Links
+```
+
+## Styling Architecture
+
+**Tailwind CSS + shadcn/ui Pattern:**
+- Base utilities from Tailwind (spacing, colors, typography)
+- Component variants using `class-variance-authority`
+- Animations via `tailwindcss-animate`
+- Dark mode: class-based toggle (`dark:` prefixed utilities)
+- Responsive breakpoints: mobile-first (sm, md, lg, xl, 2xl)
+
+**Color Scheme:**
+- Configured in `tailwind.config.ts`
+- Light and dark themes managed by `next-themes`
+- Uses CSS variables for semantic colors
+
+## Build Pipeline
+
+1. **Development** — Hot reload via `npm run dev`
+2. **Lint** — ESLint with Next.js rules
+3. **Typecheck** — TypeScript strict mode validation
+4. **Build** — Next.js static export to `./out/`
+5. **Deploy** — Vercel push with retry logic
+
+All steps run in CI/CD on every push to `main`.
+
+## Performance Considerations
+
+- **Static export:** Pre-rendered HTML (no server runtime overhead)
+- **Vercel CDN:** Global edge caching and fast delivery
+- **Image optimization:** Tailwind utility classes (no heavy assets by default)
+- **Code splitting:** Next.js automatic chunk splitting per route
+- **Theme persistence:** Client-side (localStorage) to avoid flash
+
+## Known Constraints & Limitations
+
+1. **No server rendering** — All pages must be static or hydrate on client
+2. **No API routes** — Lamplit Labs services used via external URLs only
+3. **No form submission** — Contact forms redirect to external endpoint or use API
+4. **Build time required** — Static export runs at deploy time (not incremental)
+
+## Future Architectural Considerations
+
+- [ ] Should we add internationalization (i18n) for multilingual content?
+- [ ] Do we need client-side routing animations or transitions?
+- [ ] Should dynamic product details load from a headless CMS?
+- [x] Performance monitoring or analytics integration? — Implemented: Plausible + Google Analytics 4, gated by cookie consent (see [`components/cookie-consent.tsx`](../../components/cookie-consent.tsx), [`components/google-analytics.tsx`](../../components/google-analytics.tsx)).
+- [ ] Automated screenshot/preview generation for product cards?
+
+## Related Documents
+
+- **Product Context:** [`docs/context/product.md`](../context/product.md)
+- **Technical Stack:** [`docs/context/stack.md`](../context/stack.md)
+- **Decisions:** [`docs/decisions/`](../decisions/)
+- **Features:** [`docs/features/`](../features/)

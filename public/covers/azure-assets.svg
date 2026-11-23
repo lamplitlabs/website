@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <rect width="800" height="400" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.06">
+    <line x1="0" y1="50" x2="800" y2="50" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="250" x2="800" y2="250" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="350" x2="800" y2="350" stroke="#fff" stroke-width="1"/>
+    <line x1="100" y1="0" x2="100" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="500" y1="0" x2="500" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="400" stroke="#fff" stroke-width="1"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="680" cy="80" r="120" fill="rgba(255,255,255,0.04)"/>
+  <circle cx="120" cy="320" r="90" fill="rgba(255,255,255,0.04)"/>
+
+  <!-- Draw.io diamond logo shape (left) -->
+  <g transform="translate(100, 100)" opacity="0.2">
+    <polygon points="50,5 95,50 50,95 5,50" stroke="#fff" stroke-width="3" fill="none"/>
+    <polygon points="50,20 80,50 50,80 20,50" stroke="#fff" stroke-width="2" fill="rgba(255,255,255,0.1)"/>
+  </g>
+
+  <!-- Central icon cards cluster -->
+  <g transform="translate(240, 60)">
+    <!-- Azure cloud icon card -->
+    <rect x="0" y="0" width="100" height="100" rx="12" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <path d="M30,65 Q30,40 50,35 Q65,30 72,45 Q85,42 85,55 Q85,65 75,65 Z" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" fill="rgba(255,255,255,0.15)"/>
+    <text x="50" y="88" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">Azure</text>
+
+    <!-- Icons/assets card -->
+    <rect x="120" y="0" width="100" height="100" rx="12" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <!-- Grid of small squares representing icons -->
+    <rect x="140" y="22" width="18" height="18" rx="3" fill="rgba(255,255,255,0.35)"/>
+    <rect x="163" y="22" width="18" height="18" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <rect x="186" y="22" width="18" height="18" rx="3" fill="rgba(255,255,255,0.35)"/>
+    <rect x="140" y="45" width="18" height="18" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <rect x="163" y="45" width="18" height="18" rx="3" fill="rgba(255,255,255,0.35)"/>
+    <rect x="186" y="45" width="18" height="18" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <text x="170" y="88" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">643 Icons</text>
+
+    <!-- Draw.io card -->
+    <rect x="60" y="120" width="100" height="100" rx="12" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <!-- Simplified diagram nodes and connectors -->
+    <rect x="78" y="140" width="28" height="20" rx="4" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="rgba(255,255,255,0.15)"/>
+    <rect x="118" y="140" width="28" height="20" rx="4" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="rgba(255,255,255,0.15)"/>
+    <line x1="106" y1="150" x2="118" y2="150" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+    <rect x="98" y="172" width="28" height="20" rx="4" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="rgba(255,255,255,0.15)"/>
+    <line x1="112" y1="160" x2="112" y2="172" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+    <text x="110" y="210" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.45)" text-anchor="middle">Draw.io</text>
+  </g>
+
+  <!-- Connection lines between sections (right side) -->
+  <g transform="translate(560, 100)" opacity="0.2">
+    <!-- Nodes -->
+    <circle cx="30" cy="30" r="15" stroke="#fff" stroke-width="2" fill="rgba(255,255,255,0.1)"/>
+    <circle cx="90" cy="60" r="15" stroke="#fff" stroke-width="2" fill="rgba(255,255,255,0.1)"/>
+    <circle cx="50" cy="110" r="15" stroke="#fff" stroke-width="2" fill="rgba(255,255,255,0.1)"/>
+    <!-- Lines -->
+    <line x1="42" y1="38" x2="78" y2="52" stroke="#fff" stroke-width="1.5"/>
+    <line x1="82" y1="72" x2="58" y2="98" stroke="#fff" stroke-width="1.5"/>
+    <line x1="38" y1="42" x2="42" y2="98" stroke="#fff" stroke-width="1.5"/>
+  </g>
+
+  <!-- Sync indicator -->
+  <g transform="translate(630, 230)" opacity="0.3">
+    <path d="M0,12 A12,12 0 1,1 12,24" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <polygon points="12,20 12,28 18,24" fill="#fff"/>
+    <path d="M24,12 A12,12 0 1,1 12,0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <polygon points="12,4 12,-4 6,0" fill="#fff"/>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="370" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.9)" text-anchor="middle" letter-spacing="2">AZURE DRAW.IO ASSETS</text>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="400">
+      <stop offset="0%" stop-color="#0078d4"/>
+      <stop offset="50%" stop-color="#005a9e"/>
+      <stop offset="100%" stop-color="#1b6ec2"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,479 @@
+/** Single source of truth for the public contact address (contact section, privacy page, Organization JSON-LD, PDP notify-me). */
+export const contactEmail = "hello@lamplitlabs.com";
+
+export interface ProductHighlight {
+  title: string;
+  description: string;
+}
+
+export type ProductStatus = "Live" | "In development";
+export type ProductCreativeWorkStatus = "Published" | "In development";
+export type ProductCategory =
+  | "AI"
+  | "Education"
+  | "Developer Tools"
+  | "Azure";
+
+export const productCategories: ProductCategory[] = [
+  "AI",
+  "Education",
+  "Developer Tools",
+  "Azure",
+];
+
+export interface ProductSchema {
+  name: string;
+  applicationCategory: "BusinessApplication" | "UtilitiesApplication";
+  featureList: string[];
+}
+
+export interface Product {
+  slug: string;
+  name: string;
+  title: string;
+  description: string;
+  longDescription: string;
+  url: string;
+  /** Live marketing site while the app itself is still in development. */
+  websiteUrl?: string;
+  cover: string;
+  tags: string[];
+  category: ProductCategory;
+  highlights: ProductHighlight[];
+  featured?: boolean;
+  status: ProductStatus;
+  /**
+   * Month (YYYY-MM) the current `status` label took effect, so visitors see a
+   * status history ("Live since 2026-03") instead of only the label. Update it
+   * whenever `status` changes.
+   */
+  statusSince: string;
+  /**
+   * Date (YYYY-MM-DD) this product's listing was last changed in any way
+   * (copy, highlights, links, status), independent of `statusSince`, which
+   * only moves when the status label changes. Rendered on the detail page as
+   * "Listing updated …" so visitors can tell a current page from a stale one.
+   * Bump it whenever you edit this product's entry.
+   */
+  lastUpdated: string;
+  /**
+   * Where a visitor can follow real progress on an unreleased product: an
+   * https URL or a repository-relative doc path. tests/site-data.test.mjs
+   * requires it for every product whose status is "In development", so a
+   * stale status label can never ship without a live place to track it.
+   */
+  trackingDoc?: string;
+  /**
+   * One sentence for visitors of an in-development product: what is being
+   * built right now and what unblocks release, so the status badge is more
+   * than a label plus a date. Rendered next to the status badge on the
+   * detail page when `status` is "In development".
+   */
+  roadmapNote?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  schema?: ProductSchema;
+  /** Platform for the JSON-LD `operatingSystem` (e.g. "Android"); defaults to "Web" when unset. */
+  operatingSystem?: string;
+}
+
+/** Single source of truth for product status checks used across the UI. */
+export function isProductLive(product: Pick<Product, "status">): boolean {
+  return product.status === "Live";
+}
+
+export function isProductInDevelopment(
+  product: Pick<Product, "status">,
+): boolean {
+  return product.status === "In development";
+}
+
+/**
+ * JSON-LD `creativeWorkStatus`, derived from `status` so the structured data
+ * can never drift from the catalog label (the class of bug fixed in 3e043b8).
+ * It is intentionally not a literal field on ProductSchema.
+ */
+export function productCreativeWorkStatus(
+  product: Pick<Product, "status">,
+): ProductCreativeWorkStatus {
+  return isProductLive(product) ? "Published" : "In development";
+}
+
+/**
+ * Months after which an "In development" label is considered stale: the same
+ * threshold tests/site-data.test.mjs enforces on the catalog, exported so the
+ * detail page and the test can never disagree about what "stale" means.
+ */
+export const staleInDevelopmentMonths = 12;
+
+/** Whole months elapsed from a `statusSince` month (YYYY-MM) to `now`; NaN when unparsable. */
+export function monthsSinceStatus(
+  product: Pick<Product, "statusSince">,
+  now: Date = new Date(),
+): number {
+  const [year, month] = (product.statusSince ?? "").split("-").map(Number);
+  if (!Number.isInteger(year) || !Number.isInteger(month)) return NaN;
+  return now.getUTCFullYear() * 12 + now.getUTCMonth() - (year * 12 + (month - 1));
+}
+
+/**
+ * True when a product has carried the "In development" label for more than
+ * `staleInDevelopmentMonths`. The detail page uses it to tell visitors plainly
+ * that the status has not been refreshed and to point them at the tracking
+ * page, instead of showing an indefinite "coming soon".
+ */
+export function isProductStatusStale(
+  product: Pick<Product, "status" | "statusSince">,
+  now: Date = new Date(),
+): boolean {
+  if (!isProductInDevelopment(product)) return false;
+  const months = monthsSinceStatus(product, now);
+  return Number.isFinite(months) && months > staleInDevelopmentMonths;
+}
+
+/**
+ * Human-readable form of a product's `lastUpdated` date (YYYY-MM-DD), e.g.
+ * "6 October 2026". Rendered in UTC so the static export does not depend on
+ * the build machine's time zone; returns the raw string when unparsable.
+ */
+export function formatLastUpdated(lastUpdated: string): string {
+  const [year, month, day] = (lastUpdated ?? "").split("-").map(Number);
+  if (![year, month, day].every(Number.isInteger)) return lastUpdated;
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/**
+ * `href` for the "Notify me" link on in-development product pages. The
+ * subject is percent-encoded so product names containing `&`, `?`, `#`, `+`
+ * or non-ASCII characters survive the mailto URL instead of being cut off
+ * or read as extra query parameters by the mail client.
+ */
+export function productNotifyMeHref(
+  product: Pick<Product, "name">,
+  email: string = contactEmail,
+): string {
+  return `mailto:${email}?subject=${encodeURIComponent(`Notify me: ${product.name}`)}`;
+}
+
+export interface NavLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+export interface SocialLinks {
+  facebook: string;
+  instagram: string;
+  blog: string;
+  x: string;
+  linkedin: string;
+  huggingface: string;
+}
+
+export const socialLinks: SocialLinks = {
+  facebook: "https://www.facebook.com/lamplitlabs",
+  instagram: "https://www.instagram.com/lamplitlabs",
+  blog: "https://blogs.lamplitlabs.com",
+  x: "https://x.com/lamplitlabs",
+  linkedin: "https://www.linkedin.com/company/lamplitlabs",
+  huggingface: "https://huggingface.co/lamplitlabs",
+};
+
+export const products: Product[] = [
+  {
+    slug: "light",
+    name: "Lamplit Light",
+    title: "AI that runs where you are",
+    description:
+      "Small, specialised AI models you host yourself in the browser, on a laptop, on-prem, in your private cloud, inside your app, or on the edge. Your data never leaves.",
+    longDescription:
+      "Lamplit Light is Lamplit Labs' sovereign AI lab for small, specialised models you host yourself. Each model is built for one clearly defined job, grounded in verified knowledge, measured against deterministic offline release gates and an independent multi-model judge panel, then compressed into compact ONNX exports for self-hosted use. Every model ships under the light-<purpose>-<version> naming pattern together with its purpose, base model, size, licence and gate result, so you always know what a model is for and which release you are running. The family started with a German language tutor and grows one job at a time.",
+    url: "https://ai.lamplitlabs.com",
+    cover: "/covers/light.svg",
+    tags: ["Sovereign AI", "Small Models", "On-device"],
+    category: "AI",
+    highlights: [
+      {
+        title: "Runs where you are",
+        description:
+          "Host compact models in a browser, on a laptop, on-prem, in a private cloud, inside your app, or on edge and IoT hardware.",
+      },
+      {
+        title: "Your weights, your rules",
+        description:
+          "Models are designed for self-hosting so your data stays where you run them and the exported weights are yours.",
+      },
+      {
+        title: "Small by design",
+        description:
+          "Each model is trained for a single, clearly defined job and nothing else, which keeps it small enough to run on hardware you already have.",
+      },
+      {
+        title: "Gated before release",
+        description:
+          "Every release is measured against deterministic offline gates and checked by an independent multi-model judge panel.",
+      },
+      {
+        title: "One job per model",
+        description:
+          "Named light-<purpose>-<version> and shipped with its purpose, base model, size, licence and gate result, so you always know what a model is for and which release you run.",
+      },
+    ],
+    featured: true,
+    status: "In development",
+    statusSince: "2026-09",
+    lastUpdated: "2026-10-08",
+    trackingDoc: "https://huggingface.co/lamplitlabs",
+    roadmapNote:
+      "The first light-<purpose> models are being trained and run through the offline gates and judge panel; a model is listed here only once it passes and its weights are published.",
+    metaTitle: "Lamplit Light - Small AI Models You Host Yourself",
+    metaDescription:
+      "Small, specialised AI models you host in browsers, apps, private clouds, laptops, on-prem, or at the edge. Your data never leaves.",
+    canonicalUrl: "https://ai.lamplitlabs.com",
+    schema: {
+      name: "Lamplit Light sovereign AI models",
+      applicationCategory: "BusinessApplication",
+      featureList: [
+        "Self-hosted small AI models",
+        "Single-purpose specialised models",
+        "Verified knowledge training",
+        "Deterministic offline release gates",
+        "Independent multi-model judge panel",
+        "Compact ONNX q8 and q4 exports",
+        "Browser and edge runtime support",
+      ],
+    },
+  },
+  {
+    slug: "kenntnistrainer",
+    status: "Live",
+    statusSince: "2026-04",
+    lastUpdated: "2026-10-07",
+    name: "Kenntnistrainer",
+    title: "AI-powered Kenntnisprüfung simulation and training",
+    description:
+      "Kenntnisprüfung preparation with AI simulation: a structured 7-step case flow, AI feedback, spaced repetition, and medical communication in German.",
+    longDescription:
+      "Kenntnistrainer helps foreign doctors in Germany prepare for the Kenntnisprüfung with guided case-based training. It combines exam-style simulation, feedback loops, and focused medical language practice.",
+    url: "https://www.kenntnistrainer.de",
+    cover: "/covers/kenntnistrainer.svg",
+    tags: ["AI", "Medical", "Training"],
+    category: "Education",
+    highlights: [
+      { title: "7-Step Case Flow", description: "Structured exam simulation following the official Kenntnisprüfung format step by step." },
+      { title: "AI Feedback", description: "Get instant, detailed feedback on your responses powered by AI evaluation." },
+      { title: "Spaced Repetition", description: "Smart review scheduling so you retain medical knowledge efficiently." },
+      { title: "German Medical Language", description: "Practice medical communication in German with realistic scenarios." },
+    ],
+    featured: true,
+    metaDescription:
+      "AI-powered Kenntnisprüfung training for foreign doctors in Germany: 7-step case simulation, instant feedback, spaced repetition and German medical language.",
+  },
+  {
+    slug: "fachsprachprufung",
+    status: "Live",
+    statusSince: "2026-04",
+    lastUpdated: "2026-10-06",
+    name: "Fachsprachprüfung",
+    title: "AI-powered FSP simulation and training",
+    description:
+      "FSP preparation with AI simulation: doctor-patient conversation, documentation, and doctor-to-doctor handover in German.",
+    longDescription:
+      "Fachsprachprüfung supports foreign doctors preparing for the language-focused medical exam in Germany. It trains practical workflows from patient interaction to handover communication.",
+    url: "https://www.fachsprachtrainer.de",
+    cover: "/covers/fsp.svg",
+    tags: ["AI", "Medical", "Language"],
+    category: "Education",
+    highlights: [
+      { title: "Patient Conversation", description: "Practice realistic doctor-patient dialogues with AI-simulated patients." },
+      { title: "Documentation Training", description: "Learn to write medical reports and referral letters in German." },
+      { title: "Doctor-to-Doctor Handover", description: "Train structured handover communication with medical peers." },
+      { title: "Exam-Ready Practice", description: "Covers all three FSP exam sections in a single training flow." },
+    ],
+    featured: true,
+    metaDescription:
+      "AI-powered Fachsprachprüfung (FSP) training for doctors in Germany: practice patient conversations, medical documentation and doctor-to-doctor handovers.",
+  },
+  {
+    slug: "leben-in-deutschland",
+    status: "Live",
+    statusSince: "2026-03",
+    lastUpdated: "2026-10-07",
+    name: "Leben in Deutschland",
+    title: "Citizenship test prep for Germany",
+    description:
+      "Prepare for the German citizenship test with a free platform and comprehensive resources.",
+    longDescription:
+      "Leben in Deutschland offers focused preparation for the Einbürgerungstest with complete question coverage, region-specific content, and a simple practice flow.",
+    url: "https://www.lebenindeutschland.org",
+    cover: "/covers/leben.svg",
+    tags: ["Education", "Germany", "Integration"],
+    category: "Education",
+    highlights: [
+      { title: "310 Official Questions", description: "Complete coverage of all questions from the official question catalog." },
+      { title: "Region-Specific Content", description: "Practice with questions specific to your Bundesland." },
+      { title: "Progress Tracking", description: "See which topics you have mastered and where you need more practice." },
+      { title: "Free to Use", description: "No account required, no paywalls. Just start practicing." },
+    ],
+    featured: true,
+    metaDescription:
+      "Free Einbürgerungstest preparation: practice all 310 official Leben in Deutschland questions plus Bundesland-specific ones, with progress tracking.",
+  },
+  {
+    slug: "eszett",
+    status: "In development",
+    statusSince: "2026-10",
+    lastUpdated: "2026-10-31",
+    name: "Eszett",
+    title: "Your German tutor, on your phone, offline",
+    description:
+      "Learn German A1–C2 with a tutor that runs on your phone: grammar, real conversations, speaking practice and mock exams – offline, in 12 languages.",
+    longDescription:
+      "Eszett is a German tutor that lives on your phone. A 3B language model trained to teach German runs on the device itself: it explains, corrects your sentences, plays the other person in everyday scenes – the bakery, the Bürgeramt, a job interview – and rates how you speak, the way an examiner would. A 56-week course from A1 to C2 built from the official exam syllabi, 71 grammar rules, 58 scenes, stories from Grimm to Kafka, and mock oral exams for Goethe, telc, DTZ, TestDaF and DSH. Nothing you type leaves the phone; there is no analytics and no advertising. Free for a week, then one purchase – no subscription – and a pay-it-forward pool so those who can pay fund those who cannot.",
+    url: "https://eszett.lamplitlabs.com",
+    websiteUrl: "https://eszett.lamplitlabs.com",
+    cover: "/covers/eszett.svg",
+    tags: ["Education", "German", "On-device AI"],
+    category: "Education",
+    highlights: [
+      { title: "A tutor on the phone", description: "A language model trained to teach German runs on the device – no internet, nothing leaves the phone." },
+      { title: "Course A1 to C2", description: "56 weeks with grammar cards, words, scenes, reading, listening, writing and a check, built from the exam syllabi." },
+      { title: "Speak and be rated", description: "One minute of free speech a day, real-life scenes and mock oral exams for Goethe, telc, TestDaF and DSH." },
+      { title: "Fair pricing", description: "Free for a week, then one purchase. No subscription. Pay it forward for a learner who cannot afford it." },
+    ],
+    featured: true,
+    trackingDoc: "https://eszett.lamplitlabs.com",
+    roadmapNote: "The Android app is in internal testing on Google Play; the public listing follows Google's review. The course, grammar, exam guides and stories are already free to read on the website in twelve languages.",
+    metaTitle: "Eszett – a German tutor that runs on your phone, offline",
+    metaDescription:
+      "Eszett by Lamplit Labs: learn German A1–C2 with an on-device AI tutor – grammar, conversations, speaking, mock exams. Offline, private, no subscription.",
+    operatingSystem: "Android",
+  },
+  {
+    slug: "developer-tools",
+    status: "Live",
+    statusSince: "2026-03",
+    lastUpdated: "2026-10-06",
+    name: "Developer Tools",
+    title: "Everyday utilities for developers",
+    description:
+      "A growing collection of browser-based developer utilities, including JSON formatter, Base64, UUID, and more.",
+    longDescription:
+      "Developer Tools is a practical toolkit for common engineering tasks. It focuses on speed, usability, and free access directly in the browser.",
+    url: "https://tools.lamplitlabs.com",
+    cover: "/covers/tools.svg",
+    tags: ["Developer Tools", "Utilities", "Web"],
+    category: "Developer Tools",
+    highlights: [
+      { title: "JSON Formatter", description: "Format, validate, and minify JSON with syntax highlighting." },
+      { title: "Base64 Encoder/Decoder", description: "Encode and decode Base64 strings instantly." },
+      { title: "UUID Generator", description: "Generate v4 UUIDs with one click." },
+      { title: "Browser-Based", description: "All tools run entirely in your browser. Nothing is sent to a server." },
+    ],
+    featured: true,
+    metaDescription:
+      "Free browser-based developer utilities from Lamplit Labs: JSON formatter, Base64 encoder/decoder, UUID generator and more. Nothing leaves your browser.",
+  },
+  {
+    slug: "edmx-tools",
+    status: "Live",
+    statusSince: "2026-03",
+    lastUpdated: "2026-10-06",
+    name: "EDMX Tools",
+    title: "Tools for EDMX and OData metadata",
+    description:
+      "A set of tools for EDMX and OData metadata files, including explorer, trimmer, and conversion utilities.",
+    longDescription:
+      "EDMX Tools supports teams working with enterprise metadata by making exploration and transformation of EDMX and OData schemas straightforward.",
+    url: "https://edmx.lamplitlabs.com",
+    cover: "/covers/edmx.svg",
+    tags: ["Developer Tools", ".NET", "OData"],
+    category: "Developer Tools",
+    highlights: [
+      { title: "EDMX Explorer", description: "Browse entity types, properties, and associations visually." },
+      { title: "EDMX Trimmer", description: "Remove unused entities to reduce metadata file size." },
+      { title: "OpenAPI Converter", description: "Convert EDMX metadata to OpenAPI specification." },
+      { title: "JSON Converter", description: "Transform EDMX XML into structured JSON for easier processing." },
+    ],
+    metaDescription:
+      "Free EDMX and OData metadata tools: explore entity models, trim unused entities, and convert EDMX to OpenAPI or JSON in your browser.",
+  },
+  {
+    slug: "azure-drawio-assets",
+    status: "Live",
+    statusSince: "2026-04",
+    lastUpdated: "2026-10-06",
+    name: "Azure Draw.io Assets",
+    title: "Azure icons for architecture diagrams",
+    description:
+      "Browse Azure service icons for architecture diagrams, synced from official Microsoft icon sets.",
+    longDescription:
+      "Azure Draw.io Assets provides a searchable catalog of Azure architecture icons so teams can build clean and up-to-date diagrams quickly.",
+    url: "https://azure-assets.lamplitlabs.com",
+    cover: "/covers/azure-assets.svg",
+    tags: ["Azure", "Draw.io", "Architecture"],
+    category: "Azure",
+    highlights: [
+      { title: "643+ Icons", description: "Comprehensive collection of Azure service icons for diagrams." },
+      { title: "Auto-Synced", description: "Continuously updated from official Microsoft Azure icon sets." },
+      { title: "Draw.io Ready", description: "Icons formatted and ready to drag into your Draw.io diagrams." },
+      { title: "Searchable Catalog", description: "Find the right icon quickly with built-in search." },
+    ],
+    metaDescription:
+      "Searchable catalog of 643+ Azure architecture icons, auto-synced from official Microsoft icon sets and ready to drop into Draw.io diagrams.",
+  },
+  {
+    slug: "azure-compliance-matrix",
+    status: "Live",
+    statusSince: "2026-04",
+    lastUpdated: "2026-10-04",
+    name: "Azure Compliance Matrix",
+    title: "Azure services compliance coverage",
+    description:
+      "Interactive compliance coverage matrix for Azure services with search and filtering across major frameworks.",
+    longDescription:
+      "Azure Compliance Matrix helps security and compliance teams explore certification coverage across Azure and Azure Government offerings in one place.",
+    url: "https://azure-compliance.lamplitlabs.com",
+    cover: "/covers/azure-compliance.svg",
+    tags: ["Azure", "Compliance", "Security"],
+    category: "Azure",
+    highlights: [
+      { title: "17 Frameworks", description: "Coverage across ISO 27001, SOC, HIPAA, PCI DSS, and more." },
+      { title: "Interactive Matrix", description: "Search, filter, and explore compliance coverage by service." },
+      { title: "Azure Government", description: "Includes compliance data for both Azure and Azure Government." },
+      { title: "Always Current", description: "Data sourced and updated from official Microsoft documentation." },
+    ],
+    metaDescription:
+      "Interactive compliance matrix for Azure and Azure Government services across 17 frameworks (ISO 27001, SOC, HIPAA, PCI DSS) with search and filtering.",
+  },
+];
+
+// Non-external entries are either a bare "#anchor" on the homepage or an
+// absolute path to a real route (e.g. "/ai", docs/features/ai-route.md).
+// Off-home consumers resolve them through navLinkHref().
+export const navLinks: NavLink[] = [
+  { label: "Products", href: "#products" },
+  { label: "AI", href: "/ai" },
+  { label: "About", href: "#about" },
+  { label: "Blog", href: socialLinks.blog, external: true },
+  { label: "Contact", href: "#contact" },
+];
+
+/**
+ * The href a nav link needs on a page other than the homepage: a bare
+ * "#anchor" becomes "/#anchor" so it navigates home, while external URLs and
+ * absolute routes such as "/ai" are used as they are.
+ */
+export function navLinkHref(link: NavLink): string {
+  return !link.external && link.href.startsWith("#") ? `/${link.href}` : link.href;
+}
+
+export function getProductBySlug(slug: string): Product | undefined {
+  return products.find((product) => product.slug === slug);
+}

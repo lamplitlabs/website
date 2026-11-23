@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <rect width="800" height="400" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.06">
+    <line x1="0" y1="50" x2="800" y2="50" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="250" x2="800" y2="250" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="350" x2="800" y2="350" stroke="#fff" stroke-width="1"/>
+    <line x1="100" y1="0" x2="100" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="500" y1="0" x2="500" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="400" stroke="#fff" stroke-width="1"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="680" cy="80" r="120" fill="rgba(255,255,255,0.04)"/>
+  <circle cx="120" cy="320" r="90" fill="rgba(255,255,255,0.04)"/>
+
+  <!-- XML/Code bracket icon (left side) -->
+  <g transform="translate(140, 120)" opacity="0.2">
+    <text font-family="monospace" font-size="120" fill="#fff" font-weight="bold">&lt;/&gt;</text>
+  </g>
+
+  <!-- Central icon area: stylized document with data nodes -->
+  <g transform="translate(320, 100)">
+    <!-- Document shape -->
+    <rect x="0" y="0" width="160" height="200" rx="12" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <!-- Folded corner -->
+    <path d="M120,0 L160,40 L120,40 Z" fill="rgba(255,255,255,0.15)"/>
+
+    <!-- Data lines inside document -->
+    <rect x="20" y="60" width="80" height="8" rx="4" fill="rgba(255,255,255,0.35)"/>
+    <rect x="20" y="80" width="120" height="8" rx="4" fill="rgba(255,255,255,0.25)"/>
+    <rect x="20" y="100" width="60" height="8" rx="4" fill="rgba(255,255,255,0.35)"/>
+    <rect x="20" y="120" width="100" height="8" rx="4" fill="rgba(255,255,255,0.25)"/>
+    <rect x="20" y="140" width="70" height="8" rx="4" fill="rgba(255,255,255,0.35)"/>
+    <rect x="20" y="160" width="110" height="8" rx="4" fill="rgba(255,255,255,0.25)"/>
+  </g>
+
+  <!-- Arrow (document to API) -->
+  <g transform="translate(500, 190)">
+    <line x1="0" y1="0" x2="60" y2="0" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="60,-8 76,0 60,8" fill="rgba(255,255,255,0.4)"/>
+  </g>
+
+  <!-- API/JSON result -->
+  <g transform="translate(580, 130)">
+    <rect x="0" y="0" width="120" height="120" rx="12" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <text x="60" y="50" font-family="monospace" font-size="14" fill="rgba(255,255,255,0.6)" text-anchor="middle">{ }</text>
+    <rect x="18" y="68" width="84" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <rect x="18" y="82" width="60" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>
+    <rect x="18" y="96" width="74" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="370" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="rgba(255,255,255,0.9)" text-anchor="middle" letter-spacing="2">EDMX TOOLS</text>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="400">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="50%" stop-color="#c2410c"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+</svg>

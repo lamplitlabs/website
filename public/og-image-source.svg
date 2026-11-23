@@ -1,0 +1,28 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="42%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="hsl(44, 95%, 64%)" />
+      <stop offset="55%" stop-color="hsl(38, 90%, 56%)" />
+      <stop offset="100%" stop-color="hsl(31, 92%, 47%)" />
+    </radialGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="hsl(38, 85%, 55%)" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="hsl(38, 85%, 55%)" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect x="0" y="0" width="1200" height="630" fill="#0a0a0f" />
+
+  <!-- ambient halo behind the mark -->
+  <circle cx="600" cy="185" r="200" fill="url(#halo)" />
+
+  <!-- glowing disc with negative-space L -->
+  <g transform="translate(600, 185) scale(3.4) translate(-50, -50)">
+    <circle cx="50" cy="50" r="33" fill="url(#glow)" />
+    <path d="M42 31 h10 a2 2 0 0 1 2 2 v24 h13 a2 2 0 0 1 2 2 v8 a2 2 0 0 1 -2 2 h-25 a2 2 0 0 1 -2 -2 v-34 a2 2 0 0 1 2 -2 Z"
+          fill="#0a0a0f" />
+  </g>
+
+  <text x="600" y="425" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="66" font-weight="600" fill="#fafafa">Lamplit Labs</text>
+  <text x="600" y="478" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#a1a1aa">Practical tools for real problems</text>
+  <text x="600" y="575" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#71717a">lamplitlabs.com</text>
+</svg>

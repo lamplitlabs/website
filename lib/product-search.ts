@@ -38,7 +38,10 @@
  * one of those fields (AND, not OR). So "Security Azure" finds Azure
  * Compliance Matrix even though the words come from different chips and in a
  * different order, while "Azure zzqxnosuch" finds nothing. A single-word query
- * behaves exactly like a plain substring match.
+ * behaves exactly like a plain substring match. A word that ends in an
+ * English plural ending also matches without it ("languages" finds the
+ * "Language" chip, "germanies" finds "Germany"), and ranks the same way, so a
+ * plural lists the products its singular lists in the same order.
  *
  * Results are ranked: products whose NAME contains more of the query words
  * come first (a name typed joined, "edmxtools", counts as a name match), so
@@ -147,6 +150,28 @@ function searchableText(product: SearchableProduct): string[] {
   ];
 }
 
+// A query word without its English plural ending, so "languages" also
+// matches the "Language" chip: "ies" becomes "y" ("germanies" -> "germany"),
+// "ches", "shes", "xes" and "zes" lose "es", and any other final "s" is
+// dropped unless the word ends in "ss" ("access" stays). Words of three
+// letters or fewer ("ais", "ms") are kept as typed. Returns the word as typed
+// when it has no plural ending.
+function singularForm(word: string): string {
+  if (word.length <= 3) return word;
+  if (word.endsWith("ies")) return `${word.slice(0, -3)}y`;
+  if (/(?:ch|sh|x|z)es$/.test(word)) return word.slice(0, -2);
+  if (word.endsWith("s") && !word.endsWith("ss")) return word.slice(0, -1);
+  return word;
+}
+
+// Every spelling a query word may match: as typed, and without its plural
+// ending. Matching and ranking both use these, so a plural lists exactly the
+// products its singular lists, in the same order.
+function wordForms(word: string): string[] {
+  const singular = singularForm(word);
+  return singular === word ? [word] : [word, singular];
+}
+
 export function matchesProductQuery(
   product: SearchableProduct,
   query: string
@@ -154,7 +179,9 @@ export function matchesProductQuery(
   const words = queryWords(query);
   if (words.length === 0) return true;
   const fields = searchableText(product);
-  return words.every((word) => fields.some((field) => field.includes(word)));
+  return words.every((word) =>
+    wordForms(word).some((form) => fields.some((field) => field.includes(form)))
+  );
 }
 
 export function filterProductsByQuery<T extends SearchableProduct>(
@@ -170,8 +197,9 @@ export function filterProductsByQuery<T extends SearchableProduct>(
   const nameHits = (product: SearchableProduct) => {
     const name = fold(product.name);
     const joined = name.replace(NON_ALPHANUMERIC, "");
-    return words.filter((word) => name.includes(word) || joined.includes(word))
-      .length;
+    return words.filter((word) =>
+      wordForms(word).some((form) => name.includes(form) || joined.includes(form))
+    ).length;
   };
   // A tag "matches" a query word when the word is the whole tag or one whole
   // word of it ("ai" hits "AI" and "Sovereign AI", not "Training"), so short
@@ -183,7 +211,9 @@ export function filterProductsByQuery<T extends SearchableProduct>(
         return [folded, ...folded.split(/\s+/)];
       })
     );
-    return words.filter((word) => tagWords.has(word)).length;
+    return words.filter((word) =>
+      wordForms(word).some((form) => tagWords.has(form))
+    ).length;
   };
   return matches
     .map((product, index) => ({

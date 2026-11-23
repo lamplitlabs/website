@@ -16,7 +16,12 @@
  * đ→d, ł→l), so "strasse" finds copy that says "Straße". A field with ä, ö
  * or ü is also matched with them spelled out the German way (ae, oe, ue), so
  * "kenntnispruefung", "einbuergerungstest" and "buergeramt" find their
- * products too. Blank queries match everything.
+ * products too. Blank queries match everything, and so does a query that is
+ * only punctuation.
+ *
+ * Quotes, brackets and sentence punctuation around a query word are ignored:
+ * '"Eszett"', "(AI)", "azure?" and "edmx tools." find what the bare words
+ * find. Marks inside a word ("draw.io") are kept.
  *
  * Punctuation inside the copy is optional for the visitor: each field is also
  * matched with every character that is not a letter, digit or whitespace
@@ -92,8 +97,15 @@ const NON_ALPHANUMERIC = /[^\p{L}\p{N}]+/gu;
 
 // The folded query split into the words that must all match. Hyphens split
 // like spaces, so a slug ("azure-compliance-matrix") is searched as its words.
+// Marks at the start or end of a word are dropped, so a word typed in quotes,
+// in brackets or with sentence punctuation ("\"Eszett\"", "(AI)", "azure?",
+// "tools.") matches like the bare word. Inner marks stay, so "draw.io" is
+// still matched as typed. A word that is only punctuation is dropped.
 function queryWords(query: string): string[] {
-  return fold(query).split(/[\s-]+/).filter(Boolean);
+  return fold(query)
+    .split(/[\s-]+/)
+    .map((word) => word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ""))
+    .filter(Boolean);
 }
 
 // German spells an umlaut out when the key is missing: "ü" as "ue", "ä" as

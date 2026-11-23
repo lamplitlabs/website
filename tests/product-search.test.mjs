@@ -313,6 +313,34 @@ test("punctuation in the copy is optional: 'drawio', 'ondevice', 'selfhosted' fi
   assert.deepEqual(filterProductsByQuery(products, "Azure zzqxnosuch"), []);
 });
 
+test("quotes, brackets and end punctuation around a word are ignored: '\"Eszett\"', '(AI)', 'azure?', 'edmx tools.'", () => {
+  const names = (q) => filterProductsByQuery(products, q).map((p) => p.name);
+  for (const [wrapped, bare] of [
+    ['"Eszett"', "Eszett"],
+    ["\u201cAzure\u201d", "Azure"],
+    ["'OData'", "OData"],
+    ["(AI)", "AI"],
+    ["azure?", "azure"],
+    ["edmx tools.", "edmx tools"],
+    ["kenntnistrainer,", "kenntnistrainer"],
+    ["security!", "security"],
+  ]) {
+    const expected = names(bare);
+    assert.ok(expected.length > 0, `"${bare}" finds something`);
+    assert.deepEqual(names(wrapped), expected, `"${wrapped}" lists what "${bare}" lists`);
+  }
+  // Inner marks stay: "draw.io" and ".net" still find their products.
+  assert.ok(names("draw.io").includes("Azure Draw.io Assets"));
+  assert.ok(names(".net").includes("EDMX Tools"));
+  // Nonsense stays nonsense however it is wrapped.
+  for (const q of ["(zzqxnosuch)", "zzqxnosuch?", '"azure zzqxnosuch"']) {
+    assert.deepEqual(filterProductsByQuery(products, q), [], `"${q}" finds nothing`);
+  }
+  // A query that is only punctuation behaves like an empty box.
+  assert.equal(filterProductsByQuery(products, "?").length, products.length);
+  assert.equal(filterProductsByQuery(products, '""').length, products.length);
+});
+
 test("a product name typed joined or as its slug finds the product: 'edmxtools', 'azure-compliance-matrix'", () => {
   const names = (q) => filterProductsByQuery(products, q).map((p) => p.name);
   for (const [q, name] of [

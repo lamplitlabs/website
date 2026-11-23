@@ -154,7 +154,24 @@ export function matchesProductQuery(
   const words = queryWords(query);
   if (words.length === 0) return true;
   const fields = searchableText(product);
-  return words.every((word) => fields.some((field) => field.includes(word)));
+  const found = (word: string) => fields.some((field) => field.includes(word));
+  // A plural that the copy only spells in the singular ("trainings",
+  // "integrations", "architectures", "technologies") is retried with its
+  // English plural ending removed, so it finds what the singular finds. The
+  // word as typed is always tried first, so "languages" still matches "12
+  // languages" and words that merely end in s ("class", "gauss") are kept.
+  const singular = (word: string): string | null => {
+    if (word.length < 3) return null;
+    if (/[^aeiou]ies$/.test(word)) return `${word.slice(0, -3)}y`;
+    if (/(ch|sh|x|z)es$/.test(word)) return word.slice(0, -2);
+    if (/[^s]s$/.test(word)) return word.slice(0, -1);
+    return null;
+  };
+  return words.every((word) => {
+    if (found(word)) return true;
+    const stem = singular(word);
+    return stem !== null && found(stem);
+  });
 }
 
 export function filterProductsByQuery<T extends SearchableProduct>(

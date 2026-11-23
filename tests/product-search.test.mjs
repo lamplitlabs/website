@@ -505,3 +505,27 @@ test("search matches the category tab and status badge shown on each card", () =
   assert.deepEqual(filterProductsByQuery(products, "zzqxnosuch"), []);
   assert.equal(search.suggestProductQuery(products, "zzqxnosuch"), null);
 });
+
+test("a plural query finds the same products as its singular: 'languages', 'trainings', 'integrations'", () => {
+  const set = (q) => filterProductsByQuery(products, q).map((p) => p.name).sort();
+  const pairs = [
+    ["languages", "language"],
+    ["trainings", "training"],
+    ["integrations", "integration"],
+    ["devices", "device"],
+    ["architectures", "architecture"],
+    ["germanies", "germany"],
+  ];
+  for (const [plural, singular] of pairs) {
+    assert.ok(set(singular).length > 0, `"${singular}" finds something`);
+    assert.deepEqual(set(plural), set(singular), `"${plural}" lists what "${singular}" lists`);
+  }
+  // Words that end in s on their own are kept, and nonsense plurals still find nothing.
+  assert.ok(set("assets").includes("Azure Draw.io Assets"));
+  for (const q of ["zzqxnosuchs", "zzqxnosuchies", "azures zzqxnosuch"]) assert.deepEqual(set(q), []);
+  assert.ok(set("azures").length < products.length, `"azures" does not list every product`);
+  // A word ending in "ss" keeps its ending: "glass" does not fall back to "glas".
+  assert.ok(!matchesProductQuery({ name: "One", description: "a glas", tags: [] }, "glass"));
+  assert.ok(matchesProductQuery({ name: "One", description: "a box", tags: [] }, "boxes"));
+  assert.ok(matchesProductQuery({ name: "One", description: "a policy", tags: [] }, "policies"));
+});

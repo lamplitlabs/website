@@ -40,6 +40,32 @@ Advisory set cleared since the last plan (by commit `4035a55`, next 15.5.28):
   (`^6.1.1`), so Phase 2's `postcss-nested` major bump (or a tailwindcss 4 migration)
   is still the only path.
 
+### Update 2026-11-22 (watcher alert 2026-11-22T08:48:11Z, SCHED-014 run 34)
+
+- Phases 1 and 2 are **done**: Dependabot commits `24f4ecd` (source-map-js 1.2.2,
+  brace-expansion) and `20518ba` (postcss-selector-parser override 6.1.5, 2026-10-27)
+  cleared GHSA-68fv-2mgg-jv7q and GHSA-rj75-hqrm-r3gf. Both `npm audit --omit=dev` and
+  the full `npm audit` now list **only `next`**: 1 package, 3 moderate advisories, all
+  with range `<=15.5.28` (installed `next@15.5.28`, `eslint-config-next@15.5.28`):
+
+  | Advisory | Title | Reachable here? |
+  |---|---|---|
+  | GHSA-7qx7-33qx-rqx2 | SVG rejection bypass in image optimization | No: `next.config.js` sets `images.unoptimized: true` and `output: "export"`, so no optimizer endpoint exists |
+  | GHSA-f3mh-rxg3-f5g2 | HttpOnly cookie exposure on Edge runtime routes | No: no `middleware`, no `route.ts`, no `runtime = "edge"` in `app/` |
+  | GHSA-pc58-hwjq-p385 | Cross-client response injection in self-hosted Next.js forwarding fetched responses | No: static export served as files by Vercel; no Next.js server runs in production |
+
+- **Fix:** `next@15.5.29` (published 2026-11-03, so past the 3-day age check;
+  `eslint-config-next@15.5.29` exists too). `^15.5.28` in `package.json` already
+  admits it, so only `package-lock.json` moves. That is Tier 2 (lockfile), so it needs the
+  owner or a Dependabot PR. Owner step, same shape as commit `4035a55`:
+  ```bash
+  npm install next@15.5.29 eslint-config-next@15.5.29 --no-fund && npm run check
+  npm audit --omit=dev   # expect: found 0 vulnerabilities
+  ```
+  Rollback: `git revert <commit> && npm ci`.
+- Risk while waiting is low because none of the three advisories applies to a static
+  export. The bump still keeps the watcher at 0 so a future real alert is not lost in the noise.
+
 ## Success Criteria
 
 - [ ] `npm audit --omit=dev` exits clean (0 vulnerabilities). As of 2026-10-24 the

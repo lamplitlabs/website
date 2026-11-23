@@ -3,7 +3,8 @@
 **Date:** 2026-11-19  
 **Type:** Convention  
 **Scope:** Product search (`lib/product-search.ts`), catalogue (`lib/site-data.ts`), self-improvement loop fixtures  
-**Resolution:** open: the tree with `56f3e39` scores 0 (0/232 wrapped queries)
+**Resolution:** resolved: 0 at `56f3e39` (0/232 wrapped queries), 100 once the kept experiment B-030 (`d9620ab`,
+stranded on `evolve/20261119T150724Z-lamplitlabs-lead-rsi-2`) landed on `main` in RSI sitting 31
 
 ## Summary
 
@@ -51,6 +52,13 @@ This fixture measures an eleventh search behaviour. People type into a search bo
 - [`2026-11-10-evolve-fixture-search-umlaut-spelled.md`](2026-11-10-evolve-fixture-search-umlaut-spelled.md): the
   tenth search fixture. Commit `56f3e39` lands it (0 → 100) from the saved patch of the stranded experiment
   `evolve/20261110T102416Z-lamplitlabs-lead-rsi-4`.
+
+## Landing note
+
+The lane kept B-030 (0.6923 → 0.7309) but never landed it: it retried for 72 rounds with "already delivered at
+`d9620ab`", then gave up and left the branch for review. Sitting 31 applied `git diff 86f39fa d9620ab` with
+`git apply --3way` onto `main`, and `npm run check` passed (155/155). Check `git merge-base --is-ancestor <sha> HEAD`
+for every kept archive row: a kept row is not the same as a landed row.
 
 ## Impact
 

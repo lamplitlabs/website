@@ -3,7 +3,9 @@
 **Date:** 2026-11-22  
 **Type:** Convention  
 **Scope:** Product search (`lib/product-search.ts`), catalogue (`lib/site-data.ts`), self-improvement loop fixtures  
-**Resolution:** open: the tree with `409c4de` scores 19 (3 of 16 plural chip words find their products)
+**Resolution:** the tree with `409c4de` scored 19 (3 of 16 plural chip words find their products). Kept
+experiments B-031 and B-032 (both 0.6964 → 0.7319) were stranded on `evolve/*` ("delivered at c7557ed / 9d18ce9
+already", never on main); RSI sitting 35 landed B-031 from its saved patch (see Landing below).
 
 ## Summary
 
@@ -57,3 +59,13 @@ This fixture measures a twelfth search behaviour. People type what they want in 
 
 - This score moves with any change to `fold`, `queryWords` or `matchesProductQuery`, and with any tag added to or
   removed from `lib/site-data.ts`.
+
+## Landing (2026-11-24, RSI sitting 35)
+
+- `hive evolve archive` showed B-031 (`evolve/20261123T122815Z-tundra-81-2`) and B-032 kept, but the daemon log
+  repeated "landing deferred: ... was delivered at c7557ed652bc already" while neither commit was an ancestor of
+  `main` (`git merge-base --is-ancestor`).
+- Sitting 35 applied `~/.hive/patches/evolve/lamplitlabs/B-031.patch` with `git apply --3way` (clean on
+  `b2c7cda`). `npm run check` passed 156/156, and `hive evolve measure --tree "$PWD" --fixture
+  behaviour-search-plural-words` scored 1.0000 (raw 100, was 19), with all 6 held-out fixtures at 1.0000.
+- B-032 is the same change in a different form, so it is not landed as well.

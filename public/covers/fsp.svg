@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <rect width="800" height="400" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.06">
+    <line x1="0" y1="50" x2="800" y2="50" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="250" x2="800" y2="250" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="350" x2="800" y2="350" stroke="#fff" stroke-width="1"/>
+    <line x1="100" y1="0" x2="100" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="500" y1="0" x2="500" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="400" stroke="#fff" stroke-width="1"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="700" cy="80" r="110" fill="rgba(255,255,255,0.04)"/>
+  <circle cx="100" cy="320" r="90" fill="rgba(255,255,255,0.04)"/>
+
+  <!-- Doctor figure (left) with speech bubble -->
+  <g transform="translate(100, 60)">
+    <!-- Head -->
+    <circle cx="50" cy="30" r="22" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+    <!-- Body -->
+    <rect x="30" y="55" width="40" height="60" rx="10" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+    <!-- Stethoscope hint -->
+    <path d="M40 65 C35 80, 50 90, 60 75" stroke="rgba(255,255,255,0.25)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+    <!-- Speech bubble -->
+    <rect x="90" y="5" width="130" height="60" rx="12" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+    <polygon points="90,40 78,50 90,48" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- Text lines in bubble -->
+    <rect x="105" y="18" width="80" height="5" rx="2.5" fill="rgba(255,255,255,0.3)"/>
+    <rect x="105" y="28" width="100" height="5" rx="2.5" fill="rgba(255,255,255,0.2)"/>
+    <rect x="105" y="38" width="60" height="5" rx="2.5" fill="rgba(255,255,255,0.3)"/>
+    <rect x="105" y="48" width="85" height="5" rx="2.5" fill="rgba(255,255,255,0.2)"/>
+  </g>
+
+  <!-- Patient figure (right of doctor) with response bubble -->
+  <g transform="translate(260, 90)">
+    <!-- Head -->
+    <circle cx="50" cy="30" r="20" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+    <!-- Body -->
+    <rect x="32" y="54" width="36" height="55" rx="10" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+
+    <!-- Response bubble -->
+    <rect x="-70" y="8" width="100" height="45" rx="10" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+    <polygon points="30,35 40,42 30,40" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linejoin="round"/>
+    <rect x="-55" y="20" width="65" height="4" rx="2" fill="rgba(255,255,255,0.25)"/>
+    <rect x="-55" y="29" width="50" height="4" rx="2" fill="rgba(255,255,255,0.18)"/>
+    <rect x="-55" y="38" width="70" height="4" rx="2" fill="rgba(255,255,255,0.22)"/>
+  </g>
+
+  <!-- 3-Phase FSP flow (right side) -->
+  <g transform="translate(460, 50)">
+    <!-- Phase 1: Arzt-Patienten-Gespräch -->
+    <rect x="0" y="0" width="240" height="50" rx="10" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+    <circle cx="28" cy="25" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="28" y="29" font-family="system-ui" font-size="12" fill="rgba(255,255,255,0.6)" text-anchor="middle" font-weight="600">1</text>
+    <text x="55" y="21" font-family="system-ui" font-size="11" fill="rgba(255,255,255,0.65)" font-weight="600">Arzt-Patienten-Gespräch</text>
+    <rect x="55" y="30" width="120" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
+
+    <!-- Arrow down -->
+    <line x1="120" y1="52" x2="120" y2="68" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="114,65 120,74 126,65" fill="rgba(255,255,255,0.3)"/>
+
+    <!-- Phase 2: Dokumentation -->
+    <rect x="0" y="76" width="240" height="50" rx="10" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+    <circle cx="28" cy="101" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="28" y="105" font-family="system-ui" font-size="12" fill="rgba(255,255,255,0.6)" text-anchor="middle" font-weight="600">2</text>
+    <text x="55" y="97" font-family="system-ui" font-size="11" fill="rgba(255,255,255,0.65)" font-weight="600">Dokumentation</text>
+    <rect x="55" y="106" width="100" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
+
+    <!-- Arrow down -->
+    <line x1="120" y1="128" x2="120" y2="144" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="114,141 120,150 126,141" fill="rgba(255,255,255,0.3)"/>
+
+    <!-- Phase 3: Arzt-Arzt-Übergabe -->
+    <rect x="0" y="152" width="240" height="50" rx="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+    <circle cx="28" cy="177" r="14" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+    <text x="28" y="181" font-family="system-ui" font-size="12" fill="rgba(255,255,255,0.65)" text-anchor="middle" font-weight="600">3</text>
+    <text x="55" y="173" font-family="system-ui" font-size="11" fill="rgba(255,255,255,0.65)" font-weight="600">Arzt-Arzt-Übergabe</text>
+    <rect x="55" y="182" width="110" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
+  </g>
+
+  <!-- Medical cross + KI badge -->
+  <g transform="translate(380, 230)">
+    <rect x="8" y="0" width="14" height="30" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <rect x="0" y="8" width="30" height="14" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <rect x="44" y="4" width="36" height="22" rx="6" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="62" y="19" font-family="system-ui" font-size="11" fill="rgba(255,255,255,0.65)" text-anchor="middle" font-weight="700">KI</text>
+  </g>
+
+  <!-- Language icon (Aa) -->
+  <g transform="translate(120, 200)" opacity="0.25">
+    <text font-family="system-ui, sans-serif" font-size="48" fill="#fff" font-weight="700">Aa</text>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="370" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.9)" text-anchor="middle" letter-spacing="2">FACHSPRACHPRÜFUNG</text>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="400">
+      <stop offset="0%" stop-color="#0891b2"/>
+      <stop offset="50%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+  </defs>
+</svg>

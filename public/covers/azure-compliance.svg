@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <rect width="800" height="400" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.06">
+    <line x1="0" y1="50" x2="800" y2="50" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="250" x2="800" y2="250" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="350" x2="800" y2="350" stroke="#fff" stroke-width="1"/>
+    <line x1="100" y1="0" x2="100" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="500" y1="0" x2="500" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="400" stroke="#fff" stroke-width="1"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="700" cy="70" r="110" fill="rgba(255,255,255,0.04)"/>
+  <circle cx="100" cy="330" r="80" fill="rgba(255,255,255,0.04)"/>
+
+  <!-- Large shield icon (left side) -->
+  <g transform="translate(100, 60)" opacity="0.2">
+    <path d="M70,10 L130,40 L130,100 Q130,150 70,180 Q10,150 10,100 L10,40 Z" stroke="#fff" stroke-width="5" fill="none"/>
+    <polyline points="40,95 62,117 105,74" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Central: 3 bold certification cards -->
+  <g transform="translate(280, 60)">
+    <!-- ISO card -->
+    <rect x="0" y="0" width="130" height="130" rx="16" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <text x="65" y="70" font-family="monospace" font-size="28" fill="rgba(255,255,255,0.7)" text-anchor="middle" font-weight="bold">ISO</text>
+    <text x="65" y="100" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.4)" text-anchor="middle">27001</text>
+
+    <!-- SOC card -->
+    <rect x="150" y="0" width="130" height="130" rx="16" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <text x="215" y="70" font-family="monospace" font-size="28" fill="rgba(255,255,255,0.7)" text-anchor="middle" font-weight="bold">SOC</text>
+    <text x="215" y="100" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.4)" text-anchor="middle">1, 2, 3</text>
+
+    <!-- HIPAA card -->
+    <rect x="75" y="150" width="130" height="130" rx="16" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <text x="140" y="220" font-family="monospace" font-size="24" fill="rgba(255,255,255,0.7)" text-anchor="middle" font-weight="bold">HIPAA</text>
+    <text x="140" y="250" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.4)" text-anchor="middle">BAA</text>
+  </g>
+
+  <!-- Right side: checklist indicator -->
+  <g transform="translate(580, 100)" opacity="0.25">
+    <!-- Checklist lines with checkmarks -->
+    <rect x="0" y="0" width="24" height="24" rx="5" stroke="#fff" stroke-width="2.5" fill="none"/>
+    <polyline points="5,12 10,17 19,7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="36" y="6" width="80" height="10" rx="5" fill="rgba(255,255,255,0.3)"/>
+
+    <rect x="0" y="42" width="24" height="24" rx="5" stroke="#fff" stroke-width="2.5" fill="none"/>
+    <polyline points="5,54 10,59 19,49" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="36" y="48" width="60" height="10" rx="5" fill="rgba(255,255,255,0.3)"/>
+
+    <rect x="0" y="84" width="24" height="24" rx="5" stroke="#fff" stroke-width="2.5" fill="none"/>
+    <polyline points="5,96 10,101 19,91" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="36" y="90" width="70" height="10" rx="5" fill="rgba(255,255,255,0.3)"/>
+
+    <rect x="0" y="126" width="24" height="24" rx="5" stroke="#fff" stroke-width="2.5" fill="none"/>
+    <rect x="36" y="132" width="50" height="10" rx="5" fill="rgba(255,255,255,0.15)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="370" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.9)" text-anchor="middle" letter-spacing="2">AZURE COMPLIANCE MATRIX</text>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="400">
+      <stop offset="0%" stop-color="#0078d4"/>
+      <stop offset="50%" stop-color="#004578"/>
+      <stop offset="100%" stop-color="#106ebe"/>
+    </linearGradient>
+  </defs>
+</svg>

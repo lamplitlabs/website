@@ -1,0 +1,101 @@
+# Lamplit Labs
+
+The official website for [Lamplit Labs](https://www.lamplitlabs.com) — a technology organization building practical tools that solve real problems.
+
+Formerly known as Bites In Byte.
+
+From sovereign small-model AI with Lamplit Light to medical exam prep, citizenship tools, developer utilities, and Azure resources — small, practical software packed into every byte.
+
+## Products
+
+| Product | Description | URL |
+|---------|-------------|-----|
+| **Lamplit Light** | Sovereign AI lab — small, specialised models you host yourself, exported for transformers.js (browser, laptop, on-prem, private cloud, app, edge) — **In development** | [ai.lamplitlabs.com](https://ai.lamplitlabs.com) |
+| **Kenntnistrainer** | KI-gestützte Kenntnisprüfung simulation & training for foreign doctors in Germany — **Live** | [kenntnistrainer.de](https://www.kenntnistrainer.de) |
+| **Fachsprachprüfung** | KI-gestützte FSP simulation & training for foreign doctors in Germany — **Live** | [fachsprachtrainer.de](https://www.fachsprachtrainer.de) |
+| **Leben in Deutschland** | German citizenship test (Einbürgerungstest) prep with 310 questions — **Live** | [lebenindeutschland.org](https://www.lebenindeutschland.org) |
+| **Eszett** | German tutor A1–C2 that runs on the phone (on-device Lamplit Light model, Android first) — **In development** | [eszett.lamplitlabs.com](https://eszett.lamplitlabs.com) |
+| **Developer Tools** | Everyday developer utilities — JSON formatter, Base64, UUID, and more — **Live** | [tools.lamplitlabs.com](https://tools.lamplitlabs.com) |
+| **EDMX Tools** | Tools for EDMX/OData metadata files — **Live** | [edmx.lamplitlabs.com](https://edmx.lamplitlabs.com) |
+| **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams — **Live** | [azure-assets.lamplitlabs.com](https://azure-assets.lamplitlabs.com) |
+| **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services — **Live** | [azure-compliance.lamplitlabs.com](https://azure-compliance.lamplitlabs.com) |
+
+Product descriptions, availability, and URLs follow the website catalog in [`lib/site-data.ts`](lib/site-data.ts). Each product lives in its own repository and is deployed independently.
+
+## Tech Stack
+
+- [Next.js 15](https://nextjs.org/) — static export (`output: "export"`)
+- [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) patterns
+- [TypeScript](https://www.typescriptlang.org/)
+- Deployed to [Vercel](https://vercel.com/)
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) 24.x (matches the `engines` field in `package.json`; Node 25+ fails the engines check)
+- npm
+
+### Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server at http://localhost:3000
+npm run dev
+
+# Build static export to ./out
+npm run build
+
+# Clean build artifacts
+npm run clean
+```
+
+### Testing
+
+```bash
+# Run the smoke tests (tests/**/*.test.mjs) with the Node.js built-in test runner
+npm run test
+
+# Full verification before committing: lint → typecheck → test (test builds first)
+npm run check
+```
+
+The smoke tests live in `tests/` and need no extra dependencies. `npm test` runs `next build` first so the static-export tests in `tests/routes.test.mjs` (which need `./out`) never skip; `npm run test:unit` runs the tests without building (the `tests/routes.test.mjs` export tests skip if `./out` is absent; the exact count appears as `# skipped N` in the output). Lint and typecheck individually with `npm run lint` and `npm run typecheck`; `npm run check` runs all of them in sequence and is the canonical verification command (it covers `npm run build` because `npm test` builds first).
+
+## Project Structure
+
+```
+app/            → Next.js app directory (pages, layout, global styles)
+components/     → UI components (product grid, hero globe, social bar, etc.)
+hooks/          → Custom React hooks
+lib/            → Utility functions
+public/         → Static assets (favicons, product cover SVGs, OG image)
+tests/          → Smoke tests (`*.test.mjs`, Node.js built-in test runner; run via `npm test`)
+tools/          → Maintenance scripts (`verify.sh` full check, `audit-watch.sh` dependency audit watcher)
+vercel.json     → Vercel routing config (explicit `/` → `/index` rewrite for the static export)
+.github/        → GitHub Actions workflows for CI and Vercel deployment
+```
+
+## Deployment
+
+Pushes to `main` automatically deploy to Vercel via the workflow in `.github/workflows/deploy-web-vercel.yml`.
+
+The canonical production endpoints are [lamplitlabs.com](https://lamplitlabs.com) and [www.lamplitlabs.com](https://www.lamplitlabs.com), both served by Vercel.
+
+Vercel's Next.js builder strips the `.html` extension from static-export pages (`out/index.html` is served as `/index`) and does not emit an explicit route for `/`. `vercel.json` adds that rewrite so the homepage never depends on implicit directory-index resolution. Keep it in place when changing routing.
+
+## Connect
+
+- [GitHub](https://github.com/lamplitlabs)
+- [Facebook](https://www.facebook.com/lamplitlabs)
+- [Instagram](https://www.instagram.com/lamplitlabs)
+- [Blog](https://blogs.lamplitlabs.com)
+- [X](https://x.com/lamplitlabs)
+- [LinkedIn](https://www.linkedin.com/company/lamplitlabs)
+- [Hugging Face](https://huggingface.co/lamplitlabs)
+
+## License
+
+[MIT](LICENSE)

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <rect width="800" height="400" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.06">
+    <line x1="0" y1="50" x2="800" y2="50" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="250" x2="800" y2="250" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#fff" stroke-width="1"/>
+    <line x1="0" y1="350" x2="800" y2="350" stroke="#fff" stroke-width="1"/>
+    <line x1="100" y1="0" x2="100" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="500" y1="0" x2="500" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="400" stroke="#fff" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="400" stroke="#fff" stroke-width="1"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="680" cy="90" r="120" fill="rgba(255,255,255,0.05)"/>
+  <circle cx="120" cy="310" r="90" fill="rgba(255,255,255,0.04)"/>
+
+  <!-- Centred motif: the app's mark, a white Eszett (ß) on a soft halo -->
+  <circle cx="400" cy="160" r="112" fill="url(#halo)"/>
+  <circle cx="400" cy="160" r="112" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+  <text x="400" y="228" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-size="188" font-weight="600" fill="#FFFFFF" text-anchor="middle">ß</text>
+
+  <!-- Caption -->
+  <text x="400" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="34" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">Eszett</text>
+  <text x="400" y="358" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="500" fill="#E7EBFB" text-anchor="middle" letter-spacing="0.5">German tutor · offline</text>
+
+  <defs>
+    <radialGradient id="bg" cx="760" cy="0" r="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5F7BFF"/>
+      <stop offset="100%" stop-color="#2442C6"/>
+    </radialGradient>
+    <radialGradient id="halo" cx="400" cy="160" r="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.04"/>
+    </radialGradient>
+  </defs>
+</svg>

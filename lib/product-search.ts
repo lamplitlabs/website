@@ -23,6 +23,10 @@
  * '"Eszett"', "(AI)", "azure?" and "edmx tools." find what the bare words
  * find. Marks inside a word ("draw.io") are kept.
  *
+ * A query word of 5+ letters ending in -ing or -ed also matches its base verb
+ * (see wordForms), so "learning", "tested" and "developing" find what
+ * "learn", "test" and "develop" find.
+ *
  * Punctuation inside the copy is optional for the visitor: each field is also
  * matched with every character that is not a letter, digit or whitespace
  * removed, so "drawio" finds "Draw.io", "ondevice" finds "On-device" and
@@ -147,6 +151,32 @@ function searchableText(product: SearchableProduct): string[] {
   ];
 }
 
+// The spellings a query word may match: the word itself and, for a word of 5+
+// letters ending in -ing or -ed, its base verb, so a visitor who types
+// "learning", "tested" or "developing" finds what "learn", "test" and
+// "develop" find. "-ied" gives back the "y" ("studied" -> "study"; "studying"
+// keeps it anyway), and a doubled final b/d/g/m/n/p/r/t is also tried single
+// ("planning" -> "plan", "running" -> "run"; "passing" stays "pass"). A verb that drops its "e" ("coding",
+// "practiced") leaves a stem that is still a prefix of the base verb
+// ("cod", "practic"). The stem must keep 3+ letters with a vowel, and
+// "-eed" words keep their ending, so "thing", "string", "using" and
+// "speed" are matched only as typed. Every form is a fallback: a product
+// that matches the word as typed still matches.
+function wordForms(word: string): string[] {
+  if (word.length < 5) return [word];
+  let stem = "";
+  if (word.endsWith("ing")) stem = word.slice(0, -3);
+  else if (word.endsWith("ied")) stem = `${word.slice(0, -3)}y`;
+  else if (word.endsWith("ed") && !word.endsWith("eed")) stem = word.slice(0, -2);
+  if (stem.length < 3 || !/[aeiouy]/.test(stem)) return [word];
+  const forms = [word, stem];
+  const last = stem[stem.length - 1];
+  if (/[bdgmnprt]/.test(last) && stem[stem.length - 2] === last && stem.length > 3) {
+    forms.push(stem.slice(0, -1));
+  }
+  return forms;
+}
+
 export function matchesProductQuery(
   product: SearchableProduct,
   query: string
@@ -154,7 +184,9 @@ export function matchesProductQuery(
   const words = queryWords(query);
   if (words.length === 0) return true;
   const fields = searchableText(product);
-  return words.every((word) => fields.some((field) => field.includes(word)));
+  return words.every((word) =>
+    wordForms(word).some((form) => fields.some((field) => field.includes(form)))
+  );
 }
 
 export function filterProductsByQuery<T extends SearchableProduct>(

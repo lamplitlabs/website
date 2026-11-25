@@ -505,3 +505,28 @@ test("search matches the category tab and status badge shown on each card", () =
   assert.deepEqual(filterProductsByQuery(products, "zzqxnosuch"), []);
   assert.equal(search.suggestProductQuery(products, "zzqxnosuch"), null);
 });
+
+test("a plural query word lists the same products, in the same order, as its singular", () => {
+  const names = (q) => filterProductsByQuery(products, q).map((p) => p.name);
+  for (const [plural, singular] of [
+    ["languages", "language"],
+    ["educations", "education"],
+    ["germanies", "germany"],
+    ["germans", "german"],
+    ["trainings", "training"],
+  ]) {
+    assert.ok(names(singular).length > 0, `"${singular}" finds something`);
+    assert.deepEqual(names(plural), names(singular), `"${plural}" lists what "${singular}" lists`);
+  }
+
+  // The words as typed still match: "assets", "tools" and "access" are in the copy.
+  assert.ok(names("assets").includes("Azure Draw.io Assets"));
+  assert.ok(names("tools").includes("EDMX Tools"));
+  assert.ok(names("access").length > 0, `"access" (ends in ss) still matches as typed`);
+
+  // A plural ending on nonsense still finds nothing, and one nonsense word still empties the AND match.
+  for (const q of ["zzqxnosuchs", "zzqxnosuchies", "azures zzqxnosuch"]) {
+    assert.deepEqual(names(q), [], `"${q}" finds nothing`);
+  }
+  assert.ok(names("azures").length < products.length, `"azures" does not list every product`);
+});

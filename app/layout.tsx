@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Lamplit Labs",
   },
   description:
-    "Lamplit Labs builds practical tools that solve real problems, including the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Developer Tools, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
+    "Lamplit Labs builds practical tools that solve real problems, including the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, Kenntnistrainer, Fachsprachprüfung, Leben in Deutschland, Developer Tools, the open-source agent harness Hive, EDMX Tools, Azure Draw.io Assets, and Azure Compliance Matrix.",
   metadataBase: new URL("https://www.lamplitlabs.com"),
   keywords: [
     "Lamplit Labs",
@@ -53,6 +53,10 @@ export const metadata: Metadata = {
     "JSON formatter",
     "Base64 encoder",
     "UUID generator",
+    "Hive",
+    "agent harness",
+    "coding agents",
+    "open-source AI agents",
     "EDMX Tools",
     "OData",
     "Azure Draw.io Assets",
@@ -85,7 +89,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lamplit Labs - Practical Tools for Real Problems",
     description:
-      "Lamplit Labs builds the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, and practical tools across education, developer workflows, and Azure compliance.",
+      "Lamplit Labs builds the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, the open-source agent harness Hive, and practical tools across education, developer workflows, and Azure compliance.",
     url: "https://www.lamplitlabs.com",
     siteName: "Lamplit Labs",
     type: "website",
@@ -103,7 +107,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Lamplit Labs - Practical Tools for Real Problems",
     description:
-      "Lamplit Labs builds the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, and practical tools across education, developer workflows, and Azure compliance.",
+      "Lamplit Labs builds the sovereign-AI lab Lamplit Light, the offline German tutor Eszett, the open-source agent harness Hive, and practical tools across education, developer workflows, and Azure compliance.",
     images: ["/og-image.png"],
   },
   icons: {

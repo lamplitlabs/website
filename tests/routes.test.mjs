@@ -206,6 +206,52 @@ test("static export (out/) product JSON-LD operatingSystem is Android for Eszett
   }
 });
 
+// Hive (docs/features/hive-product-entry.md): the product is named Hive and
+// its website is hivefleet.dev. The exported page and the homepage card must
+// say "Hive", send the visitor to hivefleet.dev, and describe an installed
+// binary for macOS and Linux to search engines, not a web app.
+test("static export (out/) Hive has a product page and a homepage card that lead to hivefleet.dev", skipWithoutOut, () => {
+  const out = resolve(root, "out");
+  const file = [join(out, "products", "hive.html"), join(out, "products", "hive", "index.html")].find((f) => existsSync(f));
+  assert.ok(file, "no exported page for /products/hive");
+  const page = readFileSync(file, "utf8");
+  assert.match(page, /<h1[^>]*>Hive<\/h1>/, "/products/hive must be headed with the product's name, Hive");
+  assert.match(page, /<link rel="canonical" href="https:\/\/www\.lamplitlabs\.com\/products\/hive"/, "/products/hive is its own canonical URL");
+
+  const apps = [...page.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((m) => JSON.parse(m[1]))
+    .filter((item) => item["@type"] === "SoftwareApplication" && item.name === "Hive");
+  assert.equal(apps.length, 2, "/products/hive carries the per-page and the site-wide JSON-LD block for Hive");
+  for (const app of apps) {
+    assert.equal(app.url, "https://hivefleet.dev");
+    assert.equal(app.operatingSystem, "macOS, Linux");
+    assert.equal(app.creativeWorkStatus, "Published");
+  }
+  assert.equal(apps.filter((app) => app.image === "https://www.lamplitlabs.com/covers/hive.svg").length, 1, "the per-page block shows the Hive cover");
+
+  // A Live product's buttons leave for its own site, in a new tab.
+  const visits = [...page.matchAll(/<a\b[^>]*href="https:\/\/hivefleet\.dev"[^>]*>/g)].map((m) => m[0]);
+  assert.ok(visits.length >= 3, `/products/hive needs its nav, hero and bottom buttons to open hivefleet.dev, found ${visits.length}`);
+  for (const link of visits) {
+    assert.match(link, /target="_blank"/, "a link to hivefleet.dev opens in a new tab");
+    assert.match(link, /rel="noopener noreferrer"/, "a link to hivefleet.dev must not hand over the opener");
+  }
+  assert.doesNotMatch(page.replace(/hivefleet\.dev/gi, ""), /hive\s*fleet/i, "/products/hive must not call the product Hivefleet");
+
+  // The homepage card: Featured, Live, and "Visit site" opens hivefleet.dev.
+  const home = readFileSync(resolve(out, "index.html"), "utf8");
+  const card = home
+    .split(/(?=<[a-z]+ class="[^"]*\bproduct-grid_card__)/)
+    .slice(1)
+    .find((c) => /product-grid_name__[^"]*"[^>]*>Hive</.test(c));
+  assert.ok(card, "the homepage product grid must have a Hive card");
+  assert.match(card, /product-grid_featured__/, "the Hive card is a featured card");
+  assert.match(card, /product-grid_status__[^"]*"[^>]*>(?:<[^>]+><\/[^>]+>)?Live</, "the Hive card carries the Live badge");
+  assert.match(card, /url\(\/covers\/hive\.svg\)/, "the Hive card shows the Hive cover");
+  assert.match(card, /<a\b[^>]*href="https:\/\/hivefleet\.dev"[^>]*aria-label="Visit site: Hive"|<a\b[^>]*aria-label="Visit site: Hive"[^>]*href="https:\/\/hivefleet\.dev"/, 'the Hive card\'s "Visit site" opens hivefleet.dev');
+  assert.match(card, /href="\/products\/hive"/, "the Hive card links to its page on this site");
+});
+
 // Accessibility: keyboard and screen-reader users must be able to bypass the
 // repeated header/nav links. Every exported route renders a "Skip to content"
 // anchor (first focusable element) that targets <main id="main-content">.

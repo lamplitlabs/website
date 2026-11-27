@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <rect width="800" height="400" fill="url(#bg)"/>
+
+  <!-- Subtle honeycomb -->
+  <rect width="800" height="400" fill="url(#comb)"/>
+
+  <!-- Soft glow behind the mark -->
+  <rect width="800" height="400" fill="url(#glow)"/>
+
+  <!-- Centred motif: Hive's own mark (hivefleet.dev/icon.svg), without its tile.
+       Mark and caption stay between y=104 and y=290: a small product card
+       crops the cover to about y=86..314, a featured one to y=43..357. -->
+  <g transform="translate(346.6 89.2) scale(0.42)">
+    <g transform="translate(20.48 20.48) scale(0.84)">
+      <g fill="none" stroke="url(#mark)" stroke-width="27" stroke-linejoin="miter" stroke-miterlimit="6">
+        <path d="M77.77 61L128 32L178.23 61"/>
+        <path d="M211.14 118L211.14 176L160.91 205"/>
+        <path d="M95.09 205L44.86 176L44.86 118"/>
+      </g>
+      <g fill="url(#mark)">
+        <path d="M211.14 66.5L222.83 73.25L222.83 86.75L211.14 93.5L199.45 86.75L199.45 73.25z"/>
+        <path d="M128 210.5L139.69 217.25L139.69 230.75L128 237.5L116.31 230.75L116.31 217.25z"/>
+        <path d="M44.86 66.5L56.55 73.25L56.55 86.75L44.86 93.5L33.17 86.75L33.17 73.25z"/>
+        <path d="M128 100L152.25 114L152.25 142L128 156L103.75 142L103.75 114z"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Caption: the product's name, then what it is and where it lives -->
+  <text x="400" y="242" font-family="system-ui, -apple-system, sans-serif" font-size="46" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">Hive</text>
+  <text x="400" y="281" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="500" fill="#D5DDF7" text-anchor="middle" letter-spacing="0.5">the agent harness · hivefleet.dev</text>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0c1530"/>
+      <stop offset="100%" stop-color="#060a14"/>
+    </linearGradient>
+    <linearGradient id="mark" gradientUnits="userSpaceOnUse" x1="24" y1="24" x2="232" y2="232">
+      <stop offset="0" stop-color="#50f4c5"/>
+      <stop offset="0.52" stop-color="#11bff0"/>
+      <stop offset="1" stop-color="#877af7"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="400" cy="170" r="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#11bff0" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#11bff0" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="comb" width="51.96" height="90" patternUnits="userSpaceOnUse">
+      <path d="M25.98 0L51.96 15L51.96 45L25.98 60L0 45L0 15ZM25.98 60L25.98 90" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+</svg>

@@ -530,3 +530,29 @@ test("a plural query word lists the same products, in the same order, as its sin
   }
   assert.ok(names("azures").length < products.length, `"azures" does not list every product`);
 });
+
+// docs/features/hive-product-entry.md: the product is named Hive and its site
+// is hivefleet.dev, so a visitor may type either, or what the product is.
+test("Hive is found by its name, its domain and what it is: 'hive', 'hivefleet', 'agent harness', 'open source'", () => {
+  const slugsFor = (q) => filterProductsByQuery(products, q).map((p) => p.slug);
+  for (const q of [
+    "hive",
+    "Hive",
+    "hivefleet",
+    "hivefleet.dev",
+    "agent harness",
+    "coding agents",
+    "ai agents",
+    "open source",
+    "opensource",
+    "open-source",
+  ]) {
+    const result = slugsFor(q);
+    assert.ok(result.includes("hive"), `"${q}" finds Hive: got ${result.join(", ")}`);
+    assert.ok(result.length < products.length, `"${q}" does not return the whole catalogue`);
+  }
+  assert.equal(slugsFor("hive")[0], "hive", `"hive" lists Hive first: it is the name`);
+  assert.ok(slugsFor("developer tools").includes("hive"), `"developer tools" lists Hive: it is in that category`);
+  // Hive's copy must not make these words find something (see the umlaut test above).
+  for (const q of ["true", "queue"]) assert.deepEqual(slugsFor(q), [], `"${q}" still finds nothing`);
+});

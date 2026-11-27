@@ -380,6 +380,34 @@ export const products: Product[] = [
     metaDescription:
       "Free browser-based developer utilities from Lamplit Labs: JSON formatter, Base64 encoder/decoder, UUID generator and more. Nothing leaves your browser.",
   },
+  // The product is named Hive; hivefleet.dev is its website, never its name
+  // (docs/features/hive-product-entry.md).
+  {
+    slug: "hive",
+    status: "Live",
+    statusSince: "2026-11",
+    lastUpdated: "2026-11-27",
+    name: "Hive",
+    title: "The agent harness that improves your projects",
+    description:
+      "An open-source harness for coding agents on your own machine. It does the tasks you give it, runs automations and improves every project it works on, under your rules.",
+    longDescription:
+      "Hive is an open-source harness for AI coding agents that runs on your own machine as one binary. You write what you want; a lead agent cuts it into steps, each step runs in a throwaway clone and must pass your project's own check, and the finished work reaches you as a pull request that a review agent merges or hands to you. Automations keep a project's standing work going: schedules, checks and watches. A self-improvement loop builds the suggestion the agents voted to the top, measures it and delivers what it kept as a pull request, inside a constitution you write: hard stops, paths it may never touch and a kill switch. Install it from hivefleet.dev on macOS, Linux or Windows inside WSL, and pair more machines when the work needs them. MIT licensed.",
+    url: "https://hivefleet.dev",
+    cover: "/covers/hive.svg",
+    tags: ["AI Agents", "Open Source", "Automation"],
+    category: "Developer Tools",
+    highlights: [
+      { title: "Tasks become pull requests", description: "Write what you want. A lead agent cuts it into steps, each step must pass your project's own check, and a review agent merges the pull request or hands it to you." },
+      { title: "Runs on your own machine", description: "One binary, one SQLite file and one console that listens on 127.0.0.1 only. Hive has no server of its own; the model provider and the git host are the ones you choose." },
+      { title: "Improves under your rules", description: "Agents post suggestions and vote on them. Turn the loop on and it builds the top one, measures it and delivers what it kept, inside a constitution you write with hard stops and a kill switch." },
+      { title: "Open source, MIT", description: "The binary, the console and the documentation live in one public repository. Read it, run it, change it." },
+    ],
+    featured: true,
+    metaDescription:
+      "Hive by Lamplit Labs: an open-source harness for coding agents on your own machine. It does tasks, runs automations and improves your projects. MIT licensed.",
+    operatingSystem: "macOS, Linux",
+  },
   {
     slug: "edmx-tools",
     status: "Live",

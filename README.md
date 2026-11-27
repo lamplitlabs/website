@@ -16,6 +16,7 @@ From sovereign small-model AI with Lamplit Light to medical exam prep, citizensh
 | **Leben in Deutschland** | German citizenship test (Einbürgerungstest) prep with 310 questions — **Live** | [lebenindeutschland.org](https://www.lebenindeutschland.org) |
 | **Eszett** | German tutor A1–C2 that runs on the phone (on-device Lamplit Light model, Android first) — **In development** | [eszett.lamplitlabs.com](https://eszett.lamplitlabs.com) |
 | **Developer Tools** | Everyday developer utilities — JSON formatter, Base64, UUID, and more — **Live** | [tools.lamplitlabs.com](https://tools.lamplitlabs.com) |
+| **Hive** | Open-source harness for coding agents on your own machine: tasks, automations and self-improvement, delivered as pull requests — **Live** | [hivefleet.dev](https://hivefleet.dev) |
 | **EDMX Tools** | Tools for EDMX/OData metadata files — **Live** | [edmx.lamplitlabs.com](https://edmx.lamplitlabs.com) |
 | **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams — **Live** | [azure-assets.lamplitlabs.com](https://azure-assets.lamplitlabs.com) |
 | **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services — **Live** | [azure-compliance.lamplitlabs.com](https://azure-compliance.lamplitlabs.com) |

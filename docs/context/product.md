@@ -20,6 +20,7 @@ Lamplit Labs now presents two connected pillars: practical products and the Lamp
 | **Leben in Deutschland** | German citizenship test prep (310 questions) | Next.js | Live |
 | **Eszett** | German tutor A1–C2 that runs on the phone, offline | Android app (Android first) with an on-device Lamplit Light model; app framework not recorded | In development (website live at [eszett.lamplitlabs.com](https://eszett.lamplitlabs.com); Android app in Google Play internal testing, public listing follows Google's review; see [the feature spec](../features/eszett-product-entry.md)) |
 | **Developer Tools** | JSON formatter, Base64, UUID, etc. | Next.js | Live |
+| **Hive** | Open-source harness for coding agents that runs on the user's own machine: does tasks, runs automations and improves the projects it works on | Rust (one binary), SQLite store, local web console | Live (website [hivefleet.dev](https://hivefleet.dev), which is the domain and not the product's name; source at [github.com/lamplitlabs/hive](https://github.com/lamplitlabs/hive), MIT; see [the feature spec](../features/hive-product-entry.md)) |
 | **EDMX Tools** | Tools for EDMX/OData metadata files | Next.js | Live |
 | **Azure Draw.io Assets** | Searchable Azure service icons for Draw.io architecture diagrams | Not recorded | Live |
 | **Azure Compliance Matrix** | Interactive compliance coverage matrix for Azure services | Not recorded | Live |

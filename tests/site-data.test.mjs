@@ -614,3 +614,40 @@ test("isProductStatusStale flags in-development labels older than the threshold 
   assert.ok(page.includes("isProductStatusStale(product)"), "detail page must compute staleness from the shared helper");
   assert.ok(page.includes('data-testid="stale-status-note"'), "detail page must render the stale-status note");
 });
+
+// docs/features/hive-product-entry.md: the product is named "Hive" and
+// hivefleet.dev is only its website. A later copy edit must not rename the
+// product after its domain, point the card somewhere else, or tell search
+// engines that a binary for macOS and Linux is a web app.
+test("Hive is listed under its own name, links to hivefleet.dev and is never called Hivefleet", () => {
+  const hive = products.find((p) => p.slug === "hive");
+  assert.ok(hive, 'catalog must list a product with slug "hive"');
+  assert.equal(hive.name, "Hive");
+  assert.equal(hive.url, "https://hivefleet.dev");
+  assert.equal(hive.status, "Live");
+  assert.equal(hive.category, "Developer Tools");
+  assert.equal(hive.cover, "/covers/hive.svg");
+  assert.equal(hive.operatingSystem, "macOS, Linux", "Hive is an installed binary, so the JSON-LD default \"Web\" would be wrong");
+  assert.equal(hive.highlights.length, 4, "Hive lists four key features like the other tools");
+
+  // Every "hivefleet" in public copy is the domain "hivefleet.dev", never the name.
+  const withoutDomain = (text) => text.replace(/hivefleet\.dev/gi, "");
+  const copy = {
+    name: hive.name,
+    title: hive.title,
+    description: hive.description,
+    longDescription: hive.longDescription,
+    metaDescription: hive.metaDescription,
+    tags: hive.tags.join(" "),
+    highlights: hive.highlights.flatMap((h) => [h.title, h.description]).join(" "),
+    "public/covers/hive.svg": readFileSync(resolve(root, "public/covers/hive.svg"), "utf8"),
+    "README.md": readme,
+    "app/layout.tsx": readFileSync(resolve(root, "app/layout.tsx"), "utf8"),
+  };
+  for (const [where, text] of Object.entries(copy)) {
+    assert.doesNotMatch(withoutDomain(text), /hive\s*fleet/i, `${where} calls the product "Hivefleet"; the name is Hive and hivefleet.dev is its website`);
+  }
+  // The domain stays in the searchable copy, so typing "hivefleet" finds Hive.
+  assert.match(hive.longDescription, /hivefleet\.dev/, "long description must name the website hivefleet.dev");
+  assert.match(copy["app/layout.tsx"], /agent harness Hive/, "site-wide description must name Hive with the other products");
+});

@@ -34,6 +34,10 @@
  * original field. Each field is matched a third time with spaces removed as
  * well, so a product name typed joined, the way it appears in a hashtag
  * ("edmxtools", "lamplitlight", "azurecompliancematrix"), still finds it.
+ * A match that runs across a word gap counts only when it starts at the
+ * start of a word: "agets" is not found inside "langu|age t|utor" and
+ * "assts" not inside "schem|as st|raightforward", so those typos get the
+ * did-you-mean correction ("agents", "assets") instead of an unrelated hit.
  *
  * Multi-word queries are matched word by word: the folded query is split on
  * whitespace and hyphens (so a product's URL slug such as
@@ -150,8 +154,44 @@ function searchableText(product: SearchableProduct): string[] {
   return [
     ...fields,
     ...fields.map((field) => field.replace(JOINING_PUNCTUATION, "")),
-    ...fields.map((field) => field.replace(NON_ALPHANUMERIC, "")),
   ];
+}
+
+// A field with every non-alphanumeric character removed, spaces included
+// ("edmxtools" for "EDMX Tools"), and the offsets in it where a word of the
+// field begins.
+type JoinedField = { text: string; wordStarts: Set<number> };
+
+function joinedField(field: string): JoinedField {
+  const words = field.split(NON_ALPHANUMERIC).filter(Boolean);
+  const wordStarts = new Set<number>();
+  let offset = 0;
+  for (const word of words) {
+    wordStarts.add(offset);
+    offset += word.length;
+  }
+  return { text: words.join(""), wordStarts };
+}
+
+function joinedFields(product: SearchableProduct): JoinedField[] {
+  return searchableText(product).map(joinedField);
+}
+
+// A query word typed joined ("edmxtools") matches a joined field only where
+// the match starts at the start of a word of the field. A match inside one
+// word is already found by the plain fields, so this only decides matches
+// that run across a word gap: without the rule, "agets" would hit
+// "languagetutor" and "assts" would hit "schemasstraightforward", hiding the
+// spelling suggestion for "agents" and "assets" behind an unrelated product.
+function matchesJoined(joined: JoinedField, form: string): boolean {
+  for (
+    let at = joined.text.indexOf(form);
+    at !== -1;
+    at = joined.text.indexOf(form, at + 1)
+  ) {
+    if (joined.wordStarts.has(at)) return true;
+  }
+  return false;
 }
 
 // A query word without its English plural ending, so "languages" also
@@ -216,8 +256,15 @@ export function matchesProductQuery(
   const words = queryWords(query);
   if (words.length === 0) return true;
   const fields = searchableText(product);
+  let joined: JoinedField[] | null = null;
   return words.every((word) =>
-    wordForms(word).some((form) => fields.some((field) => field.includes(form)))
+    wordForms(word).some(
+      (form) =>
+        fields.some((field) => field.includes(form)) ||
+        (joined ??= joinedFields(product)).some((field) =>
+          matchesJoined(field, form)
+        )
+    )
   );
 }
 
@@ -233,9 +280,11 @@ export function filterProductsByQuery<T extends SearchableProduct>(
   // "EDMX Tools" and puts it above products that only mention the words.
   const nameHits = (product: SearchableProduct) => {
     const name = fold(product.name);
-    const joined = name.replace(NON_ALPHANUMERIC, "");
+    const joined = joinedField(name);
     return words.filter((word) =>
-      wordForms(word).some((form) => name.includes(form) || joined.includes(form))
+      wordForms(word).some(
+        (form) => name.includes(form) || matchesJoined(joined, form)
+      )
     ).length;
   };
   // A tag "matches" a query word when the word is the whole tag or one whole
@@ -407,7 +456,12 @@ function suggestSpelling<T extends SearchableProduct>(
   if (word.length < MIN_TYPO_LENGTH) return null;
   const vocabulary = new Set(
     products.flatMap((product) =>
-      searchableText(product).flatMap((field) => field.split(/[^\p{L}\p{N}]+/u))
+      [
+        ...searchableText(product).flatMap((field) =>
+          field.split(/[^\p{L}\p{N}]+/u)
+        ),
+        ...joinedFields(product).map((field) => field.text),
+      ]
     )
   );
   let best: ProductQuerySuggestion<T> | null = null;

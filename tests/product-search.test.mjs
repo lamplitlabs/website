@@ -363,6 +363,29 @@ test("a product name typed joined or as its slug finds the product: 'edmxtools',
   assert.ok(names("azure").length < products.length, `"azure" does not return the whole catalogue`);
 });
 
+test("a joined match across a word gap must start at a word: 'agets' suggests 'agents', not 'languAGE Tutor'", () => {
+  const { suggestProductQuery } = search;
+  // Synthetic: the typo only appears joined across a gap that starts mid-word.
+  const catalogue = [
+    { name: "Tutor", description: "Started with a German language tutor" },
+    { name: "Harness", description: "Runs coding agents", tags: ["AI Agents"] },
+  ];
+  assert.deepEqual(filterProductsByQuery(catalogue, "agets"), []);
+  assert.deepEqual(suggestProductQuery(catalogue, "agets")?.products.map((p) => p.name), ["Harness"]);
+  // A join that starts at a word still matches, inside the copy as well as the name.
+  assert.deepEqual(filterProductsByQuery(catalogue, "languagetutor").map((p) => p.name), ["Tutor"]);
+  // Real catalogue: each typo gets the spelling suggestion for the product it means.
+  for (const [q, word, name] of [
+    ["agets", "agents", "Hive"],
+    ["assts", "assets", "Azure Draw.io Assets"],
+  ]) {
+    assert.deepEqual(filterProductsByQuery(products, q), [], `"${q}" has no direct match`);
+    const suggestion = suggestProductQuery(products, q);
+    assert.equal(suggestion?.query, word, `"${q}" suggests "${word}"`);
+    assert.ok(suggestion.products.some((p) => p.name === name), `"${q}" suggests ${name}`);
+  }
+});
+
 test("a name typed joined ranks as a name match: 'edmxtools' lists EDMX Tools first", () => {
   // Synthetic: the mention comes first in catalogue order, the named product still leads.
   const catalogue = [
